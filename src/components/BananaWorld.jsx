@@ -109,10 +109,17 @@ const BananaWorld = () => {
             { x: 80, y: 120 }
         ];
 
+        const textures = [
+            '/banana_rembg.png',
+            '/banana_green.png',
+            '/banana_ripe.png'
+        ];
+        const randomTexture = textures[Math.floor(Math.random() * textures.length)];
+
         const banana = Matter.Bodies.fromVertices(x, y, [vertices], {
             render: {
                 sprite: {
-                    texture: '/banana_rembg.png',
+                    texture: randomTexture,
                     xScale: 0.8, // Increased size
                     yScale: 0.8
                 }
