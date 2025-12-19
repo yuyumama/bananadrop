@@ -1,0 +1,60 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Realistic Skin Gradient -->
+    <linearGradient id="skin" x1="0%" y1="0%" x2="100%" y2="80%">
+      <stop offset="0%" style="stop-color:#F4E04D;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E6C200;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 3D Lighting Filter -->
+    <filter id="lighting">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.75" specularExponent="20" lighting-color="#ffffe0" result="specOut">
+        <fePointLight x="-5000" y="-10000" z="20000"/>
+      </feSpecularLighting>
+      <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+      <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+    </filter>
+
+    <!-- Texture Noise -->
+    <filter id="noise">
+       <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch"/>
+       <feColorMatrix type="saturate" values="0"/>
+       <feComponentTransfer><feFuncA type="linear" slope="0.2"/></feComponentTransfer>
+       <feComposite operator="in" in2="SourceGraphic" result="noise"/>
+       <feComposite operator="over" in="SourceGraphic" in2="noise"/>
+    </filter>
+  </defs>
+
+  <!-- Banana Shape -->
+  <g filter="url(#lighting)">
+    <path d="M80,260 
+             Q70,290 50,280 
+             Q20,180 80,90 
+             Q120,40 180,30 
+             L190,25 
+             Q200,20 205,40 
+             Q160,70 140,130 
+             Q120,200 130,260 
+             Q135,280 120,290 
+             Z" 
+          fill="url(#skin)" stroke="#CBA118" stroke-width="1"/>
+          
+    <!-- Stem -->
+    <path d="M180,30 Q185,20 195,15 L205,25 Q200,30 190,32 Z" fill="#6B8E23" />
+    <path d="M195,15 L200,18 L190,25 Z" fill="#556B2F" />
+
+    <!-- Tip -->
+    <path d="M120,290 Q115,295 110,290 L80,260 Q85,255 90,260 Z" fill="#3D2B1F" />
+
+    <!-- Realistic Spots -->
+    <circle cx="120" cy="150" r="1.5" fill="#5D4037" opacity="0.7" />
+    <circle cx="100" cy="220" r="2.5" fill="#5D4037" opacity="0.6" />
+    <circle cx="150" cy="80" r="1.5" fill="#5D4037" opacity="0.5" />
+    <ellipse cx="90" cy="200" rx="3" ry="1" fill="#5D4037" opacity="0.4" transform="rotate(-20 90 200)"/>
+    
+    <!-- Bruise/Ridge -->
+    <path d="M110,180 Q115,185 120,180" stroke="#B8860B" stroke-width="2" fill="none" opacity="0.2"/>
+  </g>
+</svg>
