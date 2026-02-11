@@ -1,29 +1,60 @@
 import { useEffect, useRef, useCallback } from 'react';
 import Matter from 'matter-js';
 
-const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, bounceMultiplier = 1, unlockedTiers = [], onScore }) => {
+const TABLE_HEIGHT = 20;
+const TABLE_WIDTH_RATIO = 0.4;
+const TABLE_MOVE_HZ = 0.15; // 約6.5秒で1往復
+
+const getTablePx = (ratio) => ratio * window.innerWidth * (window.innerWidth <= 430 ? 0.75 : 1);
+
+const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, panelHeight = 80, unlockedTiers = [], onScore, giantChance = 0, tableWidth = TABLE_WIDTH_RATIO }) => {
     const sceneRef = useRef(null);
+    const barVisualRef = useRef(null);
     const engineRef = useRef(null);
     const bananaPerClickRef = useRef(bananaPerClick);
     const onScoreRef = useRef(onScore);
-    const bounceMulRef = useRef(bounceMultiplier);
     const unlockedTiersRef = useRef(unlockedTiers);
+    const panelHeightRef = useRef(panelHeight);
+    const giantChanceRef = useRef(giantChance);
+    const tableRef = useRef(null);
+    const tableWidthRef = useRef(tableWidth);
 
     useEffect(() => { bananaPerClickRef.current = bananaPerClick }, [bananaPerClick]);
     useEffect(() => { onScoreRef.current = onScore }, [onScore]);
-    useEffect(() => { bounceMulRef.current = bounceMultiplier }, [bounceMultiplier]);
     useEffect(() => { unlockedTiersRef.current = unlockedTiers }, [unlockedTiers]);
+    useEffect(() => { panelHeightRef.current = panelHeight }, [panelHeight]);
+    useEffect(() => { giantChanceRef.current = giantChance }, [giantChance]);
+    useEffect(() => { tableWidthRef.current = tableWidth }, [tableWidth]);
 
+    // tableWidth変更時にテーブルを再生成
     useEffect(() => {
-        if (!engineRef.current) return;
-        engineRef.current.gravity.y = gravityScale;
-    }, [gravityScale]);
+        if (!engineRef.current || !tableRef.current) return;
+        const oldTable = tableRef.current;
+        const oldX = oldTable.position.x;
+        const oldY = oldTable.position.y;
+        Matter.Composite.remove(engineRef.current.world, oldTable);
+        const newTableW = getTablePx(tableWidth);
+        const newTable = Matter.Bodies.rectangle(oldX, oldY, newTableW, TABLE_HEIGHT, {
+            isStatic: true,
+            render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
+            friction: 0.9,
+            frictionStatic: 1.0,
+            restitution: 0.1,
+            label: 'table',
+            chamfer: { radius: TABLE_HEIGHT / 2 },
+        });
+        tableRef.current = newTable;
+        Matter.Composite.add(engineRef.current.world, newTable);
+        if (barVisualRef.current) barVisualRef.current.style.width = `${newTableW}px`;
+    }, [tableWidth]);
 
     const spawnBanana = useCallback((x) => {
         if (!engineRef.current) return;
 
         const y = -100;
-        const scale = window.innerWidth / 3000;
+        const isGiant = Math.random() < giantChanceRef.current;
+        const baseScale = Math.min(window.innerWidth, 430) / 3000;
+        const scale = isGiant ? baseScale * 4 : baseScale;
 
         const vertices = [
             { x: 0, y: 0 },
@@ -45,12 +76,13 @@ const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, 
                     yScale: 0.8 * scale
                 }
             },
-            restitution: Math.min(0.9, 0.5 * bounceMulRef.current),
-            friction: 0.1,
-            density: 0.001
+            restitution: 0.2,
+            friction: 0.6,
+            density: isGiant ? 0.06 : 0.001,
         });
         banana.label = 'banana';
-        banana.bananaScore = tier.score;
+        banana.bananaScore = tier.score * (isGiant ? 50 : 1);
+        banana.isGiant = isGiant;
 
         Matter.Body.setPosition(banana, { x, y });
         Matter.Composite.add(engineRef.current.world, banana);
@@ -79,12 +111,32 @@ const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, 
             }
         });
 
-        const wallOptions = { isStatic: true, render: { fillStyle: 'transparent' } };
-        const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, wallOptions);
-        const leftWall = Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, wallOptions);
-        const rightWall = Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, wallOptions);
+        // バーの中心Y（ボタンパネルのすぐ上）
+        const barCenterY = () =>
+            window.innerHeight - panelHeightRef.current - TABLE_HEIGHT / 2 - 20;
 
-        Composite.add(engine.world, [ground, leftWall, rightWall]);
+        const tableW = getTablePx(tableWidthRef.current);
+        const table = Bodies.rectangle(window.innerWidth / 2, barCenterY(), tableW, TABLE_HEIGHT, {
+            isStatic: true,
+            render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
+            friction: 0.9,
+            frictionStatic: 1.0,
+            restitution: 0.1,
+            label: 'table',
+            chamfer: { radius: TABLE_HEIGHT / 2 },
+        });
+        tableRef.current = table;
+        Composite.add(engine.world, [table]);
+
+        // HTMLバーの位置を同期する関数
+        const syncBar = (x, y) => {
+            if (!barVisualRef.current) return;
+            const tw = getTablePx(tableWidthRef.current);
+            barVisualRef.current.style.left = `${x - tw / 2}px`;
+            barVisualRef.current.style.top = `${y - TABLE_HEIGHT / 2}px`;
+            barVisualRef.current.style.width = `${tw}px`;
+        };
+        syncBar(window.innerWidth / 2, barCenterY());
 
         const mouse = Mouse.create(render.canvas);
         const mouseConstraint = MouseConstraint.create(engine, {
@@ -98,7 +150,7 @@ const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, 
         const runner = Runner.create();
         Runner.run(runner, engine);
 
-        // Offscreen canvases for BANANA text reveal effect
+        // BANANA テキストリビール
         const bananaCapture = document.createElement('canvas');
         const textWork = document.createElement('canvas');
         bananaCapture.width = window.innerWidth;
@@ -113,7 +165,6 @@ const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, 
             const w = render.canvas.width;
             const h = render.canvas.height;
 
-            // BANANAテキストリビール（バナナの場所のみ表示）
             captureCtx.clearRect(0, 0, w, h);
             captureCtx.drawImage(render.canvas, 0, 0);
 
@@ -130,14 +181,64 @@ const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, 
             ctx.drawImage(textWork, 0, 0);
         });
 
-        // 画面外バナナを検出 → スコアアイテムとして通知
+        // 自動左右移動
+        // setPosition だけでは静的ボディの速度が0扱いになり摩擦が効かない
+        // → setVelocity も合わせて呼ぶことで摩擦計算に速度を反映させる
+        const startTime = Date.now();
+        let prevBarX = window.innerWidth / 2;
+        Matter.Events.on(engine, 'beforeUpdate', () => {
+            if (!tableRef.current) return;
+            const tw = getTablePx(tableWidthRef.current);
+            const minX = tw / 2;
+            const maxX = window.innerWidth - tw / 2;
+            const centerX = window.innerWidth / 2;
+            const amplitude = (maxX - minX) / 2;
+            const elapsed = (Date.now() - startTime) / 1000;
+            const newX = centerX + Math.sin(elapsed * Math.PI * TABLE_MOVE_HZ * 2) * amplitude;
+            const clampedX = Math.max(minX, Math.min(maxX, newX));
+            const y = tableRef.current.position.y;
+            const vx = clampedX - prevBarX;
+            prevBarX = clampedX;
+
+            Matter.Body.setPosition(tableRef.current, { x: clampedX, y });
+            Matter.Body.setVelocity(tableRef.current, { x: vx, y: 0 });
+            syncBar(clampedX, y);
+        });
+
+        // 下落下 → スコア、左右アウト → ロス
         Matter.Events.on(engine, 'afterUpdate', () => {
             const bodies = Composite.allBodies(engine.world);
-            const fallen = bodies.filter(b => b.label === 'banana' && b.position.y > window.innerHeight + 200);
-            if (fallen.length > 0) {
-                const scoreItems = fallen.map(b => ({ score: b.bananaScore || 1, x: b.position.x }));
-                fallen.forEach(b => Composite.remove(engine.world, b));
-                onScoreRef.current?.(scoreItems);
+            const bananas = bodies.filter(b => b.label === 'banana');
+
+            const scored = bananas.filter(b =>
+                b.position.y > window.innerHeight + 200
+            );
+            const lost = bananas.filter(b =>
+                b.position.x < -200 || b.position.x > window.innerWidth + 200
+            );
+
+            if (scored.length > 0) {
+                const screenW = window.innerWidth;
+                const fadeZone = screenW * 0.1; // 端から10%以内はスコア減衰
+                const scoreItems = [];
+                scored.forEach(b => {
+                    const x = b.position.x;
+                    const distFromEdge = Math.min(x, screenW - x);
+                    const fraction = Math.min(1, distFromEdge / fadeZone);
+                    const finalScore = Math.round((b.bananaScore || 1) * fraction);
+                    if (finalScore > 0) {
+                        scoreItems.push({
+                            score: finalScore,
+                            x: Math.max(40, Math.min(screenW - 40, x)),
+                        });
+                    }
+                    Matter.Composite.remove(engine.world, b);
+                });
+                if (scoreItems.length > 0) onScoreRef.current?.(scoreItems);
+            }
+
+            if (lost.length > 0) {
+                lost.forEach(b => Composite.remove(engine.world, b));
             }
         });
 
@@ -149,9 +250,28 @@ const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, 
             textWork.width = window.innerWidth;
             textWork.height = window.innerHeight;
 
-            Matter.Body.setPosition(ground, { x: window.innerWidth / 2, y: window.innerHeight + 50 });
-            Matter.Body.setVertices(ground, Matter.Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100).vertices);
-            Matter.Body.setPosition(rightWall, { x: window.innerWidth + 50, y: window.innerHeight / 2 });
+            if (tableRef.current) {
+                Composite.remove(engine.world, tableRef.current);
+                const newTableW = getTablePx(tableWidthRef.current);
+                const newTable = Bodies.rectangle(
+                    window.innerWidth / 2,
+                    barCenterY(),
+                    newTableW,
+                    TABLE_HEIGHT,
+                    {
+                        isStatic: true,
+                        render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
+                        friction: 0.9,
+                        frictionStatic: 1.0,
+                        restitution: 0.1,
+                        label: 'table',
+                        chamfer: { radius: TABLE_HEIGHT / 2 },
+                    }
+                );
+                tableRef.current = newTable;
+                Composite.add(engine.world, newTable);
+                syncBar(window.innerWidth / 2, barCenterY());
+            }
         };
 
         window.addEventListener('resize', handleResize);
@@ -195,12 +315,28 @@ const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, 
     };
 
     return (
-        <div
-            ref={sceneRef}
-            onClick={handleDataClick}
-            onTouchStart={(e) => { handleDataClick(e); }}
-            style={{ width: '100%', height: '100%', cursor: 'pointer', touchAction: 'none' }}
-        />
+        <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+            {/* HTMLバー（バナナより後ろに描画） */}
+            <div
+                ref={barVisualRef}
+                style={{
+                    position: 'absolute',
+                    height: `${TABLE_HEIGHT}px`,
+                    background: '#c0c0c0',
+                    borderRadius: `${TABLE_HEIGHT / 2}px`,
+                    boxShadow: '0 3px 10px rgba(0,0,0,0.25)',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                }}
+            />
+            {/* Matter.jsキャンバス（バナナはここに描画、バーより前） */}
+            <div
+                ref={sceneRef}
+                onClick={handleDataClick}
+                onTouchStart={(e) => { handleDataClick(e); }}
+                style={{ position: 'absolute', inset: 0, cursor: 'pointer', touchAction: 'none', zIndex: 2 }}
+            />
+        </div>
     );
 };
 
