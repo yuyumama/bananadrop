@@ -1,12 +1,62 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import Matter from 'matter-js';
 
-const BananaWorld = () => {
+const BananaWorld = ({ bananaPerClick = 1, autoSpawnRate = 0, gravityScale = 1, bounceMultiplier = 1, unlockedTiers = [], onScore }) => {
     const sceneRef = useRef(null);
     const engineRef = useRef(null);
+    const bananaPerClickRef = useRef(bananaPerClick);
+    const onScoreRef = useRef(onScore);
+    const bounceMulRef = useRef(bounceMultiplier);
+    const unlockedTiersRef = useRef(unlockedTiers);
+
+    useEffect(() => { bananaPerClickRef.current = bananaPerClick }, [bananaPerClick]);
+    useEffect(() => { onScoreRef.current = onScore }, [onScore]);
+    useEffect(() => { bounceMulRef.current = bounceMultiplier }, [bounceMultiplier]);
+    useEffect(() => { unlockedTiersRef.current = unlockedTiers }, [unlockedTiers]);
 
     useEffect(() => {
-        // Module aliases
+        if (!engineRef.current) return;
+        engineRef.current.gravity.y = gravityScale;
+    }, [gravityScale]);
+
+    const spawnBanana = useCallback((x) => {
+        if (!engineRef.current) return;
+
+        const y = -100;
+        const scale = window.innerWidth / 3000;
+
+        const vertices = [
+            { x: 0, y: 0 },
+            { x: 200 * scale, y: -80 * scale },
+            { x: 400 * scale, y: 0 },
+            { x: 320 * scale, y: 120 * scale },
+            { x: 80 * scale, y: 120 * scale }
+        ];
+
+        const tiers = unlockedTiersRef.current;
+        const tier = tiers[Math.floor(Math.random() * tiers.length)];
+        const baseUrl = import.meta.env.BASE_URL;
+
+        const banana = Matter.Bodies.fromVertices(x, y, [vertices], {
+            render: {
+                sprite: {
+                    texture: `${baseUrl}${tier.texture}`,
+                    xScale: 0.8 * scale,
+                    yScale: 0.8 * scale
+                }
+            },
+            restitution: Math.min(0.9, 0.5 * bounceMulRef.current),
+            friction: 0.1,
+            density: 0.001
+        });
+        banana.label = 'banana';
+        banana.bananaScore = tier.score;
+
+        Matter.Body.setPosition(banana, { x, y });
+        Matter.Composite.add(engineRef.current.world, banana);
+    }, []);
+
+    useEffect(() => {
         const Engine = Matter.Engine,
             Render = Matter.Render,
             Runner = Matter.Runner,
@@ -15,11 +65,9 @@ const BananaWorld = () => {
             Mouse = Matter.Mouse,
             MouseConstraint = Matter.MouseConstraint;
 
-        // Create an engine
         const engine = Engine.create();
         engineRef.current = engine;
 
-        // Create a renderer
         const render = Render.create({
             element: sceneRef.current,
             engine: engine,
@@ -31,7 +79,6 @@ const BananaWorld = () => {
             }
         });
 
-        // Create ground and walls
         const wallOptions = { isStatic: true, render: { fillStyle: 'transparent' } };
         const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, wallOptions);
         const leftWall = Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, wallOptions);
@@ -39,27 +86,15 @@ const BananaWorld = () => {
 
         Composite.add(engine.world, [ground, leftWall, rightWall]);
 
-        // Add mouse control
         const mouse = Mouse.create(render.canvas);
         const mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
-            constraint: {
-                stiffness: 0.2,
-                render: {
-                    visible: false
-                }
-            }
+            constraint: { stiffness: 0.2, render: { visible: false } }
         });
-
         Composite.add(engine.world, mouseConstraint);
-
-        // Keep the mouse in sync with rendering
         render.mouse = mouse;
 
-        // Run the renderer
         Render.run(render);
-
-        // Create runner
         const runner = Runner.create();
         Runner.run(runner, engine);
 
@@ -78,11 +113,10 @@ const BananaWorld = () => {
             const w = render.canvas.width;
             const h = render.canvas.height;
 
-            // 1. バナナが描画された現フレームをキャプチャ
+            // BANANAテキストリビール（バナナの場所のみ表示）
             captureCtx.clearRect(0, 0, w, h);
             captureCtx.drawImage(render.canvas, 0, 0);
 
-            // 2. BANANAテキストをオフスクリーンに描画
             textCtx.clearRect(0, 0, w, h);
             textCtx.globalCompositeOperation = 'source-over';
             textCtx.font = `900 ${w * 0.18}px sans-serif`;
@@ -90,17 +124,23 @@ const BananaWorld = () => {
             textCtx.textAlign = 'center';
             textCtx.textBaseline = 'middle';
             textCtx.fillText('BANANA', w / 2, h / 2);
-
-            // 3. バナナの形でテキストをマスク（バナナがある部分だけ残す）
             textCtx.globalCompositeOperation = 'destination-in';
             textCtx.drawImage(bananaCapture, 0, 0);
             textCtx.globalCompositeOperation = 'source-over';
-
-            // 4. マスク済みテキストをメインキャンバスに合成
             ctx.drawImage(textWork, 0, 0);
         });
 
-        // Handle resize
+        // 画面外バナナを検出 → スコアアイテムとして通知
+        Matter.Events.on(engine, 'afterUpdate', () => {
+            const bodies = Composite.allBodies(engine.world);
+            const fallen = bodies.filter(b => b.label === 'banana' && b.position.y > window.innerHeight + 200);
+            if (fallen.length > 0) {
+                const scoreItems = fallen.map(b => ({ score: b.bananaScore || 1, x: b.position.x }));
+                fallen.forEach(b => Composite.remove(engine.world, b));
+                onScoreRef.current?.(scoreItems);
+            }
+        });
+
         const handleResize = () => {
             render.canvas.width = window.innerWidth;
             render.canvas.height = window.innerHeight;
@@ -109,17 +149,13 @@ const BananaWorld = () => {
             textWork.width = window.innerWidth;
             textWork.height = window.innerHeight;
 
-            // Reposition ground and walls
             Matter.Body.setPosition(ground, { x: window.innerWidth / 2, y: window.innerHeight + 50 });
             Matter.Body.setVertices(ground, Matter.Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100).vertices);
-
             Matter.Body.setPosition(rightWall, { x: window.innerWidth + 50, y: window.innerHeight / 2 });
-            // No need to move left wall
         };
 
         window.addEventListener('resize', handleResize);
 
-        // Cleanup
         return () => {
             Render.stop(render);
             Runner.stop(runner);
@@ -133,76 +169,36 @@ const BananaWorld = () => {
         };
     }, []);
 
-    const handleDataClick = (e) => {
-        if (!engineRef.current) return;
+    useEffect(() => {
+        if (autoSpawnRate <= 0) return;
+        const interval = setInterval(() => {
+            spawnBanana(Math.random() * window.innerWidth);
+        }, 1000 / autoSpawnRate);
+        return () => clearInterval(interval);
+    }, [autoSpawnRate, spawnBanana]);
 
+    const handleDataClick = (e) => {
         let x;
-        // Check for touch event first
         if (e && e.touches && e.touches.length > 0) {
             x = e.touches[0].clientX;
-        }
-        // Check for mouse event
-        else if (e && e.clientX !== undefined) {
+        } else if (e && e.clientX !== undefined) {
             x = e.clientX;
-        }
-        // Fallback or initial random
-        else {
+        } else {
             x = Math.random() * window.innerWidth;
         }
 
-        const y = -100; // Start above screen
-
-        // Create a body from vertices for a more accurate shape
-        // Vertices approximating a banana curve (convex hull)
-        // Adjusted for larger size (approx 2.5x larger than original)
-        const scale = window.innerWidth / 1200;
-
-        const vertices = [
-            { x: 0, y: 0 },
-            { x: 200 * scale, y: -80 * scale },
-            { x: 400 * scale, y: 0 },
-            { x: 320 * scale, y: 120 * scale },
-            { x: 80 * scale, y: 120 * scale }
-        ];
-
-        const baseUrl = import.meta.env.BASE_URL;
-        const textures = [
-            `${baseUrl}banana_rembg.png`,
-            `${baseUrl}banana_green.png`,
-            `${baseUrl}banana_ripe.png`
-        ];
-        const randomTexture = textures[Math.floor(Math.random() * textures.length)];
-
-        const banana = Matter.Bodies.fromVertices(x, y, [vertices], {
-            render: {
-                sprite: {
-                    texture: randomTexture,
-                    xScale: 0.8 * scale,
-                    yScale: 0.8 * scale
-                }
-            },
-            restitution: 0.5,
-            friction: 0.1,
-            // Adjust density since they are bigger
-            density: 0.001
-        });
-
-        Matter.Body.setPosition(banana, { x: x, y: y });
-
-        Matter.Composite.add(engineRef.current.world, banana);
+        const count = bananaPerClickRef.current;
+        for (let i = 0; i < count; i++) {
+            const offset = (i - (count - 1) / 2) * 40;
+            spawnBanana(x + offset);
+        }
     };
 
     return (
         <div
             ref={sceneRef}
             onClick={handleDataClick}
-            onTouchStart={(e) => {
-                // Prevent default touch behavior (scrolling/zooming) if needed, 
-                // but for now just spawning is fine. 
-                // e.preventDefault() might block scrolling completely, use with caution.
-                // e.preventDefault() might block scrolling completely, use with caution.
-                handleDataClick(e);
-            }}
+            onTouchStart={(e) => { handleDataClick(e); }}
             style={{ width: '100%', height: '100%', cursor: 'pointer', touchAction: 'none' }}
         />
     );
