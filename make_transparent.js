@@ -1,5 +1,4 @@
 import { Jimp } from 'jimp';
-import path from 'path';
 
 async function main() {
   const input = process.argv[2];
