@@ -1,5 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import BananaWorld from './components/BananaWorld';
+import ClickRipple from './components/ui/ClickRipple';
+import FloatingScoreText from './components/ui/FloatingScoreText';
+import ScoreDisplay from './components/ui/ScoreDisplay';
+import UnlockedBananaTiers from './components/ui/UnlockedBananaTiers';
 import { UPGRADES } from './data/upgrades';
 
 const BANANA_TIERS = [
@@ -125,116 +129,22 @@ function App() {
       }}
       onClick={handleClick}
     >
-      {/* スコア表示 */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 16,
-          left: 16,
-          zIndex: 10,
-          background: 'rgba(255,255,255,0.92)',
-          borderRadius: 16,
-          padding: '10px 20px',
-          fontWeight: 'bold',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
-          userSelect: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          gap: 2,
-          animation: scoreBump ? 'scoreBump 0.3s ease-out' : 'none',
-        }}
-      >
-        <span style={{ fontSize: '1.8rem', lineHeight: 1 }}>
-          🍌 {score.toLocaleString()}
-        </span>
-        {perSecond > 0 && (
-          <span style={{ fontSize: '0.72rem', color: '#888' }}>
-            +{perSecond.toLocaleString()}/秒
-          </span>
-        )}
-      </div>
-
-      {/* 解放中のバナナ種 */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 16,
-          right: 16,
-          zIndex: 10,
-          display: 'flex',
-          gap: 4,
-        }}
-      >
-        {unlockedTiers.map((t) => (
-          <div
-            key={t.tier}
-            style={{
-              background: 'rgba(255,255,255,0.88)',
-              borderRadius: 10,
-              padding: '5px 9px',
-              fontSize: '0.72rem',
-              fontWeight: 'bold',
-              color: TIER_COLORS[t.tier - 1],
-              boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
-              userSelect: 'none',
-            }}
-          >
-            {t.name}
-            <br />
-            <span style={{ fontSize: '0.65rem' }}>+{t.score}pt</span>
-          </div>
-        ))}
-      </div>
-
-      {/* 浮き上がりテキスト */}
-      {floatingTexts.map((t) => (
-        <div
-          key={t.id}
-          style={{
-            position: 'fixed',
-            left: t.x,
-            bottom: 100,
-            zIndex: 20,
-            fontSize:
-              t.value >= 500
-                ? '2.5rem'
-                : t.value >= 100
-                  ? '2.2rem'
-                  : t.value >= 30
-                    ? '1.8rem'
-                    : t.value >= 12
-                      ? '1.4rem'
-                      : '1.1rem',
-            fontWeight: 'bold',
-            color: scoreColor(t.value),
-            pointerEvents: 'none',
-            animation: 'floatUp 1.2s ease-out forwards',
-            textShadow: '0 1px 4px rgba(255,255,255,0.9)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          +{t.value}🍌
-        </div>
+      <ScoreDisplay score={score} perSecond={perSecond} scoreBump={scoreBump} />
+      <UnlockedBananaTiers
+        unlockedTiers={unlockedTiers}
+        tierColors={TIER_COLORS}
+      />
+      {floatingTexts.map((text) => (
+        <FloatingScoreText
+          key={text.id}
+          text={text}
+          color={scoreColor(text.value)}
+        />
       ))}
 
       {/* クリックリップル */}
-      {clickEffects.map((ef) => (
-        <div
-          key={ef.id}
-          style={{
-            position: 'fixed',
-            left: ef.x,
-            top: ef.y,
-            width: 50,
-            height: 50,
-            borderRadius: '50%',
-            border: '3px solid rgba(255, 200, 0, 0.9)',
-            pointerEvents: 'none',
-            zIndex: 20,
-            animation: 'ripple 0.6s ease-out forwards',
-          }}
-        />
+      {clickEffects.map((effect) => (
+        <ClickRipple key={effect.id} effect={effect} />
       ))}
 
       {/* アップグレードパネル */}
