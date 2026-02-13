@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import BananaWorld from './components/BananaWorld';
 
-export const BANANA_TIERS = [
+const BANANA_TIERS = [
   { tier: 1, name: '普通バナナ', score: 1, texture: 'banana_green.png' },
   { tier: 2, name: '熟バナナ', score: 3, texture: 'banana_rembg.png' },
   { tier: 3, name: '完熟バナナ', score: 12, texture: 'banana_ripe.png' },
