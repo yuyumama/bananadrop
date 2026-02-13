@@ -4,51 +4,29 @@ import ClickRipple from './components/ui/ClickRipple';
 import FloatingScoreText from './components/ui/FloatingScoreText';
 import ScoreDisplay from './components/ui/ScoreDisplay';
 import UnlockedBananaTiers from './components/ui/UnlockedBananaTiers';
+import UpgradePanel from './components/ui/UpgradePanel';
 import { UPGRADES } from './data/upgrades';
-
-const BANANA_TIERS = [
-  { tier: 1, name: '普通バナナ', score: 1, texture: 'banana_green.png' },
-  { tier: 2, name: '熟バナナ', score: 3, texture: 'banana_rembg.png' },
-  { tier: 3, name: '完熟バナナ', score: 12, texture: 'banana_ripe.png' },
-  { tier: 4, name: '銀バナナ', score: 30, texture: 'banana_silver.png' },
-  { tier: 5, name: '金バナナ', score: 100, texture: 'banana_gold.png' },
-  { tier: 6, name: '伝説バナナ', score: 500, texture: 'banana_legend.png' },
-];
-
-const TIER_COLORS = [
-  '#888',
-  '#c8a000',
-  '#cd7f32',
-  '#c0c0c0',
-  '#ffd700',
-  '#ff00ff',
-];
-
-const GROUPS = [
-  { key: 'click', label: '🍌 クリック', defaultLabel: '1本/クリック' },
-  { key: 'banana', label: '🌟 バナナ種', defaultLabel: '普通バナナのみ' },
-  { key: 'auto', label: '⏰ オート', defaultLabel: '手動のみ' },
-  { key: 'rare', label: '💫 レア', defaultLabel: 'レアなし' },
-];
+import { TIER_COLORS } from './data/constants/tierColors';
+import { UPGRADE_GROUPS } from './data/constants/upgradeGroups';
+import { PANEL_HEIGHT } from './data/constants/layout';
+import useUpgradeState from './hooks/useUpgradeState';
 
 let _textId = 0;
 
 function App() {
   const [score, setScore] = useState(0);
-  const [bananaPerClick, setBananaPerClick] = useState(1);
-  const [autoSpawnRate, setAutoSpawnRate] = useState(0);
-  const [giantChance, setGiantChance] = useState(0);
-  const [unlockedTiers, setUnlockedTiers] = useState([BANANA_TIERS[0]]);
-  const [purchased, setPurchased] = useState(new Set());
+  const {
+    bananaPerClick,
+    autoSpawnRate,
+    giantChance,
+    unlockedTiers,
+    purchased,
+    buyUpgrade,
+  } = useUpgradeState();
   const [floatingTexts, setFloatingTexts] = useState([]);
   const [clickEffects, setClickEffects] = useState([]);
   const [scoreBump, setScoreBump] = useState(false);
   const [perSecond, setPerSecond] = useState(0);
-
-  const unlockedTiersRef = useRef(unlockedTiers);
-  useEffect(() => {
-    unlockedTiersRef.current = unlockedTiers;
-  }, [unlockedTiers]);
 
   // 実測ローリング平均（5秒間の実スコア履歴から計算）
   const scoreHistoryRef = useRef([]);
@@ -93,22 +71,14 @@ function App() {
     );
   }, []);
 
-  const buyUpgrade = (upgrade) => {
-    if (score < upgrade.cost) return;
-    if (purchased.has(upgrade.id)) return;
-    if (upgrade.requires && !purchased.has(upgrade.requires)) return;
-
-    setScore((s) => s - upgrade.cost);
-    setPurchased((p) => new Set([...p, upgrade.id]));
-
-    if (upgrade.clickPer) setBananaPerClick(upgrade.clickPer);
-    else if (upgrade.autoPer) setAutoSpawnRate(upgrade.autoPer);
-    else if (upgrade.giantChance) setGiantChance(upgrade.giantChance);
-    else if (upgrade.tier) {
-      const newTier = BANANA_TIERS.find((t) => t.tier === upgrade.tier);
-      setUnlockedTiers((prev) => [...prev, newTier]);
-    }
-  };
+  const handleBuyUpgrade = useCallback(
+    (upgrade) => {
+      const purchasedSuccess = buyUpgrade(upgrade, score);
+      if (!purchasedSuccess) return;
+      setScore((currentScore) => currentScore - upgrade.cost);
+    },
+    [buyUpgrade, score],
+  );
 
   const scoreColor = (score) => {
     if (score >= 500) return '#ff00ff';
@@ -147,135 +117,18 @@ function App() {
         <ClickRipple key={effect.id} effect={effect} />
       ))}
 
-      {/* アップグレードパネル */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 10,
-          background: 'rgba(255,255,255,0.93)',
-          borderTop: '1.5px solid rgba(0,0,0,0.08)',
-          padding: '8px 8px 10px',
-          display: 'flex',
-          gap: 6,
-          backdropFilter: 'blur(10px)',
-        }}
-      >
-        {GROUPS.map((group) => {
-          const items = UPGRADES.filter((u) => u.group === group.key);
-          const purchasedItems = items.filter((u) => purchased.has(u.id));
-          const currentLabel =
-            purchasedItems.length > 0
-              ? purchasedItems[purchasedItems.length - 1].label
-              : group.defaultLabel;
-          const nextItem = items.find(
-            (u) =>
-              !purchased.has(u.id) &&
-              (!u.requires || purchased.has(u.requires)),
-          );
-          const affordable = nextItem && score >= nextItem.cost;
-
-          return (
-            <div
-              key={group.key}
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-                minWidth: 0,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '0.62rem',
-                  fontWeight: 'bold',
-                  color: '#888',
-                  textAlign: 'center',
-                }}
-              >
-                {group.label}
-              </div>
-              {!nextItem ? (
-                <button
-                  disabled
-                  style={{
-                    width: '100%',
-                    padding: '7px 4px',
-                    borderRadius: 10,
-                    border: 'none',
-                    background: '#b0e0a0',
-                    fontWeight: 'bold',
-                    fontSize: '0.75rem',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    cursor: 'default',
-                  }}
-                >
-                  <div style={{ fontSize: '0.7rem', color: '#3a7a3a' }}>
-                    ✓ {currentLabel}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '0.6rem',
-                      marginTop: 1,
-                      fontWeight: 'normal',
-                      color: '#5a9a5a',
-                    }}
-                  >
-                    MAX
-                  </div>
-                </button>
-              ) : (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    buyUpgrade(nextItem);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '7px 4px',
-                    borderRadius: 10,
-                    border: 'none',
-                    cursor: affordable ? 'pointer' : 'not-allowed',
-                    background: affordable ? '#ffd700' : '#eeeeee',
-                    fontWeight: 'bold',
-                    fontSize: '0.75rem',
-                    boxShadow: affordable
-                      ? '0 2px 10px rgba(255,190,0,0.6), 0 0 0 1.5px rgba(255,180,0,0.4)'
-                      : '0 1px 3px rgba(0,0,0,0.1)',
-                    transform: affordable ? 'translateY(-1px)' : 'none',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  <div style={{ fontSize: '0.6rem', color: '#666' }}>
-                    {currentLabel}
-                  </div>
-                  <div style={{ fontSize: '0.68rem', color: '#333' }}>
-                    → {nextItem.label}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '0.6rem',
-                      marginTop: 1,
-                      fontWeight: 'normal',
-                      opacity: 0.8,
-                    }}
-                  >
-                    🍌 {nextItem.cost.toLocaleString()}
-                  </div>
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      <UpgradePanel
+        groups={UPGRADE_GROUPS}
+        upgrades={UPGRADES}
+        purchased={purchased}
+        score={score}
+        onBuy={handleBuyUpgrade}
+      />
 
       <BananaWorld
         bananaPerClick={bananaPerClick}
         autoSpawnRate={autoSpawnRate}
-        panelHeight={80}
+        panelHeight={PANEL_HEIGHT}
         unlockedTiers={unlockedTiers}
         giantChance={giantChance}
         onScore={handleScore}
