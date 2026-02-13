@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import BananaWorld from './components/BananaWorld';
+import ClickRipple from './components/ClickRipple';
 import FloatingScoreText from './components/FloatingScoreText';
 import ScoreDisplay from './components/ScoreDisplay';
 import UnlockedBananaTiers from './components/UnlockedBananaTiers';
@@ -142,22 +143,8 @@ function App() {
       ))}
 
       {/* クリックリップル */}
-      {clickEffects.map((ef) => (
-        <div
-          key={ef.id}
-          style={{
-            position: 'fixed',
-            left: ef.x,
-            top: ef.y,
-            width: 50,
-            height: 50,
-            borderRadius: '50%',
-            border: '3px solid rgba(255, 200, 0, 0.9)',
-            pointerEvents: 'none',
-            zIndex: 20,
-            animation: 'ripple 0.6s ease-out forwards',
-          }}
-        />
+      {clickEffects.map((effect) => (
+        <ClickRipple key={effect.id} effect={effect} />
       ))}
 
       {/* アップグレードパネル */}
