@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import BananaWorld from './components/BananaWorld';
+import FloatingScoreText from './components/FloatingScoreText';
 import ScoreDisplay from './components/ScoreDisplay';
 import UnlockedBananaTiers from './components/UnlockedBananaTiers';
 import { UPGRADES } from './data/upgrades';
@@ -132,35 +133,12 @@ function App() {
         unlockedTiers={unlockedTiers}
         tierColors={TIER_COLORS}
       />
-      {/* 浮き上がりテキスト */}
-      {floatingTexts.map((t) => (
-        <div
-          key={t.id}
-          style={{
-            position: 'fixed',
-            left: t.x,
-            bottom: 100,
-            zIndex: 20,
-            fontSize:
-              t.value >= 500
-                ? '2.5rem'
-                : t.value >= 100
-                  ? '2.2rem'
-                  : t.value >= 30
-                    ? '1.8rem'
-                    : t.value >= 12
-                      ? '1.4rem'
-                      : '1.1rem',
-            fontWeight: 'bold',
-            color: scoreColor(t.value),
-            pointerEvents: 'none',
-            animation: 'floatUp 1.2s ease-out forwards',
-            textShadow: '0 1px 4px rgba(255,255,255,0.9)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          +{t.value}🍌
-        </div>
+      {floatingTexts.map((text) => (
+        <FloatingScoreText
+          key={text.id}
+          text={text}
+          color={scoreColor(text.value)}
+        />
       ))}
 
       {/* クリックリップル */}
