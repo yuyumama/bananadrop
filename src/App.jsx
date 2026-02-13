@@ -1,9 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import BananaWorld from './components/BananaWorld';
-import ClickRipple from './components/ClickRipple';
-import FloatingScoreText from './components/FloatingScoreText';
-import ScoreDisplay from './components/ScoreDisplay';
-import UnlockedBananaTiers from './components/UnlockedBananaTiers';
+import ClickRipple from './components/ui/ClickRipple';
+import FloatingScoreText from './components/ui/FloatingScoreText';
+import ScoreDisplay from './components/ui/ScoreDisplay';
+import UnlockedBananaTiers from './components/ui/UnlockedBananaTiers';
 import { UPGRADES } from './data/upgrades';
 
 const BANANA_TIERS = [
