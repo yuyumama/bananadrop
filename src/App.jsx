@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import BananaWorld from './components/BananaWorld';
 import ScoreDisplay from './components/ScoreDisplay';
+import UnlockedBananaTiers from './components/UnlockedBananaTiers';
 import { UPGRADES } from './data/upgrades';
 
 const BANANA_TIERS = [
@@ -127,39 +128,10 @@ function App() {
       onClick={handleClick}
     >
       <ScoreDisplay score={score} perSecond={perSecond} scoreBump={scoreBump} />
-
-      {/* 解放中のバナナ種 */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 16,
-          right: 16,
-          zIndex: 10,
-          display: 'flex',
-          gap: 4,
-        }}
-      >
-        {unlockedTiers.map((t) => (
-          <div
-            key={t.tier}
-            style={{
-              background: 'rgba(255,255,255,0.88)',
-              borderRadius: 10,
-              padding: '5px 9px',
-              fontSize: '0.72rem',
-              fontWeight: 'bold',
-              color: TIER_COLORS[t.tier - 1],
-              boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
-              userSelect: 'none',
-            }}
-          >
-            {t.name}
-            <br />
-            <span style={{ fontSize: '0.65rem' }}>+{t.score}pt</span>
-          </div>
-        ))}
-      </div>
-
+      <UnlockedBananaTiers
+        unlockedTiers={unlockedTiers}
+        tierColors={TIER_COLORS}
+      />
       {/* 浮き上がりテキスト */}
       {floatingTexts.map((t) => (
         <div
