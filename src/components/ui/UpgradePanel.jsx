@@ -1,7 +1,7 @@
 import UpgradeGroupCard from './UpgradeGroupCard';
 import { buildGroupUpgradeViewModel } from '../../services/upgradeRules';
 
-function UpgradePanel({ groups, upgrades, purchased, score, onBuy }) {
+function UpgradePanel({ groups, purchased, score, onBuy }) {
   return (
     <div
       style={{
@@ -22,7 +22,6 @@ function UpgradePanel({ groups, upgrades, purchased, score, onBuy }) {
         const { currentLabel, nextItem, affordable } =
           buildGroupUpgradeViewModel({
             group,
-            upgrades,
             purchased,
             score,
           });

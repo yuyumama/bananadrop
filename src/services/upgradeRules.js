@@ -30,13 +30,8 @@ export function applyUpgradeEffects({ upgrade, state, bananaTiers }) {
   return nextState;
 }
 
-export function buildGroupUpgradeViewModel({
-  group,
-  upgrades,
-  purchased,
-  score,
-}) {
-  const items = upgrades.filter((upgrade) => upgrade.group === group.key);
+export function buildGroupUpgradeViewModel({ group, purchased, score }) {
+  const items = group.items;
   const purchasedItems = items.filter((upgrade) => purchased.has(upgrade.id));
 
   const currentLabel =
