@@ -1,4 +1,4 @@
-export const UPGRADES = [
+export const CLICK_UPGRADES = [
   // クリック強化（~3x ずつ）
   {
     id: 'click2',
@@ -112,6 +112,9 @@ export const UPGRADES = [
     requires: 'click14',
     clickPer: 15,
   },
+];
+
+export const BANANA_UPGRADES = [
   // バナナ種解放
   {
     id: 'tier2',
@@ -153,6 +156,9 @@ export const UPGRADES = [
     requires: 'tier5',
     tier: 6,
   },
+];
+
+export const AUTO_UPGRADES = [
   // オートスポーン（~1.16x ずつ、1〜100本/秒）
   {
     id: 'auto1',
@@ -954,6 +960,9 @@ export const UPGRADES = [
     requires: 'auto99',
     autoPer: 100,
   },
+];
+
+export const RARE_UPGRADES = [
   // レアバナナ確率UP（0.1%ずつ、~1.65x ずつ、初期500）
   {
     id: 'rare1',
@@ -1155,4 +1164,11 @@ export const UPGRADES = [
     requires: 'rare24',
     giantChance: 0.025,
   },
+];
+
+export const UPGRADES = [
+  ...CLICK_UPGRADES,
+  ...BANANA_UPGRADES,
+  ...AUTO_UPGRADES,
+  ...RARE_UPGRADES,
 ];
