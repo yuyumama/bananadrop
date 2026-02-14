@@ -5,7 +5,7 @@ import FloatingScoreText from './components/ui/FloatingScoreText';
 import ScoreDisplay from './components/ui/ScoreDisplay';
 import UnlockedBananaTiers from './components/ui/UnlockedBananaTiers';
 import UpgradePanel from './components/ui/UpgradePanel';
-import { UPGRADES } from './data/upgrades';
+
 import { TIER_COLORS } from './data/constants/tierColors';
 import { UPGRADE_GROUPS } from './data/constants/upgradeGroups';
 import { PANEL_HEIGHT } from './data/constants/layout';
@@ -119,7 +119,6 @@ function App() {
 
       <UpgradePanel
         groups={UPGRADE_GROUPS}
-        upgrades={UPGRADES}
         purchased={purchased}
         score={score}
         onBuy={handleBuyUpgrade}
