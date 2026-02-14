@@ -1,23 +1,5 @@
 import { BANANA_TIERS } from './constants/bananaTiers';
 
-const LABEL_FN = {
-  click: (item) => `${item.clickPer}本/クリック`,
-  auto: (item) => `${item.autoPer}本/秒`,
-  rare: (item) => `レア${(item.giantChance * 100).toFixed(1)}%`,
-  banana: (item) => BANANA_TIERS.find((t) => t.tier === item.tier)?.name ?? '',
-};
-
-function buildUpgrades(data, groupKey) {
-  const labelFn = LABEL_FN[groupKey];
-  return data.map((item, i) => ({
-    ...item,
-    id: `${groupKey}${i}`,
-    label: labelFn(item),
-    group: groupKey,
-    requires: i === 0 ? null : `${groupKey}${i - 1}`,
-  }));
-}
-
 // クリック強化（~3x ずつ）
 const CLICK_DATA = [
   { cost: 25, clickPer: 2 },
@@ -178,7 +160,47 @@ const RARE_DATA = [
   { cost: 81500000, giantChance: 0.025 },
 ];
 
-export const CLICK_UPGRADES = buildUpgrades(CLICK_DATA, 'click');
-export const BANANA_UPGRADES = buildUpgrades(BANANA_DATA, 'banana');
-export const AUTO_UPGRADES = buildUpgrades(AUTO_DATA, 'auto');
-export const RARE_UPGRADES = buildUpgrades(RARE_DATA, 'rare');
+function buildClickUpgrades(data) {
+  return data.map((item, i) => ({
+    ...item,
+    id: `click${i}`,
+    label: `${item.clickPer}本/クリック`,
+    group: 'click',
+    requires: i === 0 ? null : `click${i - 1}`,
+  }));
+}
+
+function buildAutoUpgrades(data) {
+  return data.map((item, i) => ({
+    ...item,
+    id: `auto${i}`,
+    label: `${item.autoPer}本/秒`,
+    group: 'auto',
+    requires: i === 0 ? null : `auto${i - 1}`,
+  }));
+}
+
+function buildRareUpgrades(data) {
+  return data.map((item, i) => ({
+    ...item,
+    id: `rare${i}`,
+    label: `レア${(item.giantChance * 100).toFixed(1)}%`,
+    group: 'rare',
+    requires: i === 0 ? null : `rare${i - 1}`,
+  }));
+}
+
+function buildBananaUpgrades(data) {
+  return data.map((item, i) => ({
+    ...item,
+    id: `banana${i}`,
+    label: BANANA_TIERS.find((t) => t.tier === item.tier)?.name ?? '',
+    group: 'banana',
+    requires: i === 0 ? null : `banana${i - 1}`,
+  }));
+}
+
+export const CLICK_UPGRADES = buildClickUpgrades(CLICK_DATA);
+export const BANANA_UPGRADES = buildBananaUpgrades(BANANA_DATA);
+export const AUTO_UPGRADES = buildAutoUpgrades(AUTO_DATA);
+export const RARE_UPGRADES = buildRareUpgrades(RARE_DATA);
