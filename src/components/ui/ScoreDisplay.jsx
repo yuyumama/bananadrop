@@ -1,4 +1,4 @@
-function ScoreDisplay({ score, perSecond, scoreBump }) {
+function ScoreDisplay({ score, perSecond, scoreBump, devMode }) {
   return (
     <div
       style={{
@@ -21,6 +21,21 @@ function ScoreDisplay({ score, perSecond, scoreBump }) {
     >
       <span style={{ fontSize: '1.8rem', lineHeight: 1 }}>
         🍌 {score.toLocaleString()}
+        {devMode && (
+          <span
+            style={{
+              fontSize: '0.6rem',
+              background: '#ff4444',
+              color: '#fff',
+              borderRadius: 6,
+              padding: '2px 6px',
+              marginLeft: 8,
+              verticalAlign: 'middle',
+            }}
+          >
+            DEV
+          </span>
+        )}
       </span>
       {perSecond > 0 && (
         <span style={{ fontSize: '0.72rem', color: '#888' }}>

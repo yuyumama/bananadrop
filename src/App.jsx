@@ -27,6 +27,25 @@ function App() {
   const [clickEffects, setClickEffects] = useState([]);
   const [scoreBump, setScoreBump] = useState(false);
   const [perSecond, setPerSecond] = useState(0);
+  const [devMode, setDevMode] = useState(false);
+
+  // 開発者モード: Ctrl+Shift+D で切り替え
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        setDevMode((prev) => {
+          const next = !prev;
+          if (next) {
+            setScore(99999999);
+          }
+          return next;
+        });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // 実測ローリング平均（5秒間の実スコア履歴から計算）
   const scoreHistoryRef = useRef([]);
@@ -75,9 +94,11 @@ function App() {
     (upgrade) => {
       const purchasedSuccess = buyUpgrade(upgrade, score);
       if (!purchasedSuccess) return;
-      setScore((currentScore) => currentScore - upgrade.cost);
+      if (!devMode) {
+        setScore((currentScore) => currentScore - upgrade.cost);
+      }
     },
-    [buyUpgrade, score],
+    [buyUpgrade, score, devMode],
   );
 
   const scoreColor = (score) => {
@@ -99,7 +120,12 @@ function App() {
       }}
       onClick={handleClick}
     >
-      <ScoreDisplay score={score} perSecond={perSecond} scoreBump={scoreBump} />
+      <ScoreDisplay
+        score={score}
+        perSecond={perSecond}
+        scoreBump={scoreBump}
+        devMode={devMode}
+      />
       <UnlockedBananaTiers
         unlockedTiers={unlockedTiers}
         tierColors={TIER_COLORS}
