@@ -4,7 +4,7 @@ import Matter from 'matter-js';
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
 const TABLE_MOVE_HZ = 0.15; // 約6.5秒で1往復
-const RIM_RISE = 25;
+const RIM_RISE = 40;
 const RIM_SPREAD = 0; // ビジュアルは全幅カーブなので追加幅不要
 
 const getTablePx = (ratio) =>
