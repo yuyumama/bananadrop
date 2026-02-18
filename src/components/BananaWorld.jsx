@@ -98,14 +98,17 @@ const BananaWorld = ({
 
     const tiers = unlockedTiersRef.current;
     const tier = tiers[Math.floor(Math.random() * tiers.length)];
+    const tex =
+      tier.textures[Math.floor(Math.random() * tier.textures.length)];
+    const texScale = (2048 / tex.size) * 0.56 * scale;
     const baseUrl = import.meta.env.BASE_URL;
 
     const banana = Matter.Bodies.fromVertices(x, y, [vertices], {
       render: {
         sprite: {
-          texture: `${baseUrl}${tier.texture}`,
-          xScale: 0.8 * scale,
-          yScale: 0.8 * scale,
+          texture: `${baseUrl}${tex.file}`,
+          xScale: texScale,
+          yScale: texScale,
         },
       },
       restitution: 0.2,
