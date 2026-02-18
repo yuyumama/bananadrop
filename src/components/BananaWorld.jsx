@@ -3,7 +3,7 @@ import Matter from 'matter-js';
 
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
-const TABLE_MOVE_HZ = 0.15; // 約6.5秒で1往復
+const TABLE_MOVE_HZ = 0.08; // 約12.5秒で1往復
 const RIM_RISE = 40;
 const RIM_SPREAD = 0; // ビジュアルは全幅カーブなので追加幅不要
 
@@ -125,17 +125,21 @@ const BananaWorld = ({
   const spawnBanana = useCallback((x) => {
     if (!engineRef.current) return;
 
-    const y = -100;
+    const y = -200;
     const isGiant = Math.random() < giantChanceRef.current;
     const baseScale = Math.min(window.innerWidth, 430) / 3000;
-    const scale = isGiant ? baseScale * 2.5 : baseScale;
+    const scale = isGiant ? baseScale * 3 : baseScale;
 
+    // バナナ型（三日月型）の当たり判定
     const vertices = [
-      { x: 0, y: 0 },
-      { x: 200 * scale, y: -80 * scale },
-      { x: 400 * scale, y: 0 },
-      { x: 320 * scale, y: 120 * scale },
-      { x: 80 * scale, y: 120 * scale },
+      { x: 0 * scale, y: 0 * scale },
+      { x: 180 * scale, y: -85 * scale },
+      { x: 400 * scale, y: -105 * scale },
+      { x: 620 * scale, y: -68 * scale },
+      { x: 740 * scale, y: 10 * scale },
+      { x: 590 * scale, y: 75 * scale },
+      { x: 370 * scale, y: 92 * scale },
+      { x: 145 * scale, y: 55 * scale },
     ];
 
     const tiers = unlockedTiersRef.current;
@@ -154,14 +158,16 @@ const BananaWorld = ({
         },
       },
       restitution: 0.2,
-      friction: 0.6,
-      density: isGiant ? 0.06 : 0.001,
+      friction: 1.0,
+      frictionStatic: 0.8,
+      density: isGiant ? 0.3 : 0.001,
     });
     banana.label = 'banana';
     banana.bananaScore = tier.score * (isGiant ? 50 : 1);
     banana.isGiant = isGiant;
 
     Matter.Body.setPosition(banana, { x, y });
+    Matter.Body.setAngle(banana, Math.random() * Math.PI * 2);
     Matter.Composite.add(engineRef.current.world, banana);
   }, []);
 
