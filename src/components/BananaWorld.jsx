@@ -4,6 +4,8 @@ import Matter from 'matter-js';
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
 const TABLE_MOVE_HZ = 0.15; // 約6.5秒で1往復
+const RIM_RISE = 40;
+const RIM_SPREAD = 0; // ビジュアルは全幅カーブなので追加幅不要
 
 const getTablePx = (ratio) =>
   ratio * window.innerWidth * (window.innerWidth <= 430 ? 0.75 : 1);
@@ -26,6 +28,8 @@ const BananaWorld = ({
   const panelHeightRef = useRef(panelHeight);
   const giantChanceRef = useRef(giantChance);
   const tableRef = useRef(null);
+  const rimLeftRef = useRef(null);
+  const rimRightRef = useRef(null);
   const tableWidthRef = useRef(tableWidth);
 
   useEffect(() => {
@@ -46,6 +50,42 @@ const BananaWorld = ({
   useEffect(() => {
     tableWidthRef.current = tableWidth;
   }, [tableWidth]);
+
+  // ふち（斜め物理板）- バーの端15%を斜め板でカバー
+  const rimSpread = (tw) => tw * 0.15;
+  const rimLength = (tw) => Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
+  const rimAngle = (tw) => Math.atan2(RIM_RISE, rimSpread(tw));
+
+  const addRims = (world, cx, cy, tw) => {
+    const opts = {
+      isStatic: true,
+      render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
+      friction: 0.9, restitution: 0.1, label: 'rim',
+    };
+    const rs = rimSpread(tw);
+    const sy = cy - TABLE_HEIGHT / 2;
+    rimLeftRef.current = Matter.Bodies.rectangle(
+      cx - tw / 2 + rs / 2, sy - RIM_RISE / 2,
+      rimLength(tw), TABLE_HEIGHT, { ...opts, angle: rimAngle(tw) },
+    );
+    rimRightRef.current = Matter.Bodies.rectangle(
+      cx + tw / 2 - rs / 2, sy - RIM_RISE / 2,
+      rimLength(tw), TABLE_HEIGHT, { ...opts, angle: -rimAngle(tw) },
+    );
+    Matter.Composite.add(world, [rimLeftRef.current, rimRightRef.current]);
+  };
+
+  const removeRims = (world) => {
+    if (rimLeftRef.current) Matter.Composite.remove(world, rimLeftRef.current);
+    if (rimRightRef.current) Matter.Composite.remove(world, rimRightRef.current);
+  };
+
+  const syncRims = (cx, cy, tw) => {
+    const rs = rimSpread(tw);
+    const sy = cy - TABLE_HEIGHT / 2;
+    if (rimLeftRef.current) Matter.Body.setPosition(rimLeftRef.current, { x: cx - tw / 2 + rs / 2, y: sy - RIM_RISE / 2 });
+    if (rimRightRef.current) Matter.Body.setPosition(rimRightRef.current, { x: cx + tw / 2 - rs / 2, y: sy - RIM_RISE / 2 });
+  };
 
   // tableWidth変更時にテーブルを再生成
   useEffect(() => {
@@ -76,6 +116,8 @@ const BananaWorld = ({
     );
     tableRef.current = newTable;
     Matter.Composite.add(engineRef.current.world, newTable);
+    removeRims(engineRef.current.world);
+    addRims(engineRef.current.world, oldX, oldY, newTableW);
     if (barVisualRef.current)
       barVisualRef.current.style.width = `${newTableW}px`;
   }, [tableWidth]);
@@ -169,13 +211,14 @@ const BananaWorld = ({
     );
     tableRef.current = table;
     Composite.add(engine.world, [table]);
+    addRims(engine.world, window.innerWidth / 2, barCenterY(), tableW);
 
     // HTMLバーの位置を同期する関数
     const syncBar = (x, y) => {
       if (!barVisualRef.current) return;
       const tw = getTablePx(tableWidthRef.current);
       barVisualRef.current.style.left = `${x - tw / 2}px`;
-      barVisualRef.current.style.top = `${y - TABLE_HEIGHT / 2}px`;
+      barVisualRef.current.style.top = `${y - TABLE_HEIGHT / 2 - RIM_RISE}px`;
       barVisualRef.current.style.width = `${tw}px`;
     };
     syncBar(window.innerWidth / 2, barCenterY());
@@ -245,6 +288,7 @@ const BananaWorld = ({
 
       Matter.Body.setPosition(tableRef.current, { x: clampedX, y });
       Matter.Body.setVelocity(tableRef.current, { x: vx, y: 0 });
+      syncRims(clampedX, y, tw);
       syncBar(clampedX, y);
     });
 
@@ -317,6 +361,8 @@ const BananaWorld = ({
         );
         tableRef.current = newTable;
         Composite.add(engine.world, newTable);
+        removeRims(engine.world);
+        addRims(engine.world, window.innerWidth / 2, barCenterY(), newTableW);
         syncBar(window.innerWidth / 2, barCenterY());
       }
     };
@@ -370,19 +416,34 @@ const BananaWorld = ({
         overflow: 'hidden',
       }}
     >
-      {/* HTMLバー（バナナより後ろに描画） */}
+      {/* HTMLバー：おぼん型（全体が1本の緩やかなカーブ） */}
       <div
         ref={barVisualRef}
         style={{
           position: 'absolute',
-          height: `${TABLE_HEIGHT}px`,
-          background: '#c0c0c0',
-          borderRadius: `${TABLE_HEIGHT / 2}px`,
-          boxShadow: '0 3px 10px rgba(0,0,0,0.25)',
+          height: `${RIM_RISE + TABLE_HEIGHT}px`,
           pointerEvents: 'none',
           zIndex: 1,
+          filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
         }}
-      />
+      >
+        <svg
+          width="100%"
+          height={RIM_RISE + TABLE_HEIGHT}
+          viewBox={`0 0 100 ${RIM_RISE + TABLE_HEIGHT}`}
+          preserveAspectRatio="none"
+          style={{ display: 'block', overflow: 'visible' }}
+        >
+          <path
+            d={`M 0,${TABLE_HEIGHT / 2} Q 50,${RIM_RISE * 2 + TABLE_HEIGHT / 2} 100,${TABLE_HEIGHT / 2}`}
+            fill="none"
+            stroke="#b8864e"
+            strokeWidth={TABLE_HEIGHT}
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      </div>
       {/* Matter.jsキャンバス（バナナはここに描画、バーより前） */}
       <div
         ref={sceneRef}
