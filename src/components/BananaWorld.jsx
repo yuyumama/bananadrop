@@ -128,7 +128,7 @@ const BananaWorld = ({
     const y = -100;
     const isGiant = Math.random() < giantChanceRef.current;
     const baseScale = Math.min(window.innerWidth, 430) / 3000;
-    const scale = isGiant ? baseScale * 4 : baseScale;
+    const scale = isGiant ? baseScale * 2.5 : baseScale;
 
     const vertices = [
       { x: 0, y: 0 },

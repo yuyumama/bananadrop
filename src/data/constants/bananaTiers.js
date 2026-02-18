@@ -34,13 +34,21 @@ export const BANANA_TIERS = [
     tier: 4,
     name: '銀バナナ',
     score: 30,
-    textures: [{ file: 'banana_silver.png', size: 640 }],
+    textures: [
+      { file: 'banana_silver_01.png', size: 1024 },
+      { file: 'banana_silver_02.png', size: 1024 },
+      { file: 'banana_silver_03.png', size: 1000 },
+    ],
   },
   {
     tier: 5,
     name: '金バナナ',
     score: 100,
-    textures: [{ file: 'banana_gold.png', size: 640 }],
+    textures: [
+      { file: 'banana_gold_01.png', size: 1024 },
+      { file: 'banana_gold_02.png', size: 2048 },
+      { file: 'banana_gold_03.png', size: 1024 },
+    ],
   },
   {
     tier: 6,
