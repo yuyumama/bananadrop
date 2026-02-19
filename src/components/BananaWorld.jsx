@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
 import Matter from 'matter-js';
 
 const TABLE_HEIGHT = 20;
@@ -6,6 +6,10 @@ const TABLE_WIDTH_RATIO = 0.4;
 const TABLE_MOVE_HZ = 0.08; // 約12.5秒で1往復
 const RIM_RISE = 40;
 const RIM_SPREAD = 0; // ビジュアルは全幅カーブなので追加幅不要
+
+const rimSpread = (tw) => tw * 0.15;
+const rimLength = (tw) => Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
+const rimAngle = (tw) => Math.atan2(RIM_RISE, rimSpread(tw));
 
 const getTablePx = (ratio) =>
   ratio * window.innerWidth * (window.innerWidth <= 430 ? 0.75 : 1);
@@ -21,7 +25,7 @@ const BananaWorld = ({
 }) => {
   const sceneRef = useRef(null);
   const barVisualRef = useRef(null);
-  const [barWidth, setBarWidth] = useState(() => getTablePx(tableWidth));
+  const barWidth = useMemo(() => getTablePx(tableWidth), [tableWidth]);
   const engineRef = useRef(null);
   const bananaPerClickRef = useRef(bananaPerClick);
   const onScoreRef = useRef(onScore);
@@ -52,12 +56,9 @@ const BananaWorld = ({
     tableWidthRef.current = tableWidth;
   }, [tableWidth]);
 
-  // ふち（斜め物理板）- バーの端15%を斜め板でカバー
-  const rimSpread = (tw) => tw * 0.15;
-  const rimLength = (tw) => Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
-  const rimAngle = (tw) => Math.atan2(RIM_RISE, rimSpread(tw));
 
-  const addRims = (world, cx, cy, tw) => {
+
+  const addRims = useCallback((world, cx, cy, tw) => {
     const opts = {
       isStatic: true,
       render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
@@ -74,19 +75,19 @@ const BananaWorld = ({
       rimLength(tw), TABLE_HEIGHT, { ...opts, angle: -rimAngle(tw) },
     );
     Matter.Composite.add(world, [rimLeftRef.current, rimRightRef.current]);
-  };
+  }, []);
 
-  const removeRims = (world) => {
+  const removeRims = useCallback((world) => {
     if (rimLeftRef.current) Matter.Composite.remove(world, rimLeftRef.current);
     if (rimRightRef.current) Matter.Composite.remove(world, rimRightRef.current);
-  };
+  }, []);
 
-  const syncRims = (cx, cy, tw) => {
+  const syncRims = useCallback((cx, cy, tw) => {
     const rs = rimSpread(tw);
     const sy = cy - TABLE_HEIGHT / 2;
     if (rimLeftRef.current) Matter.Body.setPosition(rimLeftRef.current, { x: cx - tw / 2 + rs / 2, y: sy - RIM_RISE / 2 });
     if (rimRightRef.current) Matter.Body.setPosition(rimRightRef.current, { x: cx + tw / 2 - rs / 2, y: sy - RIM_RISE / 2 });
-  };
+  }, []);
 
   // tableWidth変更時にテーブルを再生成
   useEffect(() => {
@@ -120,8 +121,7 @@ const BananaWorld = ({
     addRims(engineRef.current.world, oldX, oldY, newTableW);
     if (barVisualRef.current)
       barVisualRef.current.style.width = `${newTableW}px`;
-    setBarWidth(newTableW);
-  }, [tableWidth]);
+  }, [tableWidth, addRims, removeRims]);
 
   const spawnBanana = useCallback((x) => {
     if (!engineRef.current) return;
@@ -372,7 +372,6 @@ const BananaWorld = ({
         Composite.add(engine.world, newTable);
         removeRims(engine.world);
         addRims(engine.world, window.innerWidth / 2, barCenterY(), newTableW);
-        setBarWidth(newTableW);
         syncBar(window.innerWidth / 2, barCenterY());
       }
     };
@@ -390,7 +389,7 @@ const BananaWorld = ({
       render.context = null;
       render.textures = {};
     };
-  }, []);
+  }, [addRims, removeRims, syncRims]);
 
   useEffect(() => {
     if (autoSpawnRate <= 0) return;
