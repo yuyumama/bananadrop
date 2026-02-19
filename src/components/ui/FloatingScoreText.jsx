@@ -15,16 +15,24 @@ function FloatingScoreText({ text, color }) {
                 ? '1.8rem'
                 : text.value >= 12
                   ? '1.4rem'
-                  : '1.1rem',
-        fontWeight: 'bold',
+                  : '1.2rem',
+        fontWeight: 800,
+        fontFamily: '"Outfit", sans-serif',
         color,
         pointerEvents: 'none',
-        animation: 'floatUp 1.2s ease-out forwards',
-        textShadow: '0 1px 4px rgba(255,255,255,0.9)',
+        animation: 'floatUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+        textShadow:
+          '0 2px 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 215, 0, 0.4)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
         whiteSpace: 'nowrap',
       }}
     >
-      +{text.value}🍌
+      <span style={{ fontSize: '0.8em', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}>
+        🍌
+      </span>
+      <span>+{text.value}</span>
     </div>
   );
 }

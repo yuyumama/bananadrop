@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import Matter from 'matter-js';
 
 const TABLE_HEIGHT = 20;
@@ -21,6 +21,7 @@ const BananaWorld = ({
 }) => {
   const sceneRef = useRef(null);
   const barVisualRef = useRef(null);
+  const [barWidth, setBarWidth] = useState(() => getTablePx(tableWidth));
   const engineRef = useRef(null);
   const bananaPerClickRef = useRef(bananaPerClick);
   const onScoreRef = useRef(onScore);
@@ -60,7 +61,7 @@ const BananaWorld = ({
     const opts = {
       isStatic: true,
       render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
-      friction: 0.9, restitution: 0.1, label: 'rim',
+      friction: 1.0, frictionStatic: 10.0, restitution: 0.0, label: 'rim',
     };
     const rs = rimSpread(tw);
     const sy = cy - TABLE_HEIGHT / 2;
@@ -107,11 +108,10 @@ const BananaWorld = ({
           strokeStyle: 'transparent',
           lineWidth: 0,
         },
-        friction: 0.9,
-        frictionStatic: 1.0,
-        restitution: 0.1,
+        friction: 1.0,
+        frictionStatic: 10.0,
+        restitution: 0.0,
         label: 'table',
-        chamfer: { radius: TABLE_HEIGHT / 2 },
       },
     );
     tableRef.current = newTable;
@@ -120,6 +120,7 @@ const BananaWorld = ({
     addRims(engineRef.current.world, oldX, oldY, newTableW);
     if (barVisualRef.current)
       barVisualRef.current.style.width = `${newTableW}px`;
+    setBarWidth(newTableW);
   }, [tableWidth]);
 
   const spawnBanana = useCallback((x) => {
@@ -157,9 +158,10 @@ const BananaWorld = ({
           yScale: texScale,
         },
       },
-      restitution: 0.2,
+      restitution: 0.0,
       friction: 1.0,
-      frictionStatic: 0.8,
+      frictionStatic: 10.0,
+      frictionAir: 0.02,
       density: isGiant ? 0.3 : 0.001,
     });
     banana.label = 'banana';
@@ -211,11 +213,10 @@ const BananaWorld = ({
           strokeStyle: 'transparent',
           lineWidth: 0,
         },
-        friction: 0.9,
-        frictionStatic: 1.0,
-        restitution: 0.1,
+        friction: 1.0,
+        frictionStatic: 10.0,
+        restitution: 0.0,
         label: 'table',
-        chamfer: { radius: TABLE_HEIGHT / 2 },
       },
     );
     tableRef.current = table;
@@ -264,8 +265,8 @@ const BananaWorld = ({
 
       textCtx.clearRect(0, 0, w, h);
       textCtx.globalCompositeOperation = 'source-over';
-      textCtx.font = `900 ${w * 0.18}px sans-serif`;
-      textCtx.fillStyle = 'rgba(0, 0, 0, 0.95)';
+      textCtx.font = `900 ${w * 0.18}px "Outfit", sans-serif`;
+      textCtx.fillStyle = 'rgba(74, 74, 74, 0.95)'; // var(--text-main) equivalent
       textCtx.textAlign = 'center';
       textCtx.textBaseline = 'middle';
       textCtx.fillText('BANANA', w / 2, h / 2);
@@ -361,17 +362,17 @@ const BananaWorld = ({
               strokeStyle: 'transparent',
               lineWidth: 0,
             },
-            friction: 0.9,
-            frictionStatic: 1.0,
-            restitution: 0.1,
+            friction: 1.0,
+            frictionStatic: 10.0,
+            restitution: 0.0,
             label: 'table',
-            chamfer: { radius: TABLE_HEIGHT / 2 },
           },
         );
         tableRef.current = newTable;
         Composite.add(engine.world, newTable);
         removeRims(engine.world);
         addRims(engine.world, window.innerWidth / 2, barCenterY(), newTableW);
+        setBarWidth(newTableW);
         syncBar(window.innerWidth / 2, barCenterY());
       }
     };
@@ -439,17 +440,64 @@ const BananaWorld = ({
         <svg
           width="100%"
           height={RIM_RISE + TABLE_HEIGHT}
-          viewBox={`0 0 100 ${RIM_RISE + TABLE_HEIGHT}`}
-          preserveAspectRatio="none"
+          viewBox={`0 0 ${barWidth} ${RIM_RISE + TABLE_HEIGHT}`}
+          preserveAspectRatio="xMidYMid meet"
           style={{ display: 'block', overflow: 'visible' }}
         >
+          <defs>
+            <linearGradient id="trayGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#e3c6a1', stopOpacity: 1 }} />
+              <stop offset="50%" style={{ stopColor: '#d2b48c', stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: '#bc9d76', stopOpacity: 1 }} />
+            </linearGradient>
+            <pattern id="woodGrain" patternUnits="userSpaceOnUse" width="100" height="20">
+              <path d="M0 10 Q 25 5, 50 10 T 100 10" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
+              <path d="M0 15 Q 25 10, 50 15 T 100 15" fill="none" stroke="rgba(0,0,0,0.03)" strokeWidth="1" />
+            </pattern>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
+              <feOffset dx="0" dy="2" result="offsetblur" />
+              <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3" />
+              </feComponentTransfer>
+              <feMerge>
+                <feMergeNode />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* Main Tray Body */}
           <path
-            d={`M 0,${TABLE_HEIGHT / 2} Q 50,${RIM_RISE * 2 + TABLE_HEIGHT / 2} 100,${TABLE_HEIGHT / 2}`}
+            d={`M 10,${RIM_RISE / 2} 
+               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT / 2} ${barWidth - 10},${RIM_RISE / 2}
+               L ${barWidth},${RIM_RISE / 2 + 5}
+               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT} 0,${RIM_RISE / 2 + 5}
+               Z`}
+            fill="url(#trayGradient)"
+            filter="url(#shadow)"
+          />
+
+          {/* Wood Grain Overlay */}
+          <path
+            d={`M 10,${RIM_RISE / 2} 
+               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT / 2} ${barWidth - 10},${RIM_RISE / 2}
+               L ${barWidth},${RIM_RISE / 2 + 5}
+               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT} 0,${RIM_RISE / 2 + 5}
+               Z`}
+            fill="url(#woodGrain)"
+            opacity="0.4"
+          />
+
+          {/* Tray Rim/Edge Enhancement */}
+          <path
+            d={`M 10,${RIM_RISE / 2} 
+               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT / 2} ${barWidth - 10},${RIM_RISE / 2}`}
             fill="none"
-            stroke="#b8864e"
-            strokeWidth={TABLE_HEIGHT}
+            stroke="#c4a484"
+            strokeWidth="3"
             strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
+            opacity="0.6"
           />
         </svg>
       </div>
@@ -466,6 +514,7 @@ const BananaWorld = ({
           cursor: 'pointer',
           touchAction: 'none',
           zIndex: 2,
+          filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.15))', // Soft shadow for bananas
         }}
       />
     </div>

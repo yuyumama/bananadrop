@@ -4,7 +4,10 @@ function UpgradeGroupCard({
   nextItem,
   affordable,
   onBuy,
+  score,
 }) {
+  const progress = nextItem ? Math.min(100, (score / nextItem.cost) * 100) : 0;
+
   return (
     <div
       style={{
@@ -17,83 +20,118 @@ function UpgradeGroupCard({
     >
       <div
         style={{
-          fontSize: '0.62rem',
-          fontWeight: 'bold',
-          color: '#888',
+          fontSize: '0.6rem',
+          fontWeight: 800,
+          color: 'var(--text-muted)',
           textAlign: 'center',
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
         }}
       >
         {group.label}
       </div>
-      {!nextItem ? (
-        <button
-          disabled
-          style={{
-            width: '100%',
-            padding: '7px 4px',
-            borderRadius: 10,
-            border: 'none',
-            background: '#b0e0a0',
-            fontWeight: 'bold',
-            fontSize: '0.75rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            cursor: 'default',
-          }}
-        >
-          <div style={{ fontSize: '0.7rem', color: '#3a7a3a' }}>
-            ✓ {currentLabel}
-          </div>
-          <div
-            style={{
-              fontSize: '0.6rem',
-              marginTop: 1,
-              fontWeight: 'normal',
-              color: '#5a9a5a',
-            }}
-          >
-            MAX
-          </div>
-        </button>
-      ) : (
-        <button
-          onClick={(event) => {
-            event.stopPropagation();
-            onBuy(nextItem);
-          }}
-          style={{
-            width: '100%',
-            padding: '7px 4px',
-            borderRadius: 10,
-            border: 'none',
-            cursor: affordable ? 'pointer' : 'not-allowed',
-            background: affordable ? '#ffd700' : '#eeeeee',
-            fontWeight: 'bold',
-            fontSize: '0.75rem',
-            boxShadow: affordable
-              ? '0 2px 10px rgba(255,190,0,0.6), 0 0 0 1.5px rgba(255,180,0,0.4)'
-              : '0 1px 3px rgba(0,0,0,0.1)',
-            transform: affordable ? 'translateY(-1px)' : 'none',
-            transition: 'all 0.15s',
-          }}
-        >
-          <div style={{ fontSize: '0.6rem', color: '#666' }}>
-            {currentLabel}
-          </div>
-          <div style={{ fontSize: '0.68rem', color: '#333' }}>
-            → {nextItem.label}
-          </div>
-          <div
-            style={{
-              fontSize: '0.6rem',
-              marginTop: 1,
-              fontWeight: 'normal',
-              opacity: 0.8,
-            }}
-          >
-            🍌 {nextItem.cost.toLocaleString()}
-          </div>
-        </button>
-      )}
+
+      <button
+        className="premium-button"
+        onClick={nextItem ? (e) => { e.stopPropagation(); onBuy(nextItem); } : undefined}
+        disabled={nextItem ? !affordable : true}
+        style={{
+          width: '100%',
+          height: '56px', // Slightly taller for more elegance
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 2,
+          padding: '8px 4px 10px 4px', // Balanced top padding to push text down
+          position: 'relative',
+          overflow: 'hidden',
+          backgroundColor: !nextItem ? 'var(--bg-accent)' : affordable ? '#fffef0' : 'white',
+          borderColor: affordable ? 'var(--accent-gold)' : 'var(--glass-border)',
+          transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          cursor: nextItem ? (affordable ? 'pointer' : 'not-allowed') : 'default',
+        }}
+      >
+        {!nextItem ? (
+          <>
+            <div style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 800 }}>
+              {currentLabel}
+            </div>
+            <div style={{ fontSize: '0.55rem', fontWeight: 700, opacity: 0.5, letterSpacing: '0.1em' }}>
+              MAXED COLLECTION
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Boutique Label: Current Level */}
+            <div style={{
+              fontSize: '0.5rem',
+              color: 'var(--text-muted)',
+              fontWeight: 300, // Minimalist weight
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              {currentLabel}
+            </div>
+
+            {/* Price Tag Separator */}
+            <div style={{
+              width: '12px',
+              height: '1px',
+              backgroundColor: 'rgba(0,0,0,0.05)',
+              margin: '2px 0'
+            }} />
+
+            {/* Action: Next Level */}
+            <div style={{
+              fontSize: '0.75rem',
+              color: 'var(--text-main)',
+              fontWeight: 800, // Focus on the next goal
+              letterSpacing: '-0.01em'
+            }}>
+              {nextItem.label}
+            </div>
+
+            {/* Cost Component */}
+            <div style={{
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              color: affordable ? 'var(--accent-gold)' : 'var(--text-muted)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              marginTop: 1
+            }}>
+              <span style={{ fontSize: '0.8em', opacity: 0.8 }}>🍌</span>
+              <span>{nextItem.cost.toLocaleString()}</span>
+            </div>
+
+            {/* Progress Meter: Luxury variant */}
+            {!affordable && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  height: '5px',
+                  width: '100%',
+                  backgroundColor: 'rgba(0,0,0,0.03)',
+                }}
+              >
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${progress}%`,
+                    background: 'linear-gradient(to right, #f4e4bc, #e6b800)',
+                    transition: 'width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                    boxShadow: '0 0 10px rgba(230, 184, 0, 0.2)',
+                  }}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </button>
     </div>
   );
 }
