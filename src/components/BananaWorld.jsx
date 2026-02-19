@@ -514,6 +514,7 @@ const BananaWorld = ({
           cursor: 'pointer',
           touchAction: 'none',
           zIndex: 2,
+          filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.15))', // Soft shadow for bananas
         }}
       />
     </div>
