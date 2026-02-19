@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import Matter from 'matter-js';
 
 const TABLE_HEIGHT = 20;
@@ -21,6 +21,7 @@ const BananaWorld = ({
 }) => {
   const sceneRef = useRef(null);
   const barVisualRef = useRef(null);
+  const [barWidth, setBarWidth] = useState(() => getTablePx(tableWidth));
   const engineRef = useRef(null);
   const bananaPerClickRef = useRef(bananaPerClick);
   const onScoreRef = useRef(onScore);
@@ -60,7 +61,7 @@ const BananaWorld = ({
     const opts = {
       isStatic: true,
       render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
-      friction: 0.9, restitution: 0.1, label: 'rim',
+      friction: 1.0, frictionStatic: 10.0, restitution: 0.0, label: 'rim',
     };
     const rs = rimSpread(tw);
     const sy = cy - TABLE_HEIGHT / 2;
@@ -107,11 +108,10 @@ const BananaWorld = ({
           strokeStyle: 'transparent',
           lineWidth: 0,
         },
-        friction: 0.9,
-        frictionStatic: 1.0,
-        restitution: 0.1,
+        friction: 1.0,
+        frictionStatic: 10.0,
+        restitution: 0.0,
         label: 'table',
-        chamfer: { radius: TABLE_HEIGHT / 2 },
       },
     );
     tableRef.current = newTable;
@@ -120,6 +120,7 @@ const BananaWorld = ({
     addRims(engineRef.current.world, oldX, oldY, newTableW);
     if (barVisualRef.current)
       barVisualRef.current.style.width = `${newTableW}px`;
+    setBarWidth(newTableW);
   }, [tableWidth]);
 
   const spawnBanana = useCallback((x) => {
@@ -157,9 +158,10 @@ const BananaWorld = ({
           yScale: texScale,
         },
       },
-      restitution: 0.2,
+      restitution: 0.0,
       friction: 1.0,
-      frictionStatic: 0.8,
+      frictionStatic: 10.0,
+      frictionAir: 0.02,
       density: isGiant ? 0.3 : 0.001,
     });
     banana.label = 'banana';
@@ -211,11 +213,10 @@ const BananaWorld = ({
           strokeStyle: 'transparent',
           lineWidth: 0,
         },
-        friction: 0.9,
-        frictionStatic: 1.0,
-        restitution: 0.1,
+        friction: 1.0,
+        frictionStatic: 10.0,
+        restitution: 0.0,
         label: 'table',
-        chamfer: { radius: TABLE_HEIGHT / 2 },
       },
     );
     tableRef.current = table;
@@ -361,17 +362,17 @@ const BananaWorld = ({
               strokeStyle: 'transparent',
               lineWidth: 0,
             },
-            friction: 0.9,
-            frictionStatic: 1.0,
-            restitution: 0.1,
+            friction: 1.0,
+            frictionStatic: 10.0,
+            restitution: 0.0,
             label: 'table',
-            chamfer: { radius: TABLE_HEIGHT / 2 },
           },
         );
         tableRef.current = newTable;
         Composite.add(engine.world, newTable);
         removeRims(engine.world);
         addRims(engine.world, window.innerWidth / 2, barCenterY(), newTableW);
+        setBarWidth(newTableW);
         syncBar(window.innerWidth / 2, barCenterY());
       }
     };
@@ -439,17 +440,16 @@ const BananaWorld = ({
         <svg
           width="100%"
           height={RIM_RISE + TABLE_HEIGHT}
-          viewBox={`0 0 100 ${RIM_RISE + TABLE_HEIGHT}`}
-          preserveAspectRatio="none"
+          viewBox={`0 0 ${barWidth} ${RIM_RISE + TABLE_HEIGHT}`}
+          preserveAspectRatio="xMidYMid meet"
           style={{ display: 'block', overflow: 'visible' }}
         >
           <path
-            d={`M 0,${TABLE_HEIGHT / 2} Q 50,${RIM_RISE * 2 + TABLE_HEIGHT / 2} 100,${TABLE_HEIGHT / 2}`}
+            d={`M 0,${TABLE_HEIGHT / 2} Q ${barWidth / 2},${barWidth * 0.06 + TABLE_HEIGHT / 2} ${barWidth},${TABLE_HEIGHT / 2}`}
             fill="none"
             stroke="#b8864e"
             strokeWidth={TABLE_HEIGHT}
             strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
           />
         </svg>
       </div>
