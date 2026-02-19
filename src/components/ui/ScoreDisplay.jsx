@@ -12,8 +12,11 @@ function ScoreDisplay({ score, perSecond, scoreBump, devMode }) {
         flexDirection: 'column',
         alignItems: 'flex-start',
         gap: 0,
-        animation: scoreBump ? 'scoreBump 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)' : 'none',
         userSelect: 'none',
+        animation:
+          scoreBump ? 'scoreBump 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)' :
+            (perSecond > 0 ? 'breathingGold 3s ease-in-out infinite' : 'none'),
+        transition: 'all 0.3s ease',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -44,25 +47,22 @@ function ScoreDisplay({ score, perSecond, scoreBump, devMode }) {
           </span>
         )}
       </div>
-      {perSecond > 0 && (
-        <div
-          style={{
-            paddingLeft: 22,
-            fontSize: '0.75rem',
-            fontWeight: 500,
-            color: 'var(--text-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          <span style={{ opacity: 0.6 }}>獲得</span>
-          <span style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>
-            +{perSecond.toLocaleString()}
-          </span>
-          <span style={{ fontSize: '0.65rem' }}>/秒</span>
-        </div>
-      )}
+      <div
+        style={{
+          paddingLeft: 22,
+          fontSize: '0.75rem',
+          fontWeight: 500,
+          color: 'var(--text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        <span style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>
+          +{perSecond.toLocaleString()}
+        </span>
+        <span style={{ fontSize: '0.65rem' }}>/秒</span>
+      </div>
     </div>
   );
 }

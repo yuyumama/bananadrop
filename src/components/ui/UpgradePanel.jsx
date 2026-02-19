@@ -35,6 +35,7 @@ function UpgradePanel({ groups, purchased, score, onBuy }) {
             nextItem={nextItem}
             affordable={affordable}
             onBuy={onBuy}
+            score={score}
           />
         );
       })}

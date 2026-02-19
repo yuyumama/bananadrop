@@ -119,20 +119,37 @@ body {
   border-color: #ddd;
 }
 
-@keyframes floatUp {
+
+@keyframes floatUpFade {
   0% {
     opacity: 0;
-    transform: translateX(-50%) translateY(20px) scale(0.8);
+    transform: translate(-50%, 10px) scale(0.8);
   }
 
   20% {
     opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1.1);
+    transform: translate(-50%, -10px) scale(1.1);
   }
 
   100% {
     opacity: 0;
-    transform: translateX(-50%) translateY(-100px) scale(0.9);
+    transform: translate(-50%, -80px) scale(1);
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0;
   }
 }
 
@@ -159,5 +176,22 @@ body {
 
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes breathingGold {
+  0% {
+    box-shadow: var(--shadow-soft);
+    border-color: var(--glass-border);
+  }
+
+  50% {
+    box-shadow: 0 8px 32px 0 rgba(212, 175, 55, 0.25);
+    border-color: rgba(212, 175, 55, 0.4);
+  }
+
+  100% {
+    box-shadow: var(--shadow-soft);
+    border-color: var(--glass-border);
   }
 }
