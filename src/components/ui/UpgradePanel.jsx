@@ -4,18 +4,19 @@ import { buildGroupUpgradeViewModel } from '../../services/upgradeRules';
 function UpgradePanel({ groups, purchased, score, onBuy }) {
   return (
     <div
+      className="glass-panel"
       style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         zIndex: 10,
-        background: 'rgba(255,255,255,0.93)',
-        borderTop: '1.5px solid rgba(0,0,0,0.08)',
-        padding: '8px 8px 10px',
+        padding: '6px 12px 8px',
         display: 'flex',
-        gap: 6,
-        backdropFilter: 'blur(10px)',
+        gap: 8,
+        borderRadius: '16px 16px 0 0',
+        border: '1px solid rgba(255, 255, 255, 0.5)',
+        borderBottom: 'none',
       }}
     >
       {groups.map((group) => {
