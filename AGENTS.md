@@ -42,5 +42,4 @@ If adding tests, prefer Vitest + React Testing Library and place specs alongside
 - PRs should include:
   - Clear summary of behavior changes
   - Linked issue (if applicable)
-  - Screenshots or short clips for UI/gameplay changes
   - Notes on manual test coverage performed
