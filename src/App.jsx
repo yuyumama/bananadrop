@@ -3,6 +3,8 @@ import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
 import FloatingScoreText from './components/ui/FloatingScoreText';
 import ScoreDisplay from './components/ui/ScoreDisplay';
+import BananaTree from './components/ui/BananaTree';
+import ShopButton from './components/ui/ShopButton';
 import UnlockedBananaTiers from './components/ui/UnlockedBananaTiers';
 import UpgradePanel from './components/ui/UpgradePanel';
 
@@ -22,6 +24,10 @@ function App() {
     unlockedTiers,
     purchased,
     buyUpgrade,
+    treeLevel,
+    seeds,
+    treeGrowth,
+    waterTree,
   } = useUpgradeState();
   const [floatingTexts, setFloatingTexts] = useState([]);
   const [clickEffects, setClickEffects] = useState([]);
@@ -101,6 +107,13 @@ function App() {
     [buyUpgrade, score, devMode],
   );
 
+  const handleWaterTree = useCallback(() => {
+    const cost = waterTree(score);
+    if (cost && !devMode) {
+      setScore((currentScore) => currentScore - cost);
+    }
+  }, [waterTree, score, devMode]);
+
   const scoreColor = (score) => {
     if (score >= 500) return '#ff00ff';
     if (score >= 100) return '#ffd700';
@@ -129,6 +142,14 @@ function App() {
       <UnlockedBananaTiers
         unlockedTiers={unlockedTiers}
         tierColors={TIER_COLORS}
+      />
+      <ShopButton seeds={seeds} />
+      <BananaTree
+        score={score}
+        treeLevel={treeLevel}
+        treeGrowth={treeGrowth}
+        onWater={handleWaterTree}
+        devMode={devMode}
       />
       {floatingTexts.map((text) => (
         <FloatingScoreText

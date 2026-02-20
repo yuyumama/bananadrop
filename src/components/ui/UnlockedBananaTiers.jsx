@@ -3,13 +3,14 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
     <div
       style={{
         position: 'fixed',
-        top: 24,
+        top: 110,
         right: 24,
         zIndex: 10,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end',
-        gap: 8,
+        gap: 12,
+        maxWidth: '300px', // 横に広がりすぎないように制限
       }}
     >
       <div
@@ -20,29 +21,56 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
           marginBottom: -4,
+          alignSelf: 'flex-end',
         }}
       >
         Collection
       </div>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+          alignItems: 'flex-end'
+        }}
+      >
         {unlockedTiers.map((tier) => (
           <div
             key={tier.tier}
             className="glass-panel"
             style={{
-              padding: '6px 12px',
-              fontSize: '0.7rem',
-              fontWeight: 700,
+              padding: '6px 14px',
+              fontSize: '0.75rem',
+              fontWeight: 800,
               color: tierColors[tier.tier - 1],
               display: 'flex',
               alignItems: 'center',
-              gap: 4,
+              gap: 8,
               userSelect: 'none',
-              transition: 'transform 0.2s ease',
+              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              borderLeft: `3px solid ${tierColors[tier.tier - 1]}`,
+              background: 'rgba(255, 255, 255, 0.8)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateX(-4px)';
+              e.currentTarget.style.background = '#fff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateX(0)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)';
             }}
           >
+            <span style={{ fontSize: '0.9rem' }}>🍌</span>
             <span>{tier.name}</span>
-            <span style={{ opacity: 0.5, fontWeight: 500, color: 'var(--text-muted)' }}>
+            <span style={{
+              fontSize: '0.65rem',
+              opacity: 0.6,
+              fontWeight: 600,
+              color: 'var(--text-muted)',
+              marginLeft: 'auto',
+              paddingLeft: 8
+            }}>
               {tier.score}pt
             </span>
           </div>
