@@ -1,8 +1,6 @@
 import { forwardRef } from 'react';
 
-const TrayVisual = 
-forwardRef
-(function TrayVisual(
+const TrayVisual = forwardRef(function TrayVisual(
   { barWidth, rimRise, tableHeight },
   ref,
 ) {
