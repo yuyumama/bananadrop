@@ -9,7 +9,8 @@ const RIM_RISE = 40;
 const RIM_SPREAD = 0; // ビジュアルは全幅カーブなので追加幅不要
 
 const rimSpread = (tw) => tw * 0.15;
-const rimLength = (tw) => Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
+const rimLength = (tw) =>
+  Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
 const rimAngle = (tw) => Math.atan2(RIM_RISE, rimSpread(tw));
 
 const getTablePx = (ratio) =>
@@ -57,37 +58,57 @@ const BananaWorld = ({
     tableWidthRef.current = tableWidth;
   }, [tableWidth]);
 
-
-
   const addRims = useCallback((world, cx, cy, tw) => {
     const opts = {
       isStatic: true,
-      render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
-      friction: 1.0, frictionStatic: 10.0, restitution: 0.0, label: 'rim',
+      render: {
+        fillStyle: 'transparent',
+        strokeStyle: 'transparent',
+        lineWidth: 0,
+      },
+      friction: 1.0,
+      frictionStatic: 10.0,
+      restitution: 0.0,
+      label: 'rim',
     };
     const rs = rimSpread(tw);
     const sy = cy - TABLE_HEIGHT / 2;
     rimLeftRef.current = Matter.Bodies.rectangle(
-      cx - tw / 2 + rs / 2, sy - RIM_RISE / 2,
-      rimLength(tw), TABLE_HEIGHT, { ...opts, angle: rimAngle(tw) },
+      cx - tw / 2 + rs / 2,
+      sy - RIM_RISE / 2,
+      rimLength(tw),
+      TABLE_HEIGHT,
+      { ...opts, angle: rimAngle(tw) },
     );
     rimRightRef.current = Matter.Bodies.rectangle(
-      cx + tw / 2 - rs / 2, sy - RIM_RISE / 2,
-      rimLength(tw), TABLE_HEIGHT, { ...opts, angle: -rimAngle(tw) },
+      cx + tw / 2 - rs / 2,
+      sy - RIM_RISE / 2,
+      rimLength(tw),
+      TABLE_HEIGHT,
+      { ...opts, angle: -rimAngle(tw) },
     );
     Matter.Composite.add(world, [rimLeftRef.current, rimRightRef.current]);
   }, []);
 
   const removeRims = useCallback((world) => {
     if (rimLeftRef.current) Matter.Composite.remove(world, rimLeftRef.current);
-    if (rimRightRef.current) Matter.Composite.remove(world, rimRightRef.current);
+    if (rimRightRef.current)
+      Matter.Composite.remove(world, rimRightRef.current);
   }, []);
 
   const syncRims = useCallback((cx, cy, tw) => {
     const rs = rimSpread(tw);
     const sy = cy - TABLE_HEIGHT / 2;
-    if (rimLeftRef.current) Matter.Body.setPosition(rimLeftRef.current, { x: cx - tw / 2 + rs / 2, y: sy - RIM_RISE / 2 });
-    if (rimRightRef.current) Matter.Body.setPosition(rimRightRef.current, { x: cx + tw / 2 - rs / 2, y: sy - RIM_RISE / 2 });
+    if (rimLeftRef.current)
+      Matter.Body.setPosition(rimLeftRef.current, {
+        x: cx - tw / 2 + rs / 2,
+        y: sy - RIM_RISE / 2,
+      });
+    if (rimRightRef.current)
+      Matter.Body.setPosition(rimRightRef.current, {
+        x: cx + tw / 2 - rs / 2,
+        y: sy - RIM_RISE / 2,
+      });
   }, []);
 
   // tableWidth変更時にテーブルを再生成
@@ -146,8 +167,7 @@ const BananaWorld = ({
 
     const tiers = unlockedTiersRef.current;
     const tier = tiers[Math.floor(Math.random() * tiers.length)];
-    const tex =
-      tier.textures[Math.floor(Math.random() * tier.textures.length)];
+    const tex = tier.textures[Math.floor(Math.random() * tier.textures.length)];
     const texScale = (2048 / tex.size) * 0.5 * scale;
     const baseUrl = import.meta.env.BASE_URL;
 

@@ -24,7 +24,14 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
       >
         Collection
       </div>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 6,
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end',
+        }}
+      >
         {unlockedTiers.map((tier) => (
           <div
             key={tier.tier}
@@ -42,7 +49,13 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
             }}
           >
             <span>{tier.name}</span>
-            <span style={{ opacity: 0.5, fontWeight: 500, color: 'var(--text-muted)' }}>
+            <span
+              style={{
+                opacity: 0.5,
+                fontWeight: 500,
+                color: 'var(--text-muted)',
+              }}
+            >
               {tier.score}pt
             </span>
           </div>

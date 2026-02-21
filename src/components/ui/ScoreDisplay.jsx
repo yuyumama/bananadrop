@@ -13,9 +13,11 @@ function ScoreDisplay({ score, perSecond, scoreBump, devMode }) {
         alignItems: 'flex-start',
         gap: 0,
         userSelect: 'none',
-        animation:
-          scoreBump ? 'scoreBump 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)' :
-            (perSecond > 0 ? 'breathingGold 3s ease-in-out infinite' : 'none'),
+        animation: scoreBump
+          ? 'scoreBump 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
+          : perSecond > 0
+            ? 'breathingGold 3s ease-in-out infinite'
+            : 'none',
         transition: 'all 0.3s ease',
       }}
     >
