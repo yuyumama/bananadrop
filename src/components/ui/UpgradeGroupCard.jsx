@@ -33,7 +33,14 @@ function UpgradeGroupCard({
 
       <button
         className="premium-button"
-        onClick={nextItem ? (e) => { e.stopPropagation(); onBuy(nextItem); } : undefined}
+        onClick={
+          nextItem
+            ? (e) => {
+                e.stopPropagation();
+                onBuy(nextItem);
+              }
+            : undefined
+        }
         disabled={nextItem ? !affordable : true}
         style={{
           width: '100%',
@@ -46,62 +53,93 @@ function UpgradeGroupCard({
           padding: '8px 4px 10px 4px', // Balanced top padding to push text down
           position: 'relative',
           overflow: 'hidden',
-          backgroundColor: !nextItem ? 'var(--bg-accent)' : affordable ? '#fffef0' : 'white',
-          borderColor: affordable ? 'var(--accent-gold)' : 'var(--glass-border)',
+          backgroundColor: !nextItem
+            ? 'var(--bg-accent)'
+            : affordable
+              ? '#fffef0'
+              : 'white',
+          borderColor: affordable
+            ? 'var(--accent-gold)'
+            : 'var(--glass-border)',
           transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          cursor: nextItem ? (affordable ? 'pointer' : 'not-allowed') : 'default',
+          cursor: nextItem
+            ? affordable
+              ? 'pointer'
+              : 'not-allowed'
+            : 'default',
         }}
       >
         {!nextItem ? (
           <>
-            <div style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: 800 }}>
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--accent-gold)',
+                fontWeight: 800,
+              }}
+            >
               {currentLabel}
             </div>
-            <div style={{ fontSize: '0.55rem', fontWeight: 700, opacity: 0.5, letterSpacing: '0.1em' }}>
+            <div
+              style={{
+                fontSize: '0.55rem',
+                fontWeight: 700,
+                opacity: 0.5,
+                letterSpacing: '0.1em',
+              }}
+            >
               MAXED COLLECTION
             </div>
           </>
         ) : (
           <>
             {/* Boutique Label: Current Level */}
-            <div style={{
-              fontSize: '0.5rem',
-              color: 'var(--text-muted)',
-              fontWeight: 300, // Minimalist weight
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
-            }}>
+            <div
+              style={{
+                fontSize: '0.5rem',
+                color: 'var(--text-muted)',
+                fontWeight: 300, // Minimalist weight
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
               {currentLabel}
             </div>
 
             {/* Price Tag Separator */}
-            <div style={{
-              width: '12px',
-              height: '1px',
-              backgroundColor: 'rgba(0,0,0,0.05)',
-              margin: '2px 0'
-            }} />
+            <div
+              style={{
+                width: '12px',
+                height: '1px',
+                backgroundColor: 'rgba(0,0,0,0.05)',
+                margin: '2px 0',
+              }}
+            />
 
             {/* Action: Next Level */}
-            <div style={{
-              fontSize: '0.75rem',
-              color: 'var(--text-main)',
-              fontWeight: 800, // Focus on the next goal
-              letterSpacing: '-0.01em'
-            }}>
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-main)',
+                fontWeight: 800, // Focus on the next goal
+                letterSpacing: '-0.01em',
+              }}
+            >
               {nextItem.label}
             </div>
 
             {/* Cost Component */}
-            <div style={{
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              color: affordable ? 'var(--accent-gold)' : 'var(--text-muted)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              marginTop: 1
-            }}>
+            <div
+              style={{
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                color: affordable ? 'var(--accent-gold)' : 'var(--text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                marginTop: 1,
+              }}
+            >
               <span style={{ fontSize: '0.8em', opacity: 0.8 }}>🍌</span>
               <span>{nextItem.cost.toLocaleString()}</span>
             </div>

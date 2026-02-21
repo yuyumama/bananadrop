@@ -29,7 +29,12 @@ function FloatingScoreText({ text, color }) {
         whiteSpace: 'nowrap',
       }}
     >
-      <span style={{ fontSize: '0.8em', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}>
+      <span
+        style={{
+          fontSize: '0.8em',
+          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+        }}
+      >
         🍌
       </span>
       <span>+{text.value}</span>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import Matter from 'matter-js';
+import TrayVisual from './ui/TrayVisual';
 
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
@@ -8,7 +9,8 @@ const RIM_RISE = 40;
 const RIM_SPREAD = 0; // ビジュアルは全幅カーブなので追加幅不要
 
 const rimSpread = (tw) => tw * 0.15;
-const rimLength = (tw) => Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
+const rimLength = (tw) =>
+  Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
 const rimAngle = (tw) => Math.atan2(RIM_RISE, rimSpread(tw));
 
 const getTablePx = (ratio) =>
@@ -56,37 +58,57 @@ const BananaWorld = ({
     tableWidthRef.current = tableWidth;
   }, [tableWidth]);
 
-
-
   const addRims = useCallback((world, cx, cy, tw) => {
     const opts = {
       isStatic: true,
-      render: { fillStyle: 'transparent', strokeStyle: 'transparent', lineWidth: 0 },
-      friction: 1.0, frictionStatic: 10.0, restitution: 0.0, label: 'rim',
+      render: {
+        fillStyle: 'transparent',
+        strokeStyle: 'transparent',
+        lineWidth: 0,
+      },
+      friction: 1.0,
+      frictionStatic: 10.0,
+      restitution: 0.0,
+      label: 'rim',
     };
     const rs = rimSpread(tw);
     const sy = cy - TABLE_HEIGHT / 2;
     rimLeftRef.current = Matter.Bodies.rectangle(
-      cx - tw / 2 + rs / 2, sy - RIM_RISE / 2,
-      rimLength(tw), TABLE_HEIGHT, { ...opts, angle: rimAngle(tw) },
+      cx - tw / 2 + rs / 2,
+      sy - RIM_RISE / 2,
+      rimLength(tw),
+      TABLE_HEIGHT,
+      { ...opts, angle: rimAngle(tw) },
     );
     rimRightRef.current = Matter.Bodies.rectangle(
-      cx + tw / 2 - rs / 2, sy - RIM_RISE / 2,
-      rimLength(tw), TABLE_HEIGHT, { ...opts, angle: -rimAngle(tw) },
+      cx + tw / 2 - rs / 2,
+      sy - RIM_RISE / 2,
+      rimLength(tw),
+      TABLE_HEIGHT,
+      { ...opts, angle: -rimAngle(tw) },
     );
     Matter.Composite.add(world, [rimLeftRef.current, rimRightRef.current]);
   }, []);
 
   const removeRims = useCallback((world) => {
     if (rimLeftRef.current) Matter.Composite.remove(world, rimLeftRef.current);
-    if (rimRightRef.current) Matter.Composite.remove(world, rimRightRef.current);
+    if (rimRightRef.current)
+      Matter.Composite.remove(world, rimRightRef.current);
   }, []);
 
   const syncRims = useCallback((cx, cy, tw) => {
     const rs = rimSpread(tw);
     const sy = cy - TABLE_HEIGHT / 2;
-    if (rimLeftRef.current) Matter.Body.setPosition(rimLeftRef.current, { x: cx - tw / 2 + rs / 2, y: sy - RIM_RISE / 2 });
-    if (rimRightRef.current) Matter.Body.setPosition(rimRightRef.current, { x: cx + tw / 2 - rs / 2, y: sy - RIM_RISE / 2 });
+    if (rimLeftRef.current)
+      Matter.Body.setPosition(rimLeftRef.current, {
+        x: cx - tw / 2 + rs / 2,
+        y: sy - RIM_RISE / 2,
+      });
+    if (rimRightRef.current)
+      Matter.Body.setPosition(rimRightRef.current, {
+        x: cx + tw / 2 - rs / 2,
+        y: sy - RIM_RISE / 2,
+      });
   }, []);
 
   // tableWidth変更時にテーブルを再生成
@@ -145,8 +167,7 @@ const BananaWorld = ({
 
     const tiers = unlockedTiersRef.current;
     const tier = tiers[Math.floor(Math.random() * tiers.length)];
-    const tex =
-      tier.textures[Math.floor(Math.random() * tier.textures.length)];
+    const tex = tier.textures[Math.floor(Math.random() * tier.textures.length)];
     const texScale = (2048 / tex.size) * 0.5 * scale;
     const baseUrl = import.meta.env.BASE_URL;
 
@@ -426,80 +447,12 @@ const BananaWorld = ({
       }}
     >
       {/* HTMLバー：おぼん型（全体が1本の緩やかなカーブ） */}
-      <div
+      <TrayVisual
         ref={barVisualRef}
-        style={{
-          position: 'absolute',
-          height: `${RIM_RISE + TABLE_HEIGHT}px`,
-          pointerEvents: 'none',
-          zIndex: 1,
-          filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
-        }}
-      >
-        <svg
-          width="100%"
-          height={RIM_RISE + TABLE_HEIGHT}
-          viewBox={`0 0 ${barWidth} ${RIM_RISE + TABLE_HEIGHT}`}
-          preserveAspectRatio="xMidYMid meet"
-          style={{ display: 'block', overflow: 'visible' }}
-        >
-          <defs>
-            <linearGradient id="trayGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#e3c6a1', stopOpacity: 1 }} />
-              <stop offset="50%" style={{ stopColor: '#d2b48c', stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: '#bc9d76', stopOpacity: 1 }} />
-            </linearGradient>
-            <pattern id="woodGrain" patternUnits="userSpaceOnUse" width="100" height="20">
-              <path d="M0 10 Q 25 5, 50 10 T 100 10" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="1" />
-              <path d="M0 15 Q 25 10, 50 15 T 100 15" fill="none" stroke="rgba(0,0,0,0.03)" strokeWidth="1" />
-            </pattern>
-            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-              <feOffset dx="0" dy="2" result="offsetblur" />
-              <feComponentTransfer>
-                <feFuncA type="linear" slope="0.3" />
-              </feComponentTransfer>
-              <feMerge>
-                <feMergeNode />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-
-          {/* Main Tray Body */}
-          <path
-            d={`M 10,${RIM_RISE / 2} 
-               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT / 2} ${barWidth - 10},${RIM_RISE / 2}
-               L ${barWidth},${RIM_RISE / 2 + 5}
-               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT} 0,${RIM_RISE / 2 + 5}
-               Z`}
-            fill="url(#trayGradient)"
-            filter="url(#shadow)"
-          />
-
-          {/* Wood Grain Overlay */}
-          <path
-            d={`M 10,${RIM_RISE / 2} 
-               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT / 2} ${barWidth - 10},${RIM_RISE / 2}
-               L ${barWidth},${RIM_RISE / 2 + 5}
-               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT} 0,${RIM_RISE / 2 + 5}
-               Z`}
-            fill="url(#woodGrain)"
-            opacity="0.4"
-          />
-
-          {/* Tray Rim/Edge Enhancement */}
-          <path
-            d={`M 10,${RIM_RISE / 2} 
-               Q ${barWidth / 2},${RIM_RISE + TABLE_HEIGHT / 2} ${barWidth - 10},${RIM_RISE / 2}`}
-            fill="none"
-            stroke="#c4a484"
-            strokeWidth="3"
-            strokeLinecap="round"
-            opacity="0.6"
-          />
-        </svg>
-      </div>
+        barWidth={barWidth}
+        rimRise={RIM_RISE}
+        tableHeight={TABLE_HEIGHT}
+      />
       {/* Matter.jsキャンバス（バナナはここに描画、バーより前） */}
       <div
         ref={sceneRef}
