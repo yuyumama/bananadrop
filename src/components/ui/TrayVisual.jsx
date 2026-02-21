@@ -4,12 +4,20 @@ const TrayVisual = forwardRef(function TrayVisual(
   { barWidth, rimRise, tableHeight },
   ref,
 ) {
+  const totalHeight = rimRise + tableHeight;
+  const trayRimPath = `M 10,${rimRise / 2} Q ${barWidth / 2},${
+    rimRise + tableHeight / 2
+  } ${barWidth - 10},${rimRise / 2}`;
+  const trayBodyPath = `${trayRimPath} L ${barWidth},${
+    rimRise / 2 + 5
+  } Q ${barWidth / 2},${totalHeight} 0,${rimRise / 2 + 5} Z`;
+
   return (
     <div
       ref={ref}
       style={{
         position: 'absolute',
-        height: `${rimRise + tableHeight}px`,
+        height: `${totalHeight}px`,
         pointerEvents: 'none',
         zIndex: 1,
         filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
@@ -17,8 +25,8 @@ const TrayVisual = forwardRef(function TrayVisual(
     >
       <svg
         width="100%"
-        height={rimRise + tableHeight}
-        viewBox={`0 0 ${barWidth} ${rimRise + tableHeight}`}
+        height={totalHeight}
+        viewBox={`0 0 ${barWidth} ${totalHeight}`}
         preserveAspectRatio="xMidYMid meet"
         style={{ display: 'block', overflow: 'visible' }}
       >
@@ -71,30 +79,17 @@ const TrayVisual = forwardRef(function TrayVisual(
 
         {/* Main Tray Body */}
         <path
-          d={`M 10,${rimRise / 2} 
-               Q ${barWidth / 2},${rimRise + tableHeight / 2} ${barWidth - 10},${rimRise / 2}
-               L ${barWidth},${rimRise / 2 + 5}
-               Q ${barWidth / 2},${rimRise + tableHeight} 0,${rimRise / 2 + 5}
-               Z`}
+          d={trayBodyPath}
           fill="url(#trayGradient)"
           filter="url(#shadow)"
         />
 
         {/* Wood Grain Overlay */}
-        <path
-          d={`M 10,${rimRise / 2} 
-               Q ${barWidth / 2},${rimRise + tableHeight / 2} ${barWidth - 10},${rimRise / 2}
-               L ${barWidth},${rimRise / 2 + 5}
-               Q ${barWidth / 2},${rimRise + tableHeight} 0,${rimRise / 2 + 5}
-               Z`}
-          fill="url(#woodGrain)"
-          opacity="0.4"
-        />
+        <path d={trayBodyPath} fill="url(#woodGrain)" opacity="0.4" />
 
         {/* Tray Rim/Edge Enhancement */}
         <path
-          d={`M 10,${rimRise / 2} 
-               Q ${barWidth / 2},${rimRise + tableHeight / 2} ${barWidth - 10},${rimRise / 2}`}
+          d={trayRimPath}
           fill="none"
           stroke="#c4a484"
           strokeWidth="3"
