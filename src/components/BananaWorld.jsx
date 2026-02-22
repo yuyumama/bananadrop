@@ -8,6 +8,7 @@ import {
   rimLength,
   rimSpread,
 } from '../services/bananaWorldGeometry';
+import { createBananaBody } from '../services/bananaFactory';
 import { collectBananaOutcome } from '../services/bananaScore';
 
 const TABLE_HEIGHT = 20;
@@ -148,48 +149,14 @@ const BananaWorld = ({
     if (!engineRef.current) return;
 
     const y = -200;
-    const isGiant = Math.random() < giantChanceRef.current;
-    const baseScale = Math.min(window.innerWidth, 430) / 3000;
-    const scale = isGiant ? baseScale * 3 : baseScale;
-
-    // バナナ型（三日月型）の当たり判定
-    const vertices = [
-      { x: 0 * scale, y: 0 * scale },
-      { x: 180 * scale, y: -85 * scale },
-      { x: 400 * scale, y: -105 * scale },
-      { x: 620 * scale, y: -68 * scale },
-      { x: 740 * scale, y: 10 * scale },
-      { x: 590 * scale, y: 75 * scale },
-      { x: 370 * scale, y: 92 * scale },
-      { x: 145 * scale, y: 55 * scale },
-    ];
-
-    const tiers = unlockedTiersRef.current;
-    const tier = tiers[Math.floor(Math.random() * tiers.length)];
-    const tex = tier.textures[Math.floor(Math.random() * tier.textures.length)];
-    const texScale = (2048 / tex.size) * 0.5 * scale;
-    const baseUrl = import.meta.env.BASE_URL;
-
-    const banana = Matter.Bodies.fromVertices(x, y, [vertices], {
-      render: {
-        sprite: {
-          texture: `${baseUrl}${tex.file}`,
-          xScale: texScale,
-          yScale: texScale,
-        },
-      },
-      restitution: 0.0,
-      friction: 1.0,
-      frictionStatic: 10.0,
-      frictionAir: 0.02,
-      density: isGiant ? 0.3 : 0.001,
+    const banana = createBananaBody({
+      x,
+      y,
+      tiers: unlockedTiersRef.current,
+      giantChance: giantChanceRef.current,
+      viewportWidth: window.innerWidth,
+      baseUrl: import.meta.env.BASE_URL,
     });
-    banana.label = 'banana';
-    banana.bananaScore = tier.score * (isGiant ? 50 : 1);
-    banana.isGiant = isGiant;
-
-    Matter.Body.setPosition(banana, { x, y });
-    Matter.Body.setAngle(banana, Math.random() * Math.PI * 2);
     Matter.Composite.add(engineRef.current.world, banana);
   }, []);
 
