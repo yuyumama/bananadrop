@@ -96,20 +96,23 @@ export default function useMatterBananaWorld({
       });
   }, []);
 
-  const spawnBanana = useCallback((x) => {
-    if (!engineRef.current) return;
+  const spawnBanana = useCallback(
+    (x) => {
+      if (!engineRef.current) return;
 
-    const y = -200;
-    const banana = createBananaBody({
-      x,
-      y,
-      tiers: unlockedTiersRef.current,
-      giantChance: giantChanceRef.current,
-      viewportWidth: window.innerWidth,
-      baseUrl: import.meta.env.BASE_URL,
-    });
-    Matter.Composite.add(engineRef.current.world, banana);
-  }, [giantChanceRef, unlockedTiersRef]);
+      const y = -200;
+      const banana = createBananaBody({
+        x,
+        y,
+        tiers: unlockedTiersRef.current,
+        giantChance: giantChanceRef.current,
+        viewportWidth: window.innerWidth,
+        baseUrl: import.meta.env.BASE_URL,
+      });
+      Matter.Composite.add(engineRef.current.world, banana);
+    },
+    [giantChanceRef, unlockedTiersRef],
+  );
 
   // tableWidth変更時にテーブルを再生成
   useEffect(() => {
@@ -155,11 +158,7 @@ export default function useMatterBananaWorld({
     });
 
     const barCenterY = () =>
-      calcBarCenterY(
-        window.innerHeight,
-        panelHeightRef.current,
-        TABLE_HEIGHT,
-      );
+      calcBarCenterY(window.innerHeight, panelHeightRef.current, TABLE_HEIGHT);
 
     const syncBar = (x, y) => {
       if (!barVisualRef.current) return;

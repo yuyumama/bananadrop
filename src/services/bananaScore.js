@@ -1,4 +1,8 @@
-export const collectBananaOutcome = ({ bananas, screenWidth, screenHeight }) => {
+export const collectBananaOutcome = ({
+  bananas,
+  screenWidth,
+  screenHeight,
+}) => {
   const scoredBodies = bananas.filter((b) => b.position.y > screenHeight + 200);
   const lostBodies = bananas.filter(
     (b) => b.position.x < -200 || b.position.x > screenWidth + 200,
