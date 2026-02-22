@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import Matter from 'matter-js';
 import TrayVisual from './ui/TrayVisual';
+import useLatestRef from '../hooks/useLatestRef';
 import {
   calcBarCenterY,
   getTablePx,
@@ -29,34 +30,15 @@ const BananaWorld = ({
   const barVisualRef = useRef(null);
   const barWidth = useMemo(() => getTablePx(tableWidth), [tableWidth]);
   const engineRef = useRef(null);
-  const bananaPerClickRef = useRef(bananaPerClick);
-  const onScoreRef = useRef(onScore);
-  const unlockedTiersRef = useRef(unlockedTiers);
-  const panelHeightRef = useRef(panelHeight);
-  const giantChanceRef = useRef(giantChance);
+  const bananaPerClickRef = useLatestRef(bananaPerClick);
+  const onScoreRef = useLatestRef(onScore);
+  const unlockedTiersRef = useLatestRef(unlockedTiers);
+  const panelHeightRef = useLatestRef(panelHeight);
+  const giantChanceRef = useLatestRef(giantChance);
   const tableRef = useRef(null);
   const rimLeftRef = useRef(null);
   const rimRightRef = useRef(null);
-  const tableWidthRef = useRef(tableWidth);
-
-  useEffect(() => {
-    bananaPerClickRef.current = bananaPerClick;
-  }, [bananaPerClick]);
-  useEffect(() => {
-    onScoreRef.current = onScore;
-  }, [onScore]);
-  useEffect(() => {
-    unlockedTiersRef.current = unlockedTiers;
-  }, [unlockedTiers]);
-  useEffect(() => {
-    panelHeightRef.current = panelHeight;
-  }, [panelHeight]);
-  useEffect(() => {
-    giantChanceRef.current = giantChance;
-  }, [giantChance]);
-  useEffect(() => {
-    tableWidthRef.current = tableWidth;
-  }, [tableWidth]);
+  const tableWidthRef = useLatestRef(tableWidth);
 
   const addRims = useCallback((world, cx, cy, tw) => {
     const opts = {
@@ -158,7 +140,7 @@ const BananaWorld = ({
       baseUrl: import.meta.env.BASE_URL,
     });
     Matter.Composite.add(engineRef.current.world, banana);
-  }, []);
+  }, [giantChanceRef, unlockedTiersRef]);
 
   useEffect(() => {
     const Engine = Matter.Engine,
@@ -358,7 +340,7 @@ const BananaWorld = ({
       render.context = null;
       render.textures = {};
     };
-  }, [addRims, removeRims, syncRims]);
+  }, [addRims, onScoreRef, panelHeightRef, removeRims, syncRims, tableWidthRef]);
 
   useEffect(() => {
     if (autoSpawnRate <= 0) return;
