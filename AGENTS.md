@@ -6,8 +6,8 @@ This is a Vite + React project. Main code lives in `src/`:
 
 - `src/main.jsx` bootstraps the app, and `src/App.jsx` composes the main screen.
 - `src/components/` contains gameplay and UI components (shared UI is in `src/components/ui/`).
-- `src/hooks/` holds stateful logic (`useUpgradeState.js`).
-- `src/services/` contains pure game logic (`upgradeRules.js`).
+- `src/hooks/` holds stateful logic and runtime side effects (`useUpgradeState.js`, `useLatestRef.js`, `useAutoSpawn.js`, `useMatterBananaWorld.js`).
+- `src/services/` contains reusable game-domain helpers and factories (`upgradeRules.js`, `bananaWorldGeometry.js`, `bananaScore.js`, `bananaFactory.js`).
 - `src/data/` stores upgrade definitions and constants (`src/data/constants/`).
 - `public/` stores banana image assets; `dist/` is build output (do not edit directly).
 
@@ -32,6 +32,7 @@ Deployment is automated by `.github/workflows/deploy.yml` on pushes to `main`, p
   - Hooks: `useSomething.js` (example: `useUpgradeState.js`)
   - Constants/data modules: `camelCase.js` in `src/data/constants/`
 - Keep game rules in `src/services/` and avoid embedding them in UI components.
+- Keep Matter.js lifecycle and other physics side effects in hooks (for example `useMatterBananaWorld.js`), and keep `BananaWorld.jsx` focused on UI boundary and input wiring.
 
 ## Testing Guidelines
 
