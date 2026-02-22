@@ -1,20 +1,18 @@
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import Matter from 'matter-js';
 import TrayVisual from './ui/TrayVisual';
+import {
+  calcBarCenterY,
+  getTablePx,
+  rimAngle,
+  rimLength,
+  rimSpread,
+} from '../services/bananaWorldGeometry';
 
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
 const TABLE_MOVE_HZ = 0.08; // 約12.5秒で1往復
 const RIM_RISE = 40;
-const RIM_SPREAD = 0; // ビジュアルは全幅カーブなので追加幅不要
-
-const rimSpread = (tw) => tw * 0.15;
-const rimLength = (tw) =>
-  Math.sqrt(RIM_RISE * RIM_RISE + rimSpread(tw) * rimSpread(tw));
-const rimAngle = (tw) => Math.atan2(RIM_RISE, rimSpread(tw));
-
-const getTablePx = (ratio) =>
-  ratio * window.innerWidth * (window.innerWidth <= 430 ? 0.75 : 1);
 
 const BananaWorld = ({
   bananaPerClick = 1,
@@ -219,7 +217,11 @@ const BananaWorld = ({
 
     // バーの中心Y（ボタンパネルのすぐ上）
     const barCenterY = () =>
-      window.innerHeight - panelHeightRef.current - TABLE_HEIGHT / 2 - 20;
+      calcBarCenterY(
+        window.innerHeight,
+        panelHeightRef.current,
+        TABLE_HEIGHT,
+      );
 
     const tableW = getTablePx(tableWidthRef.current);
     const table = Bodies.rectangle(
