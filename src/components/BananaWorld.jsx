@@ -8,6 +8,7 @@ import {
   rimLength,
   rimSpread,
 } from '../services/bananaWorldGeometry';
+import { collectBananaOutcome } from '../services/bananaScore';
 
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
@@ -329,37 +330,15 @@ const BananaWorld = ({
     Matter.Events.on(engine, 'afterUpdate', () => {
       const bodies = Composite.allBodies(engine.world);
       const bananas = bodies.filter((b) => b.label === 'banana');
+      const { scoreItems, scoredBodies, lostBodies } = collectBananaOutcome({
+        bananas,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+      });
 
-      const scored = bananas.filter(
-        (b) => b.position.y > window.innerHeight + 200,
-      );
-      const lost = bananas.filter(
-        (b) => b.position.x < -200 || b.position.x > window.innerWidth + 200,
-      );
-
-      if (scored.length > 0) {
-        const screenW = window.innerWidth;
-        const fadeZone = screenW * 0.1; // 端から10%以内はスコア減衰
-        const scoreItems = [];
-        scored.forEach((b) => {
-          const x = b.position.x;
-          const distFromEdge = Math.min(x, screenW - x);
-          const fraction = Math.min(1, distFromEdge / fadeZone);
-          const finalScore = Math.round((b.bananaScore || 1) * fraction);
-          if (finalScore > 0) {
-            scoreItems.push({
-              score: finalScore,
-              x: Math.max(40, Math.min(screenW - 40, x)),
-            });
-          }
-          Matter.Composite.remove(engine.world, b);
-        });
-        if (scoreItems.length > 0) onScoreRef.current?.(scoreItems);
-      }
-
-      if (lost.length > 0) {
-        lost.forEach((b) => Composite.remove(engine.world, b));
-      }
+      scoredBodies.forEach((b) => Matter.Composite.remove(engine.world, b));
+      lostBodies.forEach((b) => Composite.remove(engine.world, b));
+      if (scoreItems.length > 0) onScoreRef.current?.(scoreItems);
     });
 
     const handleResize = () => {
