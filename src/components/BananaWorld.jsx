@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useMemo } from 'react';
 import Matter from 'matter-js';
 import TrayVisual from './ui/TrayVisual';
+import useAutoSpawn from '../hooks/useAutoSpawn';
 import useLatestRef from '../hooks/useLatestRef';
 import {
   calcBarCenterY,
@@ -342,13 +343,7 @@ const BananaWorld = ({
     };
   }, [addRims, onScoreRef, panelHeightRef, removeRims, syncRims, tableWidthRef]);
 
-  useEffect(() => {
-    if (autoSpawnRate <= 0) return;
-    const interval = setInterval(() => {
-      spawnBanana(Math.random() * window.innerWidth);
-    }, 1000 / autoSpawnRate);
-    return () => clearInterval(interval);
-  }, [autoSpawnRate, spawnBanana]);
+  useAutoSpawn({ autoSpawnRate, spawnBanana });
 
   const handleDataClick = (e) => {
     let x;
