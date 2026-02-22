@@ -9,6 +9,18 @@ const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
 const RIM_RISE = 40;
 
+const resolvePointerX = (event) => {
+  if (event && event.touches && event.touches.length > 0) {
+    return event.touches[0].clientX;
+  }
+
+  if (event && event.clientX !== undefined) {
+    return event.clientX;
+  }
+
+  return Math.random() * window.innerWidth;
+};
+
 const BananaWorld = ({
   bananaPerClick = 1,
   autoSpawnRate = 0,
@@ -42,15 +54,7 @@ const BananaWorld = ({
   useAutoSpawn({ autoSpawnRate, spawnBanana });
 
   const handleDataClick = (e) => {
-    let x;
-    if (e && e.touches && e.touches.length > 0) {
-      x = e.touches[0].clientX;
-    } else if (e && e.clientX !== undefined) {
-      x = e.clientX;
-    } else {
-      x = Math.random() * window.innerWidth;
-    }
-
+    const x = resolvePointerX(e);
     const count = bananaPerClickRef.current;
     for (let i = 0; i < count; i++) {
       const offset = (i - (count - 1) / 2) * 40;
