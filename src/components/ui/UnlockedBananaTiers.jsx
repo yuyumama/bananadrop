@@ -31,7 +31,7 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
-          alignItems: 'flex-end'
+          alignItems: 'flex-end',
         }}
       >
         {unlockedTiers.map((tier) => (
@@ -67,14 +67,16 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
               style={{ width: 24, height: 24, objectFit: 'contain' }}
             />
             <span>{tier.name}</span>
-            <span style={{
-              fontSize: '0.65rem',
-              opacity: 0.6,
-              fontWeight: 600,
-              color: 'var(--text-muted)',
-              marginLeft: 'auto',
-              paddingLeft: 8
-            }}>
+            <span
+              style={{
+                fontSize: '0.65rem',
+                opacity: 0.6,
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                marginLeft: 'auto',
+                paddingLeft: 8,
+              }}
+            >
               {tier.score}pt
             </span>
           </div>

@@ -258,7 +258,9 @@ body {
   }
 
   50% {
-    box-shadow: 0 0 30px rgba(212, 175, 55, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.4);
+    box-shadow:
+      0 0 30px rgba(212, 175, 55, 0.8),
+      inset 0 0 15px rgba(212, 175, 55, 0.4);
     border-color: var(--accent-gold);
     background: white;
   }

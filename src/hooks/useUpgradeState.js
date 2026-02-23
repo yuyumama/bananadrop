@@ -70,33 +70,36 @@ export default function useUpgradeState() {
     [purchased, bananaPerClick, autoSpawnRate, giantChance, unlockedTiers],
   );
 
-  const waterTree = useCallback((currentScore) => {
-    // ツリーのレベルに応じた水やりコスト
-    const cost = 100 + treeData.level * 50;
+  const waterTree = useCallback(
+    (currentScore) => {
+      // ツリーのレベルに応じた水やりコスト
+      const cost = 100 + treeData.level * 50;
 
-    if (currentScore < cost) return false;
+      if (currentScore < cost) return false;
 
-    setTreeData((prev) => {
-      let newGrowth = prev.growth + 20;
-      let newLevel = prev.level;
-      let newSeeds = prev.seeds;
+      setTreeData((prev) => {
+        let newGrowth = prev.growth + 20;
+        let newLevel = prev.level;
+        let newSeeds = prev.seeds;
 
-      if (newGrowth >= 100) {
-        newLevel += 1;
-        newSeeds += 1;
-        newGrowth -= 100;
-      }
+        if (newGrowth >= 100) {
+          newLevel += 1;
+          newSeeds += 1;
+          newGrowth -= 100;
+        }
 
-      return {
-        ...prev,
-        growth: newGrowth,
-        level: newLevel,
-        seeds: newSeeds,
-      };
-    });
+        return {
+          ...prev,
+          growth: newGrowth,
+          level: newLevel,
+          seeds: newSeeds,
+        };
+      });
 
-    return cost; // 消費したスコアを返す
-  }, [treeData.level]);
+      return cost; // 消費したスコアを返す
+    },
+    [treeData.level],
+  );
 
   return {
     bananaPerClick,
