@@ -61,7 +61,11 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
               e.currentTarget.style.background = 'rgba(255, 255, 255, 0.8)';
             }}
           >
-            <span style={{ fontSize: '0.9rem' }}>🍌</span>
+            <img
+              src={`${import.meta.env.BASE_URL}${tier.icon}`}
+              alt={tier.name}
+              style={{ width: 24, height: 24, objectFit: 'contain' }}
+            />
             <span>{tier.name}</span>
             <span style={{
               fontSize: '0.65rem',

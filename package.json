@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "jimp": "^1.6.0",
+    "lucide-react": "^0.575.0",
     "matter-js": "^0.20.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
