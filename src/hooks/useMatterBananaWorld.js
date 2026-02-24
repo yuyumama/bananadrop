@@ -118,17 +118,21 @@ export default function useMatterBananaWorld({
     [giantChanceRef, unlockedTiersRef],
   );
 
-  const spawnSpecialBanana = useCallback((x, item) => {
-    if (!engineRef.current) return;
-    const body = createSpecialBananaBody({
-      x,
-      y: -200,
-      item,
-      viewportWidth: window.innerWidth,
-      baseUrl: import.meta.env.BASE_URL,
-    });
-    Matter.Composite.add(engineRef.current.world, body);
-  }, []);
+  const spawnSpecialBanana = useCallback(
+    (x, item) => {
+      if (!engineRef.current) return;
+      const body = createSpecialBananaBody({
+        x,
+        y: -200,
+        item,
+        giantChance: giantChanceRef.current,
+        viewportWidth: window.innerWidth,
+        baseUrl: import.meta.env.BASE_URL,
+      });
+      Matter.Composite.add(engineRef.current.world, body);
+    },
+    [giantChanceRef],
+  );
 
   // tableWidth変更時にテーブルを再生成
   useEffect(() => {
@@ -258,6 +262,32 @@ export default function useMatterBananaWorld({
       Matter.Body.setVelocity(tableRef.current, { x: vx, y: 0 });
       syncRims(clampedX, y, tw);
       syncBar(clampedX, y);
+
+      // ブラックホール引力：半径350px以内のバナナを引き寄せる
+      const allBodies = Composite.allBodies(engine.world);
+      const blackholes = allBodies.filter(
+        (b) =>
+          b.label === 'special_banana' && b.shopItemId === 'banana_blackhole',
+      );
+      if (blackholes.length > 0) {
+        const bananas = allBodies.filter((b) => b.label === 'banana');
+        blackholes.forEach((bh) => {
+          bananas.forEach((banana) => {
+            if (banana.isStatic) return;
+            const dx = bh.position.x - banana.position.x;
+            const dy = bh.position.y - banana.position.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 350 && dist > 5) {
+              // 重力の約2.5倍の引力（dist=200 基準）
+              const forceMag = (0.5 * banana.mass) / Math.max(dist, 30);
+              Matter.Body.applyForce(banana, banana.position, {
+                x: (dx / dist) * forceMag,
+                y: (dy / dist) * forceMag,
+              });
+            }
+          });
+        });
+      }
     });
 
     // 下落下 → スコア/効果発動、左右アウト → ロス

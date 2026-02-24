@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import TrayVisual from './ui/TrayVisual';
 import useAutoSpawn from '../hooks/useAutoSpawn';
 import useLatestRef from '../hooks/useLatestRef';
@@ -58,19 +58,38 @@ const BananaWorld = ({
     tableWidth,
   });
 
-  useAutoSpawn({
-    autoSpawnRate,
-    spawnBanana,
-    spawnSpecialBanana,
-    shopPurchasesRef,
-  });
+  const trySpawnSpecial = useCallback(
+    (x) => {
+      SHOP_ITEMS.forEach((item) => {
+        const count = shopPurchasesRef.current?.[item.id] ?? 0;
+        if (count === 0) return;
+        const chance = item.spawnChanceStacks
+          ? item.spawnChancePerBanana * count
+          : item.spawnChancePerBanana;
+        if (Math.random() < chance) {
+          spawnSpecialBanana(x, item);
+        }
+      });
+    },
+    [spawnSpecialBanana, shopPurchasesRef],
+  );
+
+  const spawnBananaWithCheck = useCallback(
+    (x) => {
+      spawnBanana(x);
+      trySpawnSpecial(x);
+    },
+    [spawnBanana, trySpawnSpecial],
+  );
+
+  useAutoSpawn({ autoSpawnRate, spawnBanana: spawnBananaWithCheck });
 
   const handleDataClick = (e) => {
     const x = resolvePointerX(e);
     const count = bananaPerClickRef.current;
     for (let i = 0; i < count; i++) {
       const offset = (i - (count - 1) / 2) * 40;
-      spawnBanana(x + offset);
+      spawnBananaWithCheck(x + offset);
     }
   };
 

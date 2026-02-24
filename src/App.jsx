@@ -42,6 +42,9 @@ function App() {
     isFever,
     feverEndTime,
     feverDuration,
+    isAllGiant,
+    allGiantEndTime,
+    allGiantDuration,
   } = useActiveEffects();
 
   const [floatingTexts, setFloatingTexts] = useState([]);
@@ -178,8 +181,24 @@ function App() {
         )
       : 0;
 
-  // フィーバー中はオートスポーン倍率を適用
+  // allGiant 残り秒数と進捗
+  const allGiantRemaining = isAllGiant
+    ? Math.max(0, Math.ceil((allGiantEndTime - Date.now()) / 1000))
+    : 0;
+  const allGiantPercent =
+    isAllGiant && allGiantDuration > 0
+      ? Math.max(
+          0,
+          Math.min(
+            100,
+            ((allGiantEndTime - Date.now()) / (allGiantDuration * 1000)) * 100,
+          ),
+        )
+      : 0;
+
+  // エフェクト適用後の値
   const effectiveRate = autoSpawnRate * effectiveAutoMultiplier;
+  const effectiveGiantChance = isAllGiant ? 1 : giantChance;
 
   return (
     <div
@@ -202,6 +221,9 @@ function App() {
         tierColors={TIER_COLORS}
         nuiBananaCount={shopPurchases['banana_nui'] ?? 0}
         isFever={isFever}
+        magicBananaCount={shopPurchases['banana_magic'] ?? 0}
+        isAllGiant={isAllGiant}
+        blackholeBananaCount={shopPurchases['banana_blackhole'] ?? 0}
       />
       <ShopButton seeds={seeds} onOpen={() => setIsShopOpen(true)} />
       {isShopOpen && (
@@ -235,8 +257,7 @@ function App() {
               style={{
                 height: '100%',
                 width: `${feverPercent}%`,
-                background:
-                  'linear-gradient(90deg, #ff6b35, #ffd700, #ff9f00)',
+                background: 'linear-gradient(90deg, #ff6b35, #ffd700, #ff9f00)',
                 backgroundSize: '200% 100%',
                 boxShadow:
                   '0 0 12px rgba(255,107,53,0.8), 0 0 4px rgba(255,215,0,0.6)',
@@ -287,6 +308,74 @@ function App() {
         </>
       )}
 
+      {/* allGiant：上部カウントダウンバー + 中央ラベル */}
+      {isAllGiant && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              top: isFever ? 5 : 0,
+              left: 0,
+              right: 0,
+              height: 5,
+              zIndex: 200,
+              background: 'rgba(0,0,0,0.06)',
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${allGiantPercent}%`,
+                background: 'linear-gradient(90deg, #a855f7, #ec4899, #a855f7)',
+                backgroundSize: '200% 100%',
+                boxShadow:
+                  '0 0 12px rgba(168,85,247,0.8), 0 0 4px rgba(236,72,153,0.6)',
+                borderRadius: '0 3px 3px 0',
+                transition: 'width 0.5s linear',
+                animation: 'feverBarShimmer 2s linear infinite',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              position: 'fixed',
+              top: isFever ? 36 : 10,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 201,
+              pointerEvents: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'rgba(168, 85, 247, 0.12)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(168,85,247,0.3)',
+              borderRadius: 20,
+              padding: '4px 14px',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              color: '#9333ea',
+              whiteSpace: 'nowrap',
+              letterSpacing: '0.04em',
+            }}
+          >
+            <span style={{ fontSize: '0.85rem' }}>✨</span>
+            <span>全員巨大化</span>
+            <span
+              style={{
+                opacity: 0.65,
+                fontWeight: 600,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {allGiantRemaining}s
+            </span>
+          </div>
+        </>
+      )}
+
       <BananaTree
         score={score}
         seeds={seeds}
@@ -323,7 +412,7 @@ function App() {
         autoSpawnRate={effectiveRate}
         panelHeight={PANEL_HEIGHT}
         unlockedTiers={unlockedTiers}
-        giantChance={giantChance}
+        giantChance={effectiveGiantChance}
         onScore={handleScore}
         onEffect={handleEffect}
         shopPurchases={shopPurchases}

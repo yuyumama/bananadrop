@@ -1,5 +1,9 @@
 import { X } from 'lucide-react';
-import { SHOP_ITEMS, getShopItemCost } from '../../data/shopItems';
+import {
+  SHOP_ITEMS,
+  getShopItemCost,
+  getEffectDuration,
+} from '../../data/shopItems';
 
 export default function ShopModal({
   seeds,
@@ -316,6 +320,95 @@ export default function ShopModal({
                   >
                     {item.description}
                   </div>
+
+                  {/* spawnChanceStacks: 出現確率表示 */}
+                  {item.spawnChanceStacks && (
+                    <div
+                      style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        color: '#1e3a5f',
+                        marginBottom: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      {count === 0 ? (
+                        <span
+                          style={{
+                            color: 'var(--text-muted)',
+                            fontWeight: 500,
+                          }}
+                        >
+                          購入で 🌀 出現率{' '}
+                          {(item.spawnChancePerBanana * 100).toFixed(1)}%
+                        </span>
+                      ) : (
+                        <>
+                          <span>
+                            🌀 出現率{' '}
+                            {(item.spawnChancePerBanana * count * 100).toFixed(
+                              1,
+                            )}
+                            %
+                          </span>
+                          {!isMaxed && (
+                            <span style={{ color: '#3b82f6', fontWeight: 600 }}>
+                              → 次購入で{' '}
+                              {(
+                                item.spawnChancePerBanana *
+                                (count + 1) *
+                                100
+                              ).toFixed(1)}
+                              %
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* allGiant: 効果時間表示 */}
+                  {item.effect?.type === 'allGiant' && (
+                    <div
+                      style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        color: '#9333ea',
+                        marginBottom: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      {count === 0 ? (
+                        <span
+                          style={{
+                            color: 'var(--text-muted)',
+                            fontWeight: 500,
+                          }}
+                        >
+                          購入で ✨ {getEffectDuration(item.effect, 1)}s 巨大化
+                        </span>
+                      ) : (
+                        <>
+                          <span>
+                            ✨ 現在 {getEffectDuration(item.effect, count)}s
+                            効果
+                          </span>
+                          {!isMaxed && (
+                            <span style={{ color: '#a855f7', fontWeight: 600 }}>
+                              → 次購入で{' '}
+                              {getEffectDuration(item.effect, count + 1)}s
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
 
                   {/* feverTime: 効果時間表示 */}
                   {isFeverItem && (
