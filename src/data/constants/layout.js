@@ -1,1 +1,1 @@
-export const PANEL_HEIGHT = 80;
+export const PANEL_HEIGHT = 100;
