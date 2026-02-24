@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { SHOP_ITEMS } from '../data/shopItems';
+import { SHOP_ITEMS, getEffectDuration } from '../data/shopItems';
 
 export default function useActiveEffects() {
   const [effects, setEffects] = useState([]);
@@ -20,11 +20,8 @@ export default function useActiveEffects() {
     const item = SHOP_ITEMS.find((s) => s.id === itemId);
     if (!item?.effect) return;
 
-    const { type, duration, maxDuration, autoMultiplier } = item.effect;
-    const totalDuration = Math.min(
-      maxDuration ?? Infinity,
-      duration * Math.max(1, count),
-    );
+    const { type, autoMultiplier } = item.effect;
+    const totalDuration = getEffectDuration(item.effect, Math.max(1, count));
     setEffects((prev) => [
       // 同じ type は上書き（重複を避ける）
       ...prev.filter((e) => e.type !== type),
@@ -44,6 +41,7 @@ export default function useActiveEffects() {
   );
 
   const feverEffect = effects.find((e) => e.type === 'feverTime');
+  const allGiantEffect = effects.find((e) => e.type === 'allGiant');
 
   return {
     effects,
@@ -52,5 +50,8 @@ export default function useActiveEffects() {
     isFever: Boolean(feverEffect),
     feverEndTime: feverEffect?.endTime ?? 0,
     feverDuration: feverEffect?.duration ?? 0,
+    isAllGiant: Boolean(allGiantEffect),
+    allGiantEndTime: allGiantEffect?.endTime ?? 0,
+    allGiantDuration: allGiantEffect?.duration ?? 0,
   };
 }

@@ -57,10 +57,12 @@ export const createSpecialBananaBody = ({
   x,
   y,
   item,
+  giantChance,
   viewportWidth,
   baseUrl,
 }) => {
-  const r = (Math.min(viewportWidth, 430) / 430) * 42;
+  const isGiant = Math.random() < giantChance;
+  const r = (Math.min(viewportWidth, 430) / 430) * 42 * (isGiant ? 3 : 1);
 
   const body = Matter.Bodies.circle(x, y, r, {
     render: {
@@ -74,7 +76,7 @@ export const createSpecialBananaBody = ({
     friction: 0.6,
     frictionStatic: 3.0,
     frictionAir: 0.015,
-    density: 0.002,
+    density: isGiant ? 0.3 : 0.002,
   });
 
   body.label = 'special_banana';
