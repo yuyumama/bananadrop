@@ -1,4 +1,10 @@
-import { useRef, useMemo, useCallback } from 'react';
+import {
+  useRef,
+  useMemo,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import TrayVisual from './ui/TrayVisual';
 import useAutoSpawn from '../hooks/useAutoSpawn';
 import useLatestRef from '../hooks/useLatestRef';
@@ -22,150 +28,164 @@ const resolvePointerX = (event) => {
   return Math.random() * window.innerWidth;
 };
 
-const BananaWorld = ({
-  bananaPerClick = 1,
-  autoSpawnRate = 0,
-  panelHeight = 80,
-  unlockedTiers = [],
-  onScore,
-  onEffect,
-  giantChance = 0,
-  tableWidth = TABLE_WIDTH_RATIO,
-  shopPurchases = {},
-  devMode = false,
-}) => {
-  const sceneRef = useRef(null);
-  const barVisualRef = useRef(null);
-  const barWidth = useMemo(() => getTablePx(tableWidth), [tableWidth]);
-  const bananaPerClickRef = useLatestRef(bananaPerClick);
-  const onScoreRef = useLatestRef(onScore);
-  const onEffectRef = useLatestRef(onEffect);
-  const unlockedTiersRef = useLatestRef(unlockedTiers);
-  const panelHeightRef = useLatestRef(panelHeight);
-  const giantChanceRef = useLatestRef(giantChance);
-  const tableWidthRef = useLatestRef(tableWidth);
-  const shopPurchasesRef = useLatestRef(shopPurchases);
-
-  const { spawnBanana, spawnSpecialBanana } = useMatterBananaWorld({
-    sceneRef,
-    barVisualRef,
-    panelHeightRef,
-    tableWidthRef,
-    unlockedTiersRef,
-    giantChanceRef,
-    onScoreRef,
-    onEffectRef,
-    tableWidth,
-  });
-
-  const trySpawnSpecial = useCallback(
-    (x) => {
-      SHOP_ITEMS.forEach((item) => {
-        const count = shopPurchasesRef.current?.[item.id] ?? 0;
-        if (count === 0) return;
-        const chance = item.spawnChanceStacks
-          ? item.spawnChancePerBanana * count
-          : item.spawnChancePerBanana;
-        if (Math.random() < chance) {
-          spawnSpecialBanana(x, item);
-        }
-      });
+const BananaWorld = forwardRef(
+  (
+    {
+      bananaPerClick = 1,
+      autoSpawnRate = 0,
+      panelHeight = 80,
+      unlockedTiers = [],
+      onScore,
+      onEffect,
+      onCoinCollected,
+      giantChance = 0,
+      tableWidth = TABLE_WIDTH_RATIO,
+      shopPurchases = {},
+      devMode = false,
     },
-    [spawnSpecialBanana, shopPurchasesRef],
-  );
+    ref,
+  ) => {
+    const sceneRef = useRef(null);
+    const barVisualRef = useRef(null);
+    const barWidth = useMemo(() => getTablePx(tableWidth), [tableWidth]);
+    const bananaPerClickRef = useLatestRef(bananaPerClick);
+    const onScoreRef = useLatestRef(onScore);
+    const onEffectRef = useLatestRef(onEffect);
+    const onCoinRef = useLatestRef(onCoinCollected);
+    const unlockedTiersRef = useLatestRef(unlockedTiers);
+    const panelHeightRef = useLatestRef(panelHeight);
+    const giantChanceRef = useLatestRef(giantChance);
+    const tableWidthRef = useLatestRef(tableWidth);
+    const shopPurchasesRef = useLatestRef(shopPurchases);
 
-  const spawnBananaWithCheck = useCallback(
-    (x) => {
-      spawnBanana(x);
-      trySpawnSpecial(x);
-    },
-    [spawnBanana, trySpawnSpecial],
-  );
+    const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
+      {
+        sceneRef,
+        barVisualRef,
+        panelHeightRef,
+        tableWidthRef,
+        unlockedTiersRef,
+        giantChanceRef,
+        onScoreRef,
+        onEffectRef,
+        onCoinRef,
+        tableWidth,
+      },
+    );
 
-  useAutoSpawn({ autoSpawnRate, spawnBanana: spawnBananaWithCheck });
+    useImperativeHandle(ref, () => ({
+      spawnCoin,
+    }));
 
-  const handleDataClick = (e) => {
-    const x = resolvePointerX(e);
-    const count = bananaPerClickRef.current;
-    for (let i = 0; i < count; i++) {
-      const offset = (i - (count - 1) / 2) * 40;
-      spawnBananaWithCheck(x + offset);
-    }
-  };
+    const trySpawnSpecial = useCallback(
+      (x) => {
+        SHOP_ITEMS.forEach((item) => {
+          const count = shopPurchasesRef.current?.[item.id] ?? 0;
+          if (count === 0) return;
+          const chance = item.spawnChanceStacks
+            ? item.spawnChancePerBanana * count
+            : item.spawnChancePerBanana;
+          if (Math.random() < chance) {
+            spawnSpecialBanana(x, item);
+          }
+        });
+      },
+      [spawnSpecialBanana, shopPurchasesRef],
+    );
 
-  return (
-    <div
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-      }}
-    >
-      {/* HTMLバー：おぼん型（全体が1本の緩やかなカーブ） */}
-      <TrayVisual
-        ref={barVisualRef}
-        barWidth={barWidth}
-        rimRise={RIM_RISE}
-        tableHeight={TABLE_HEIGHT}
-      />
-      {/* 開発者モード: 特殊バナナ即スポーンボタン（SHOP_ITEMS から自動生成） */}
-      {devMode && (
+    const spawnBananaWithCheck = useCallback(
+      (x) => {
+        spawnBanana(x);
+        trySpawnSpecial(x);
+      },
+      [spawnBanana, trySpawnSpecial],
+    );
+
+    useAutoSpawn({ autoSpawnRate, spawnBanana: spawnBananaWithCheck });
+
+    const handleDataClick = (e) => {
+      const x = resolvePointerX(e);
+      const count = bananaPerClickRef.current;
+      for (let i = 0; i < count; i++) {
+        const offset = (i - (count - 1) / 2) * 40;
+        spawnBananaWithCheck(x + offset);
+      }
+    };
+
+    return (
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        {/* HTMLバー：おぼん型（全体が1本の緩やかなカーブ） */}
+        <TrayVisual
+          ref={barVisualRef}
+          barWidth={barWidth}
+          rimRise={RIM_RISE}
+          tableHeight={TABLE_HEIGHT}
+        />
+        {/* 開発者モード: 特殊バナナ即スポーンボタン（SHOP_ITEMS から自動生成） */}
+        {devMode && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 10,
+              display: 'flex',
+              gap: 8,
+              pointerEvents: 'auto',
+            }}
+          >
+            {SHOP_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  spawnSpecialBanana(window.innerWidth / 2, item);
+                }}
+                style={{
+                  padding: '6px 14px',
+                  background: 'rgba(255,140,0,0.85)',
+                  color: '#fff',
+                  fontWeight: 800,
+                  fontSize: '0.75rem',
+                  border: 'none',
+                  borderRadius: 20,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Matter.jsキャンバス（バナナはここに描画、バーより前） */}
         <div
+          ref={sceneRef}
+          onClick={handleDataClick}
+          onTouchStart={(e) => {
+            handleDataClick(e);
+          }}
           style={{
             position: 'absolute',
-            top: 12,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 10,
-            display: 'flex',
-            gap: 8,
-            pointerEvents: 'auto',
+            inset: 0,
+            cursor: 'pointer',
+            touchAction: 'none',
+            zIndex: 2,
+            filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.15))', // Soft shadow for bananas
           }}
-        >
-          {SHOP_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={(e) => {
-                e.stopPropagation();
-                spawnSpecialBanana(window.innerWidth / 2, item);
-              }}
-              style={{
-                padding: '6px 14px',
-                background: 'rgba(255,140,0,0.85)',
-                color: '#fff',
-                fontWeight: 800,
-                fontSize: '0.75rem',
-                border: 'none',
-                borderRadius: 20,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Matter.jsキャンバス（バナナはここに描画、バーより前） */}
-      <div
-        ref={sceneRef}
-        onClick={handleDataClick}
-        onTouchStart={(e) => {
-          handleDataClick(e);
-        }}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          cursor: 'pointer',
-          touchAction: 'none',
-          zIndex: 2,
-          filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.15))', // Soft shadow for bananas
-        }}
-      />
-    </div>
-  );
-};
+        />
+      </div>
+    );
+  },
+);
 
 export default BananaWorld;

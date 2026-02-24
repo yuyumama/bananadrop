@@ -1,6 +1,6 @@
 import { Store } from 'lucide-react';
 
-export default function ShopButton({ seeds, onOpen }) {
+export default function ShopButton({ banaCoins, onOpen }) {
   return (
     <div
       className="glass-panel"
@@ -9,10 +9,10 @@ export default function ShopButton({ seeds, onOpen }) {
         top: 24,
         right: 24,
         zIndex: 10,
-        padding: '10px 20px',
+        padding: '12px 18px',
         display: 'flex',
         alignItems: 'center',
-        gap: 14,
+        gap: 12,
         cursor: 'pointer',
         transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         background: 'rgba(255, 255, 255, 0.85)',
@@ -30,54 +30,85 @@ export default function ShopButton({ seeds, onOpen }) {
       }}
       onClick={onOpen}
     >
-      <div
+      {/* コインアイコン（大） */}
+      <img
+        src={`${import.meta.env.BASE_URL}coin.png`}
+        alt="バナコイン"
         style={{
           width: 40,
           height: 40,
-          borderRadius: '12px',
-          background:
-            'linear-gradient(135deg, var(--accent-gold-soft) 0%, #fff 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--accent-gold)',
-          boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.8)',
+          objectFit: 'contain',
+          filter: 'drop-shadow(0 2px 6px rgba(212,175,55,0.5))',
+          flexShrink: 0,
         }}
-      >
-        <Store size={22} strokeWidth={2.5} />
-      </div>
+      />
+
+      {/* バナコイン残高 */}
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
+          gap: 1,
         }}
       >
         <span
           style={{
-            fontSize: '0.85rem',
-            fontWeight: 800,
-            color: 'var(--text-main)',
-            letterSpacing: '0.05em',
+            fontSize: '0.6rem',
+            fontWeight: 700,
+            color: 'var(--text-muted)',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          }}
+        >
+          バナコイン
+        </span>
+        <span
+          style={{
+            fontSize: '1.3rem',
+            fontWeight: 900,
+            color: 'var(--accent-gold)',
+            letterSpacing: '-0.02em',
+            lineHeight: 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {banaCoins.toLocaleString()}
+        </span>
+      </div>
+
+      {/* 区切り */}
+      <div
+        style={{
+          width: 1,
+          height: 32,
+          background: 'rgba(0,0,0,0.08)',
+          flexShrink: 0,
+        }}
+      />
+
+      {/* ショップアイコン */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+          color: 'var(--text-muted)',
+          flexShrink: 0,
+        }}
+      >
+        <Store size={18} strokeWidth={2} />
+        <span
+          style={{
+            fontSize: '0.55rem',
+            fontWeight: 700,
+            letterSpacing: '0.06em',
             textTransform: 'uppercase',
           }}
         >
           Shop
         </span>
-        <div
-          style={{
-            marginTop: 2,
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            color: 'var(--accent-gold)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          <span style={{ opacity: 0.7 }}>✨</span>
-          <span>{seeds} Seeds</span>
-        </div>
       </div>
     </div>
   );

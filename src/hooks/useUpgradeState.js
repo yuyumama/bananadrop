@@ -18,7 +18,7 @@ export default function useUpgradeState() {
   const [treeData, setTreeData] = useState({
     level: 0,
     growth: 0,
-    seeds: 0,
+    banaCoins: 0,
   });
 
   // 時間経過でツリーが成長 (1秒に1%)
@@ -27,11 +27,9 @@ export default function useUpgradeState() {
       setTreeData((prev) => {
         let newGrowth = prev.growth + 1;
         let newLevel = prev.level;
-        let newSeeds = prev.seeds;
 
         if (newGrowth >= 100) {
           newLevel += 1;
-          newSeeds += 1;
           newGrowth -= 100;
         }
 
@@ -39,7 +37,6 @@ export default function useUpgradeState() {
           ...prev,
           growth: newGrowth,
           level: newLevel,
-          seeds: newSeeds,
         };
       });
     }, 1000);
@@ -82,11 +79,9 @@ export default function useUpgradeState() {
       setTreeData((prev) => {
         let newGrowth = prev.growth + 20;
         let newLevel = prev.level;
-        let newSeeds = prev.seeds;
 
         if (newGrowth >= 100) {
           newLevel += 1;
-          newSeeds += 1;
           newGrowth -= 100;
         }
 
@@ -94,7 +89,6 @@ export default function useUpgradeState() {
           ...prev,
           growth: newGrowth,
           level: newLevel,
-          seeds: newSeeds,
         };
       });
 
@@ -103,25 +97,29 @@ export default function useUpgradeState() {
     [treeData.level],
   );
 
+  const addBanaCoin = useCallback(() => {
+    setTreeData((prev) => ({ ...prev, banaCoins: prev.banaCoins + 1 }));
+  }, []);
+
   const buyShopItem = useCallback(
     (item) => {
       const count = shopPurchases[item.id] ?? 0;
       if (count >= item.maxCount) return false;
       const cost = getShopItemCost(item, count);
-      if (treeData.seeds < cost) return false;
+      if (treeData.banaCoins < cost) return false;
 
-      setTreeData((prev) => ({ ...prev, seeds: prev.seeds - cost }));
+      setTreeData((prev) => ({ ...prev, banaCoins: prev.banaCoins - cost }));
       setShopPurchases((prev) => ({
         ...prev,
         [item.id]: (prev[item.id] ?? 0) + 1,
       }));
       return true;
     },
-    [shopPurchases, treeData.seeds],
+    [shopPurchases, treeData.banaCoins],
   );
 
-  const cheatSeeds = useCallback(() => {
-    setTreeData((prev) => ({ ...prev, seeds: prev.seeds + 999 }));
+  const cheatBanaCoins = useCallback(() => {
+    setTreeData((prev) => ({ ...prev, banaCoins: prev.banaCoins + 999 }));
   }, []);
 
   return {
@@ -131,14 +129,15 @@ export default function useUpgradeState() {
     unlockedTiers,
     purchased,
     buyUpgrade,
-    // Tree states & functions (エイリアスを貼って後方互換性を維持)
+    // Tree states & functions
     treeLevel: treeData.level,
-    seeds: treeData.seeds,
+    banaCoins: treeData.banaCoins,
     treeGrowth: treeData.growth,
     waterTree,
+    addBanaCoin,
     // Shop
     shopPurchases,
     buyShopItem,
-    cheatSeeds,
+    cheatBanaCoins,
   };
 }

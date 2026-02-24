@@ -6,7 +6,7 @@ import {
 } from '../../data/shopItems';
 
 export default function ShopModal({
-  seeds,
+  banaCoins,
   shopPurchases,
   onBuy,
   onClose,
@@ -167,7 +167,7 @@ export default function ShopModal({
                   color: 'var(--text-muted)',
                 }}
               >
-                <span>次のシードまで</span>
+                <span>次のバナコインまで</span>
                 <span>{Math.round(progress)}%</span>
               </div>
               <div
@@ -190,7 +190,7 @@ export default function ShopModal({
               </div>
             </div>
 
-            {/* Seeds balance */}
+            {/* BanaCoins balance */}
             <div
               style={{
                 display: 'flex',
@@ -201,8 +201,12 @@ export default function ShopModal({
                 color: 'var(--accent-gold)',
               }}
             >
-              <span>✨</span>
-              <span>{seeds} Seeds</span>
+              <img
+                src={`${import.meta.env.BASE_URL}coin.png`}
+                alt="coin"
+                style={{ width: 16, height: 16, objectFit: 'contain' }}
+              />
+              <span>{banaCoins} バナコイン</span>
             </div>
           </div>
         </div>
@@ -235,7 +239,7 @@ export default function ShopModal({
             const count = shopPurchases[item.id] ?? 0;
             const isMaxed = count >= item.maxCount;
             const currentCost = getShopItemCost(item, count);
-            const canAfford = seeds >= currentCost;
+            const canAfford = banaCoins >= currentCost;
 
             const isFeverItem = item.effect?.type === 'feverTime';
             const baseDuration = item.effect?.duration ?? 0;
@@ -498,7 +502,16 @@ export default function ShopModal({
                           height: 'auto',
                         }}
                       >
-                        <span style={{ opacity: 0.8 }}>✨</span>
+                        <img
+                          src={`${import.meta.env.BASE_URL}coin.png`}
+                          alt="coin"
+                          style={{
+                            width: 14,
+                            height: 14,
+                            objectFit: 'contain',
+                            opacity: 0.9,
+                          }}
+                        />
                         <span>{currentCost}</span>
                       </button>
                     )}

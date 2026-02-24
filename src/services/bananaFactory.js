@@ -52,6 +52,28 @@ export const createBananaBody = ({
   return banana;
 };
 
+// バナコイン（円形ボディ、coin.png）
+export const createCoinBody = ({ x, y, viewportWidth, baseUrl }) => {
+  const r = (Math.min(viewportWidth, 430) / 430) * 28;
+  const body = Matter.Bodies.circle(x, y, r, {
+    render: {
+      sprite: {
+        texture: `${baseUrl}coin.png`,
+        xScale: (r * 2) / 512,
+        yScale: (r * 2) / 512,
+      },
+    },
+    restitution: 0.5,
+    friction: 0.3,
+    frictionStatic: 1.0,
+    frictionAir: 0.01,
+    density: 0.002,
+  });
+  body.label = 'coin';
+  Matter.Body.setPosition(body, { x, y });
+  return body;
+};
+
 // ショップアイテムの特殊バナナ（円形ボディ）
 export const createSpecialBananaBody = ({
   x,

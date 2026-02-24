@@ -28,12 +28,13 @@ function App() {
     purchased,
     buyUpgrade,
     treeLevel,
-    seeds,
+    banaCoins,
     treeGrowth,
     waterTree,
+    addBanaCoin,
     shopPurchases,
     buyShopItem,
-    cheatSeeds,
+    cheatBanaCoins,
   } = useUpgradeState();
 
   const {
@@ -46,6 +47,8 @@ function App() {
     allGiantEndTime,
     allGiantDuration,
   } = useActiveEffects();
+
+  const bananaWorldRef = useRef(null);
 
   const [floatingTexts, setFloatingTexts] = useState([]);
   const [clickEffects, setClickEffects] = useState([]);
@@ -64,7 +67,7 @@ function App() {
           const next = !prev;
           if (next) {
             setScore(99999999);
-            cheatSeeds();
+            cheatBanaCoins();
           }
           return next;
         });
@@ -72,7 +75,40 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cheatSeeds]);
+  }, [cheatBanaCoins]);
+
+  // ツリーレベルアップ時にバナコインをスポーン
+  const prevTreeLevelRef = useRef(null);
+  useEffect(() => {
+    if (prevTreeLevelRef.current === null) {
+      prevTreeLevelRef.current = treeLevel;
+      return;
+    }
+    if (treeLevel > prevTreeLevelRef.current) {
+      const x = 80 + Math.random() * (window.innerWidth - 160);
+      bananaWorldRef.current?.spawnCoin(x);
+    }
+    prevTreeLevelRef.current = treeLevel;
+  }, [treeLevel]);
+
+  const [floatingCoins, setFloatingCoins] = useState([]);
+
+  const handleCoinCollected = useCallback(
+    (x) => {
+      addBanaCoin();
+      const id = ++_textId;
+      const clampedX = Math.max(
+        60,
+        Math.min(window.innerWidth - 60, x ?? window.innerWidth / 2),
+      );
+      setFloatingCoins((prev) => [...prev, { id, x: clampedX }]);
+      setTimeout(
+        () => setFloatingCoins((prev) => prev.filter((c) => c.id !== id)),
+        1200,
+      );
+    },
+    [addBanaCoin],
+  );
 
   // 実測ローリング平均（5秒間の実スコア履歴から計算）
   const scoreHistoryRef = useRef([]);
@@ -225,10 +261,10 @@ function App() {
         isAllGiant={isAllGiant}
         blackholeBananaCount={shopPurchases['banana_blackhole'] ?? 0}
       />
-      <ShopButton seeds={seeds} onOpen={() => setIsShopOpen(true)} />
+      <ShopButton banaCoins={banaCoins} onOpen={() => setIsShopOpen(true)} />
       {isShopOpen && (
         <ShopModal
-          seeds={seeds}
+          banaCoins={banaCoins}
           shopPurchases={shopPurchases}
           onBuy={buyShopItem}
           onClose={() => setIsShopOpen(false)}
@@ -378,12 +414,48 @@ function App() {
 
       <BananaTree
         score={score}
-        seeds={seeds}
         treeLevel={treeLevel}
         treeGrowth={treeGrowth}
         onWater={handleWaterTree}
         devMode={devMode}
       />
+      {floatingCoins.map((coin) => (
+        <div
+          key={coin.id}
+          style={{
+            position: 'fixed',
+            left: coin.x,
+            bottom: 120,
+            transform: 'translateX(-50%)',
+            zIndex: 20,
+            fontSize: '1.6rem',
+            fontWeight: 900,
+            fontFamily: '"Outfit", sans-serif',
+            color: '#d4af37',
+            pointerEvents: 'none',
+            animation:
+              'floatUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+            textShadow:
+              '0 2px 10px rgba(255,215,0,0.6), 0 0 20px rgba(255,215,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <img
+            src={`${import.meta.env.BASE_URL}coin.png`}
+            alt="coin"
+            style={{
+              width: 28,
+              height: 28,
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 2px 6px rgba(212,175,55,0.6))',
+            }}
+          />
+          <span>+1</span>
+        </div>
+      ))}
       {floatingTexts.map((text) => (
         <FloatingScoreText
           key={text.id}
@@ -408,6 +480,7 @@ function App() {
       />
 
       <BananaWorld
+        ref={bananaWorldRef}
         bananaPerClick={bananaPerClick}
         autoSpawnRate={effectiveRate}
         panelHeight={PANEL_HEIGHT}
@@ -415,6 +488,7 @@ function App() {
         giantChance={effectiveGiantChance}
         onScore={handleScore}
         onEffect={handleEffect}
+        onCoinCollected={handleCoinCollected}
         shopPurchases={shopPurchases}
         devMode={devMode}
       />
