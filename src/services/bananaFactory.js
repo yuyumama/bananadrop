@@ -51,3 +51,35 @@ export const createBananaBody = ({
 
   return banana;
 };
+
+// ショップアイテムの特殊バナナ（円形ボディ）
+export const createSpecialBananaBody = ({
+  x,
+  y,
+  item,
+  viewportWidth,
+  baseUrl,
+}) => {
+  const r = (Math.min(viewportWidth, 430) / 430) * 42;
+
+  const body = Matter.Bodies.circle(x, y, r, {
+    render: {
+      sprite: {
+        texture: `${baseUrl}${item.icon}`,
+        xScale: (r * 2) / 512,
+        yScale: (r * 2) / 512,
+      },
+    },
+    restitution: 0.35,
+    friction: 0.6,
+    frictionStatic: 3.0,
+    frictionAir: 0.015,
+    density: 0.002,
+  });
+
+  body.label = 'special_banana';
+  body.shopItemId = item.id;
+
+  Matter.Body.setPosition(body, { x, y });
+  return body;
+};

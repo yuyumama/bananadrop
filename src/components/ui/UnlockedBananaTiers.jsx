@@ -1,4 +1,25 @@
-function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
+const SectionLabel = ({ children }) => (
+  <div
+    style={{
+      fontSize: '0.6rem',
+      fontWeight: 800,
+      color: 'var(--text-muted)',
+      letterSpacing: '0.1em',
+      textTransform: 'uppercase',
+      alignSelf: 'flex-end',
+      marginBottom: -2,
+    }}
+  >
+    {children}
+  </div>
+);
+
+function UnlockedBananaTiers({
+  unlockedTiers,
+  tierColors,
+  nuiBananaCount,
+  isFever,
+}) {
   return (
     <div
       style={{
@@ -9,23 +30,12 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end',
-        gap: 12,
-        maxWidth: '300px', // 横に広がりすぎないように制限
+        gap: 10,
+        maxWidth: '300px',
       }}
     >
-      <div
-        style={{
-          fontSize: '0.65rem',
-          fontWeight: 800,
-          color: 'var(--text-muted)',
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          marginBottom: -4,
-          alignSelf: 'flex-end',
-        }}
-      >
-        Collection
-      </div>
+      {/* バナナ種別セクション */}
+      <SectionLabel>Bananas</SectionLabel>
       <div
         style={{
           display: 'flex',
@@ -82,6 +92,72 @@ function UnlockedBananaTiers({ unlockedTiers, tierColors }) {
           </div>
         ))}
       </div>
+
+      {/* 特殊アイテムセクション（1体以上購入済みの場合のみ） */}
+      {nuiBananaCount > 0 && (
+        <>
+          <div
+            style={{
+              width: '100%',
+              height: 1,
+              background: 'rgba(0,0,0,0.07)',
+              alignSelf: 'stretch',
+              marginTop: 2,
+              marginBottom: -2,
+            }}
+          />
+          <SectionLabel>Special</SectionLabel>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              alignItems: 'flex-end',
+            }}
+          >
+            <div
+              className="glass-panel"
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                color: '#ff8c00',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                userSelect: 'none',
+                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                borderLeft: '3px solid #ff8c00',
+                background: isFever
+                  ? 'rgba(255, 140, 0, 0.15)'
+                  : 'rgba(255, 255, 255, 0.8)',
+                boxShadow: isFever
+                  ? '0 2px 12px rgba(255, 140, 0, 0.3)'
+                  : '0 2px 10px rgba(0,0,0,0.05)',
+              }}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}banana_nui.png`}
+                alt="ぬいバナナ"
+                style={{ width: 24, height: 24, objectFit: 'contain' }}
+              />
+              <span>ぬいバナナ</span>
+              <span
+                style={{
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  color: '#ff8c00',
+                  marginLeft: 'auto',
+                  paddingLeft: 8,
+                  opacity: 0.8,
+                }}
+              >
+                ×{nuiBananaCount}
+              </span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

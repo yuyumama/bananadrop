@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
 import Matter from 'matter-js';
-import { createBananaBody } from '../services/bananaFactory';
+import {
+  createBananaBody,
+  createSpecialBananaBody,
+} from '../services/bananaFactory';
 import {
   calcBarCenterY,
   getTablePx,
@@ -36,6 +39,7 @@ export default function useMatterBananaWorld({
   unlockedTiersRef,
   giantChanceRef,
   onScoreRef,
+  onEffectRef,
   tableWidth,
 }) {
   const engineRef = useRef(null);
@@ -113,6 +117,18 @@ export default function useMatterBananaWorld({
     },
     [giantChanceRef, unlockedTiersRef],
   );
+
+  const spawnSpecialBanana = useCallback((x, item) => {
+    if (!engineRef.current) return;
+    const body = createSpecialBananaBody({
+      x,
+      y: -200,
+      item,
+      viewportWidth: window.innerWidth,
+      baseUrl: import.meta.env.BASE_URL,
+    });
+    Matter.Composite.add(engineRef.current.world, body);
+  }, []);
 
   // tableWidth変更時にテーブルを再生成
   useEffect(() => {
@@ -244,19 +260,36 @@ export default function useMatterBananaWorld({
       syncBar(clampedX, y);
     });
 
-    // 下落下 → スコア、左右アウト → ロス
+    // 下落下 → スコア/効果発動、左右アウト → ロス
     Matter.Events.on(engine, 'afterUpdate', () => {
       const bodies = Composite.allBodies(engine.world);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      // 通常バナナ
       const bananas = bodies.filter((b) => b.label === 'banana');
       const { scoreItems, scoredBodies, lostBodies } = collectBananaOutcome({
         bananas,
-        screenWidth: window.innerWidth,
-        screenHeight: window.innerHeight,
+        screenWidth: w,
+        screenHeight: h,
       });
-
       scoredBodies.forEach((b) => Matter.Composite.remove(engine.world, b));
       lostBodies.forEach((b) => Composite.remove(engine.world, b));
       if (scoreItems.length > 0) onScoreRef.current?.(scoreItems);
+
+      // 特殊バナナ：画面下に落ちたら効果発動、横に出たら消去
+      const specials = bodies.filter((b) => b.label === 'special_banana');
+      specials.forEach((b) => {
+        if (b.position.y > h + 200) {
+          Composite.remove(engine.world, b);
+          onEffectRef.current?.(b.shopItemId, {
+            x: b.position.x,
+            y: h - 20,
+          });
+        } else if (b.position.x < -200 || b.position.x > w + 200) {
+          Composite.remove(engine.world, b);
+        }
+      });
     });
 
     const handleResize = () => {
@@ -296,6 +329,7 @@ export default function useMatterBananaWorld({
       render.context = null;
       render.textures = {};
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onEffectRef は ref なので依存不要
   }, [
     addRims,
     barVisualRef,
@@ -307,5 +341,5 @@ export default function useMatterBananaWorld({
     tableWidthRef,
   ]);
 
-  return { spawnBanana };
+  return { spawnBanana, spawnSpecialBanana };
 }

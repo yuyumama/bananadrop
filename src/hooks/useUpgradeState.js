@@ -4,6 +4,7 @@ import {
   canPurchaseUpgrade,
   applyUpgradeEffects,
 } from '../services/upgradeRules';
+import { getShopItemCost } from '../data/shopItems';
 
 export default function useUpgradeState() {
   const [bananaPerClick, setBananaPerClick] = useState(1);
@@ -11,6 +12,7 @@ export default function useUpgradeState() {
   const [giantChance, setGiantChance] = useState(0);
   const [unlockedTiers, setUnlockedTiers] = useState([BANANA_TIERS[0]]);
   const [purchased, setPurchased] = useState(new Set());
+  const [shopPurchases, setShopPurchases] = useState({});
 
   // バナナツリー用ステート (アトミックな更新のためにオブジェクトに統合)
   const [treeData, setTreeData] = useState({
@@ -101,6 +103,27 @@ export default function useUpgradeState() {
     [treeData.level],
   );
 
+  const buyShopItem = useCallback(
+    (item) => {
+      const count = shopPurchases[item.id] ?? 0;
+      if (count >= item.maxCount) return false;
+      const cost = getShopItemCost(item, count);
+      if (treeData.seeds < cost) return false;
+
+      setTreeData((prev) => ({ ...prev, seeds: prev.seeds - cost }));
+      setShopPurchases((prev) => ({
+        ...prev,
+        [item.id]: (prev[item.id] ?? 0) + 1,
+      }));
+      return true;
+    },
+    [shopPurchases, treeData.seeds],
+  );
+
+  const cheatSeeds = useCallback(() => {
+    setTreeData((prev) => ({ ...prev, seeds: prev.seeds + 999 }));
+  }, []);
+
   return {
     bananaPerClick,
     autoSpawnRate,
@@ -113,5 +136,9 @@ export default function useUpgradeState() {
     seeds: treeData.seeds,
     treeGrowth: treeData.growth,
     waterTree,
+    // Shop
+    shopPurchases,
+    buyShopItem,
+    cheatSeeds,
   };
 }

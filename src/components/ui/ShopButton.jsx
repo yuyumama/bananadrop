@@ -1,6 +1,6 @@
 import { Store } from 'lucide-react';
 
-export default function ShopButton({ seeds }) {
+export default function ShopButton({ seeds, onOpen }) {
   return (
     <div
       className="glass-panel"
@@ -28,7 +28,7 @@ export default function ShopButton({ seeds }) {
         e.currentTarget.style.borderColor = 'var(--accent-gold-soft)';
         e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
       }}
-      onClick={() => alert('ショップ機能は準備中です！')}
+      onClick={onOpen}
     >
       <div
         style={{
