@@ -1,5 +1,5 @@
 // ショップアイテム定義
-// cost: 初回購入コスト（Seeds）
+// cost: 初回購入コスト（バナコイン）
 // costMultiplier: 購入ごとの価格倍率（指数関数的値上がり）
 // maxCount: 最大購入回数
 // spawnChancePerBanana: 通常バナナ1体出るごとの出現確率（購入1体あたり）

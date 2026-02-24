@@ -13,13 +13,12 @@ const TREE_STAGES = [
 
 export default function BananaTree({
   score,
-  seeds,
   treeLevel,
   treeGrowth,
   onWater,
   devMode,
 }) {
-  const [showSeedEffect, setShowSeedEffect] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
   const prevLevelRef = useRef(treeLevel);
 
   const stageIndex = Math.min(
@@ -34,11 +33,12 @@ export default function BananaTree({
   const progress = Math.min(100, Math.max(0, treeGrowth));
 
   const imgSrc = `${import.meta.env.BASE_URL}tree_stage${String(stageIndex).padStart(2, '0')}.png`;
+  const coinSrc = `${import.meta.env.BASE_URL}coin.png`;
 
   useEffect(() => {
     if (treeLevel > prevLevelRef.current) {
-      const showTimer = setTimeout(() => setShowSeedEffect(true), 0);
-      const hideTimer = setTimeout(() => setShowSeedEffect(false), 2000);
+      const showTimer = setTimeout(() => setShowLevelUp(true), 0);
+      const hideTimer = setTimeout(() => setShowLevelUp(false), 2000);
       prevLevelRef.current = treeLevel;
       return () => {
         clearTimeout(showTimer);
@@ -67,11 +67,11 @@ export default function BananaTree({
         border: isGold
           ? '1px solid var(--accent-gold-soft)'
           : '1px solid var(--glass-border)',
-        animation: showSeedEffect ? 'levelUpFlash 0.8s ease-out' : undefined,
+        animation: showLevelUp ? 'levelUpFlash 0.8s ease-out' : undefined,
       }}
     >
-      {/* Level-up seed pop-up */}
-      {showSeedEffect && (
+      {/* Level-up coin pop-up */}
+      {showLevelUp && (
         <div
           style={{
             position: 'absolute',
@@ -86,11 +86,15 @@ export default function BananaTree({
             animation: 'seedPopUp 2s ease-out forwards',
             display: 'flex',
             alignItems: 'center',
-            gap: 3,
+            gap: 4,
           }}
         >
-          <span>+1</span>
-          <span style={{ fontSize: '1rem' }}>🌱</span>
+          <span>コイン</span>
+          <img
+            src={coinSrc}
+            alt="coin"
+            style={{ width: 18, height: 18, objectFit: 'contain' }}
+          />
         </div>
       )}
 
@@ -146,44 +150,19 @@ export default function BananaTree({
           minWidth: 0,
         }}
       >
-        {/* Stage name + Seeds balance */}
-        <div
+        {/* Stage name */}
+        <span
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 8,
+            fontSize: '0.88rem',
+            fontWeight: 900,
+            color: currentStage.color,
+            letterSpacing: '0.03em',
           }}
         >
-          <span
-            style={{
-              fontSize: '0.88rem',
-              fontWeight: 900,
-              color: currentStage.color,
-              letterSpacing: '0.03em',
-            }}
-          >
-            {currentStage.label}
-          </span>
-          <span
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 800,
-              color: 'var(--accent-gold)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 3,
-              background: 'rgba(212,175,55,0.1)',
-              padding: '2px 8px',
-              borderRadius: 10,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            ✨ {seeds}
-          </span>
-        </div>
+          {currentStage.label}
+        </span>
 
-        {/* Growth bar */}
+        {/* Growth bar + coin goal */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div
             style={{
@@ -195,28 +174,45 @@ export default function BananaTree({
               color: 'var(--text-muted)',
             }}
           >
-            <span>次のシードまで</span>
+            <span>次のバナコインまで</span>
             <span style={{ fontVariantNumeric: 'tabular-nums' }}>
               {Math.round(progress)}%
             </span>
           </div>
-          <div
-            style={{
-              height: 7,
-              background: 'rgba(0,0,0,0.07)',
-              borderRadius: 4,
-              overflow: 'hidden',
-            }}
-          >
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div
               style={{
-                height: '100%',
-                width: `${progress}%`,
-                background: isGold
-                  ? 'linear-gradient(90deg, var(--accent-gold), #ffe066)'
-                  : `linear-gradient(90deg, ${currentStage.color}, #a5d678)`,
+                flex: 1,
+                height: 7,
+                background: 'rgba(0,0,0,0.07)',
                 borderRadius: 4,
-                transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  height: '100%',
+                  width: `${progress}%`,
+                  background: isGold
+                    ? 'linear-gradient(90deg, var(--accent-gold), #ffe066)'
+                    : `linear-gradient(90deg, ${currentStage.color}, #a5d678)`,
+                  borderRadius: 4,
+                  transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              />
+            </div>
+            <img
+              src={coinSrc}
+              alt="バナコイン"
+              style={{
+                width: 22,
+                height: 22,
+                objectFit: 'contain',
+                flexShrink: 0,
+                animation: 'coinGlow 2s ease-in-out infinite',
+                opacity: progress >= 95 ? 1 : 0.45,
+                transition: 'opacity 0.5s',
               }}
             />
           </div>
@@ -275,7 +271,7 @@ export default function BananaTree({
             style={{
               fontSize: '0.68rem',
               fontWeight: 700,
-              color: canAfford ? 'var(--text-muted)' : 'var(--text-muted)',
+              color: 'var(--text-muted)',
               opacity: canAfford ? 0.7 : 0.35,
               whiteSpace: 'nowrap',
             }}

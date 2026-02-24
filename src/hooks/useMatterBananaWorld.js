@@ -3,6 +3,7 @@ import Matter from 'matter-js';
 import {
   createBananaBody,
   createSpecialBananaBody,
+  createCoinBody,
 } from '../services/bananaFactory';
 import {
   calcBarCenterY,
@@ -40,6 +41,7 @@ export default function useMatterBananaWorld({
   giantChanceRef,
   onScoreRef,
   onEffectRef,
+  onCoinRef,
   tableWidth,
 }) {
   const engineRef = useRef(null);
@@ -117,6 +119,17 @@ export default function useMatterBananaWorld({
     },
     [giantChanceRef, unlockedTiersRef],
   );
+
+  const spawnCoin = useCallback((x) => {
+    if (!engineRef.current) return;
+    const coin = createCoinBody({
+      x,
+      y: -100,
+      viewportWidth: window.innerWidth,
+      baseUrl: import.meta.env.BASE_URL,
+    });
+    Matter.Composite.add(engineRef.current.world, coin);
+  }, []);
 
   const spawnSpecialBanana = useCallback(
     (x, item) => {
@@ -320,6 +333,17 @@ export default function useMatterBananaWorld({
           Composite.remove(engine.world, b);
         }
       });
+
+      // バナコイン：画面下に落ちたら収集、横に出たら消去
+      const coins = bodies.filter((b) => b.label === 'coin');
+      coins.forEach((coin) => {
+        if (coin.position.y > h + 100) {
+          Composite.remove(engine.world, coin);
+          onCoinRef.current?.(coin.position.x);
+        } else if (coin.position.x < -200 || coin.position.x > w + 200) {
+          Composite.remove(engine.world, coin);
+        }
+      });
     });
 
     const handleResize = () => {
@@ -371,5 +395,5 @@ export default function useMatterBananaWorld({
     tableWidthRef,
   ]);
 
-  return { spawnBanana, spawnSpecialBanana };
+  return { spawnBanana, spawnSpecialBanana, spawnCoin };
 }
