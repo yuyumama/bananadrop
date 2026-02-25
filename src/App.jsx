@@ -209,12 +209,12 @@ function App() {
   const feverPercent =
     isFever && feverDuration > 0
       ? Math.max(
-          0,
-          Math.min(
-            100,
-            ((feverEndTime - Date.now()) / (feverDuration * 1000)) * 100,
-          ),
-        )
+        0,
+        Math.min(
+          100,
+          ((feverEndTime - Date.now()) / (feverDuration * 1000)) * 100,
+        ),
+      )
       : 0;
 
   // allGiant 残り秒数と進捗
@@ -224,12 +224,12 @@ function App() {
   const allGiantPercent =
     isAllGiant && allGiantDuration > 0
       ? Math.max(
-          0,
-          Math.min(
-            100,
-            ((allGiantEndTime - Date.now()) / (allGiantDuration * 1000)) * 100,
-          ),
-        )
+        0,
+        Math.min(
+          100,
+          ((allGiantEndTime - Date.now()) / (allGiantDuration * 1000)) * 100,
+        ),
+      )
       : 0;
 
   // エフェクト適用後の値
@@ -330,7 +330,7 @@ function App() {
             }}
           >
             <span style={{ fontSize: '0.85rem' }}>🔥</span>
-            <span>オート×3</span>
+            <span>ぬいバナナ</span>
             <span
               style={{
                 opacity: 0.65,
@@ -398,7 +398,7 @@ function App() {
             }}
           >
             <span style={{ fontSize: '0.85rem' }}>✨</span>
-            <span>全員巨大化</span>
+            <span>マジックバナナ</span>
             <span
               style={{
                 opacity: 0.65,
