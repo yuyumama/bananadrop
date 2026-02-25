@@ -160,7 +160,6 @@ export default function BananaTree({
           gap: 8,
         }}
       >
-
         {/* Growth bar + coin goal */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div
@@ -218,7 +217,14 @@ export default function BananaTree({
         </div>
 
         {/* Water button + cost */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
           <button
             onClick={() => canAfford && onWater()}
             disabled={!canAfford}

@@ -222,7 +222,12 @@ export default function useMatterBananaWorld({
     const savedFilters = new WeakMap();
     Matter.Events.on(mouseConstraint, 'startdrag', (event) => {
       const body = event.body;
-      if (body && (body.label === 'banana' || body.label === 'special_banana' || body.label === 'coin')) {
+      if (
+        body &&
+        (body.label === 'banana' ||
+          body.label === 'special_banana' ||
+          body.label === 'coin')
+      ) {
         savedFilters.set(body, {
           category: body.collisionFilter.category,
           mask: body.collisionFilter.mask,

@@ -209,12 +209,12 @@ function App() {
   const feverPercent =
     isFever && feverDuration > 0
       ? Math.max(
-        0,
-        Math.min(
-          100,
-          ((feverEndTime - Date.now()) / (feverDuration * 1000)) * 100,
-        ),
-      )
+          0,
+          Math.min(
+            100,
+            ((feverEndTime - Date.now()) / (feverDuration * 1000)) * 100,
+          ),
+        )
       : 0;
 
   // allGiant 残り秒数と進捗
@@ -224,12 +224,12 @@ function App() {
   const allGiantPercent =
     isAllGiant && allGiantDuration > 0
       ? Math.max(
-        0,
-        Math.min(
-          100,
-          ((allGiantEndTime - Date.now()) / (allGiantDuration * 1000)) * 100,
-        ),
-      )
+          0,
+          Math.min(
+            100,
+            ((allGiantEndTime - Date.now()) / (allGiantDuration * 1000)) * 100,
+          ),
+        )
       : 0;
 
   // エフェクト適用後の値
