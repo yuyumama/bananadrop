@@ -229,7 +229,7 @@ function UnlockedBananaTiers({
                   <img
                     src={`${import.meta.env.BASE_URL}banana_blackhole.png`}
                     alt="ブラックホールバナナ"
-                    style={{ width: 24, height: 24, objectFit: 'contain', transform: 'rotate(90deg)' }}
+                    style={{ width: 24, height: 24, objectFit: 'contain' }}
                   />
                   <span>ブラックホール</span>
                   <span
