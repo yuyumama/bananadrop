@@ -330,7 +330,7 @@ function App() {
             }}
           >
             <span style={{ fontSize: '0.85rem' }}>🔥</span>
-            <span>オート×3</span>
+            <span>ぬいバナナ</span>
             <span
               style={{
                 opacity: 0.65,
@@ -398,7 +398,7 @@ function App() {
             }}
           >
             <span style={{ fontSize: '0.85rem' }}>✨</span>
-            <span>全員巨大化</span>
+            <span>マジックバナナ</span>
             <span
               style={{
                 opacity: 0.65,

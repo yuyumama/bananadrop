@@ -216,6 +216,42 @@ export default function useMatterBananaWorld({
     Composite.add(engine.world, mouseConstraint);
     render.mouse = mouse;
 
+    // ドラッグ中のバナナは他のバナナ・UIとの衝突を無視する
+    // (バナナを持っているときはそっちを優先)
+    // また、HTML UI要素がマウスイベントを奪わないよう pointer-events を無効化
+    const savedFilters = new WeakMap();
+    Matter.Events.on(mouseConstraint, 'startdrag', (event) => {
+      const body = event.body;
+      if (
+        body &&
+        (body.label === 'banana' ||
+          body.label === 'special_banana' ||
+          body.label === 'coin')
+      ) {
+        savedFilters.set(body, {
+          category: body.collisionFilter.category,
+          mask: body.collisionFilter.mask,
+          group: body.collisionFilter.group,
+        });
+        // 独自カテゴリに移行: 同グループ内で衝突しない
+        body.collisionFilter.group = -1;
+        // HTML UI要素のpointer-eventsを無効化してドラッグを途切れさせない
+        document.body.classList.add('banana-dragging');
+      }
+    });
+    Matter.Events.on(mouseConstraint, 'enddrag', (event) => {
+      const body = event.body;
+      if (body && savedFilters.has(body)) {
+        const saved = savedFilters.get(body);
+        body.collisionFilter.category = saved.category;
+        body.collisionFilter.mask = saved.mask;
+        body.collisionFilter.group = saved.group;
+        savedFilters.delete(body);
+      }
+      // pointer-events を復元
+      document.body.classList.remove('banana-dragging');
+    });
+
     Render.run(render);
     const runner = Runner.create();
     Runner.run(runner, engine);
@@ -244,7 +280,9 @@ export default function useMatterBananaWorld({
       textCtx.fillStyle = 'rgba(74, 74, 74, 0.95)'; // var(--text-main) equivalent
       textCtx.textAlign = 'center';
       textCtx.textBaseline = 'middle';
-      textCtx.fillText('BANANA', w / 2, h / 2);
+      // ツリーパネル（幅160px + 左24px = 約200px）との重なりを回避するため、やや右寄りに配置
+      const textX = w * 0.55;
+      textCtx.fillText('BANANA', textX, h / 2);
       textCtx.globalCompositeOperation = 'destination-in';
       textCtx.drawImage(bananaCapture, 0, 0);
       textCtx.globalCompositeOperation = 'source-over';

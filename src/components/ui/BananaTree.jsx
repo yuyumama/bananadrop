@@ -56,13 +56,13 @@ export default function BananaTree({
         top: 130,
         left: 24,
         zIndex: 10,
-        padding: '14px 18px',
+        padding: '14px 16px',
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
-        gap: 16,
+        gap: 10,
         userSelect: 'none',
-        minWidth: 280,
+        width: 160,
         borderRadius: '24px',
         border: isGold
           ? '1px solid var(--accent-gold-soft)'
@@ -98,14 +98,13 @@ export default function BananaTree({
         </div>
       )}
 
-      {/* Left: tree image + level badge */}
+      {/* Top: tree image + level badge */}
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 5,
-          flexShrink: 0,
+          gap: 4,
         }}
       >
         <img
@@ -113,8 +112,8 @@ export default function BananaTree({
           src={imgSrc}
           alt={currentStage.label}
           style={{
-            width: 120,
-            height: 120,
+            width: 90,
+            height: 90,
             objectFit: 'contain',
             display: 'block',
             filter: isGold
@@ -122,46 +121,45 @@ export default function BananaTree({
               : 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))',
           }}
         />
-        {/* LV badge */}
-        <div
-          style={{
-            fontSize: '0.62rem',
-            fontWeight: 900,
-            color: currentStage.color,
-            background: isGold
-              ? 'rgba(212,175,55,0.14)'
-              : 'rgba(76,175,80,0.1)',
-            padding: '2px 10px',
-            borderRadius: 10,
-            letterSpacing: '0.05em',
-          }}
-        >
-          LV.{treeLevel}
+        {/* Stage name + LV badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span
+            style={{
+              fontSize: '0.78rem',
+              fontWeight: 900,
+              color: currentStage.color,
+              letterSpacing: '0.03em',
+            }}
+          >
+            {currentStage.label}
+          </span>
+          <div
+            style={{
+              fontSize: '0.58rem',
+              fontWeight: 900,
+              color: currentStage.color,
+              background: isGold
+                ? 'rgba(212,175,55,0.14)'
+                : 'rgba(76,175,80,0.1)',
+              padding: '1px 8px',
+              borderRadius: 10,
+              letterSpacing: '0.05em',
+            }}
+          >
+            LV.{treeLevel}
+          </div>
         </div>
       </div>
 
-      {/* Right: info column */}
+      {/* Bottom: info column */}
       <div
         style={{
-          flex: 1,
+          width: '100%',
           display: 'flex',
           flexDirection: 'column',
-          gap: 10,
-          minWidth: 0,
+          gap: 8,
         }}
       >
-        {/* Stage name */}
-        <span
-          style={{
-            fontSize: '0.88rem',
-            fontWeight: 900,
-            color: currentStage.color,
-            letterSpacing: '0.03em',
-          }}
-        >
-          {currentStage.label}
-        </span>
-
         {/* Growth bar + coin goal */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div
@@ -219,7 +217,14 @@ export default function BananaTree({
         </div>
 
         {/* Water button + cost */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
           <button
             onClick={() => canAfford && onWater()}
             disabled={!canAfford}
@@ -230,16 +235,17 @@ export default function BananaTree({
               padding: '7px 15px',
               borderRadius: 20,
               border: 'none',
+              width: '100%',
+              justifyContent: 'center',
               background: canAfford
                 ? 'linear-gradient(135deg, #64B5F6 0%, #1E88E5 100%)'
                 : '#ececec',
               color: canAfford ? '#fff' : '#bbb',
-              fontSize: '0.73rem',
+              fontSize: '0.7rem',
               fontWeight: 800,
               cursor: canAfford ? 'pointer' : 'not-allowed',
               boxShadow: canAfford ? '0 3px 10px rgba(30,136,229,0.3)' : 'none',
               transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-              flexShrink: 0,
             }}
             onMouseEnter={(e) => {
               if (canAfford) {
@@ -269,14 +275,18 @@ export default function BananaTree({
           </button>
           <span
             style={{
-              fontSize: '0.68rem',
+              fontSize: '0.65rem',
               fontWeight: 700,
-              color: 'var(--text-muted)',
-              opacity: canAfford ? 0.7 : 0.35,
+              color: canAfford ? 'var(--accent-gold)' : 'var(--text-muted)',
+              opacity: canAfford ? 0.85 : 0.4,
               whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
             }}
           >
-            -{cost}pt
+            <span style={{ fontSize: '0.8em' }}>🍌</span>
+            <span>{cost.toLocaleString()}</span>
           </span>
         </div>
       </div>
