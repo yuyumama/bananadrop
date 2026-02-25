@@ -273,6 +273,7 @@ export default function ShopModal({
                     filter: isMaxed
                       ? 'drop-shadow(0 0 8px rgba(76,175,80,0.4))'
                       : 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))',
+                    transform: item.id === 'banana_blackhole' ? 'rotate(70deg)' : undefined,
                   }}
                 />
 

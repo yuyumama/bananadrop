@@ -53,6 +53,11 @@ body {
   border-radius: 16px;
 }
 
+/* バナナドラッグ中はUI要素がマウスイベントを奪わないようにする */
+.banana-dragging .glass-panel {
+  pointer-events: none !important;
+}
+
 .premium-button {
   background: white;
   color: var(--text-main);
