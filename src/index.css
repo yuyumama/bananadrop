@@ -54,7 +54,8 @@ body {
 }
 
 /* バナナドラッグ中はUI要素がマウスイベントを奪わないようにする */
-.banana-dragging .glass-panel {
+.banana-dragging .glass-panel,
+.banana-dragging .banana-ui-block {
   pointer-events: none !important;
 }
 
@@ -96,12 +97,10 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.6) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      transparent 100%);
   transform: rotate(45deg);
   animation: shimmer 3s infinite;
   pointer-events: none;

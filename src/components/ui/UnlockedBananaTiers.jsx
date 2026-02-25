@@ -25,6 +25,7 @@ function UnlockedBananaTiers({
 }) {
   return (
     <div
+      className="banana-ui-block"
       style={{
         position: 'fixed',
         top: 110,
