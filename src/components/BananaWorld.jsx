@@ -42,6 +42,7 @@ const BananaWorld = forwardRef(
       tableWidth = TABLE_WIDTH_RATIO,
       shopPurchases = {},
       devMode = false,
+      onResetUpgrades,
     },
     ref,
   ) => {
@@ -166,6 +167,25 @@ const BananaWorld = forwardRef(
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onResetUpgrades?.();
+              }}
+              style={{
+                padding: '6px 14px',
+                background: 'rgba(220,50,50,0.85)',
+                color: '#fff',
+                fontWeight: 800,
+                fontSize: '0.75rem',
+                border: 'none',
+                borderRadius: 20,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              リセット
+            </button>
           </div>
         )}
 
