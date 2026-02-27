@@ -44,8 +44,9 @@ export default function useUpgradeState() {
   }, []);
 
   const buyUpgrade = useCallback(
-    (upgrade, score) => {
-      if (!canPurchaseUpgrade({ upgrade, score, purchased })) return false;
+    (upgrade, score, devMode) => {
+      if (!canPurchaseUpgrade({ upgrade, score, purchased, devMode }))
+        return false;
 
       const nextState = applyUpgradeEffects({
         upgrade,
@@ -122,6 +123,14 @@ export default function useUpgradeState() {
     setTreeData((prev) => ({ ...prev, banaCoins: prev.banaCoins + 999 }));
   }, []);
 
+  const resetUpgrades = useCallback(() => {
+    setPurchased(new Set());
+    setBananaPerClick(1);
+    setAutoSpawnRate(0);
+    setGiantChance(0);
+    setUnlockedTiers([BANANA_TIERS[0]]);
+  }, []);
+
   return {
     bananaPerClick,
     autoSpawnRate,
@@ -139,5 +148,6 @@ export default function useUpgradeState() {
     shopPurchases,
     buyShopItem,
     cheatBanaCoins,
+    resetUpgrades,
   };
 }

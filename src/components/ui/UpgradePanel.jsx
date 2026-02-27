@@ -1,7 +1,7 @@
 import UpgradeGroupCard from './UpgradeGroupCard';
 import { buildGroupUpgradeViewModel } from '../../services/upgradeRules';
 
-function UpgradePanel({ groups, purchased, score, onBuy }) {
+function UpgradePanel({ groups, purchased, score, onBuy, devMode }) {
   return (
     <div
       className="glass-panel"
@@ -25,6 +25,7 @@ function UpgradePanel({ groups, purchased, score, onBuy }) {
             group,
             purchased,
             score,
+            devMode,
           });
 
         return (

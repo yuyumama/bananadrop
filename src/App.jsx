@@ -35,6 +35,7 @@ function App() {
     shopPurchases,
     buyShopItem,
     cheatBanaCoins,
+    resetUpgrades,
   } = useUpgradeState();
 
   const {
@@ -177,7 +178,7 @@ function App() {
 
   const handleBuyUpgrade = useCallback(
     (upgrade) => {
-      const purchasedSuccess = buyUpgrade(upgrade, score);
+      const purchasedSuccess = buyUpgrade(upgrade, score, devMode);
       if (!purchasedSuccess) return;
       if (!devMode) {
         setScore((currentScore) => currentScore - upgrade.cost);
@@ -477,6 +478,7 @@ function App() {
         purchased={purchased}
         score={score}
         onBuy={handleBuyUpgrade}
+        devMode={devMode}
       />
 
       <BananaWorld
@@ -491,6 +493,7 @@ function App() {
         onCoinCollected={handleCoinCollected}
         shopPurchases={shopPurchases}
         devMode={devMode}
+        onResetUpgrades={resetUpgrades}
       />
     </div>
   );

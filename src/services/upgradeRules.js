@@ -1,6 +1,7 @@
-export function canPurchaseUpgrade({ upgrade, score, purchased }) {
-  if (score < upgrade.cost) return false;
+export function canPurchaseUpgrade({ upgrade, score, purchased, devMode }) {
   if (purchased.has(upgrade.id)) return false;
+  if (devMode) return true;
+  if (score < upgrade.cost) return false;
   if (upgrade.requires && !purchased.has(upgrade.requires)) return false;
   return true;
 }
@@ -30,7 +31,12 @@ export function applyUpgradeEffects({ upgrade, state, bananaTiers }) {
   return nextState;
 }
 
-export function buildGroupUpgradeViewModel({ group, purchased, score }) {
+export function buildGroupUpgradeViewModel({
+  group,
+  purchased,
+  score,
+  devMode,
+}) {
   const items = group.items;
   const purchasedItems = items.filter((upgrade) => purchased.has(upgrade.id));
 
@@ -39,13 +45,17 @@ export function buildGroupUpgradeViewModel({ group, purchased, score }) {
       ? purchasedItems[purchasedItems.length - 1].label
       : group.defaultLabel;
 
-  const nextItem = items.find(
-    (upgrade) =>
-      !purchased.has(upgrade.id) &&
-      (!upgrade.requires || purchased.has(upgrade.requires)),
-  );
+  const nextItem = devMode
+    ? items.find((upgrade) => !purchased.has(upgrade.id))
+    : items.find(
+        (upgrade) =>
+          !purchased.has(upgrade.id) &&
+          (!upgrade.requires || purchased.has(upgrade.requires)),
+      );
 
-  const affordable = Boolean(nextItem && score >= nextItem.cost);
+  const affordable = devMode
+    ? Boolean(nextItem)
+    : Boolean(nextItem && score >= nextItem.cost);
 
   return {
     currentLabel,
