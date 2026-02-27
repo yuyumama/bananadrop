@@ -20,11 +20,17 @@ const CLICK_DATA = [
 
 // バナナ種解放
 const BANANA_DATA = [
-  { cost: 500, tier: 2 },
-  { cost: 1500, tier: 3 },
-  { cost: 8000, tier: 4 },
-  { cost: 50000, tier: 5 },
-  { cost: 300000, tier: 6 },
+  { cost: 2000, tier: 2 }, // 完熟バナナ 10pt
+  { cost: 8000, tier: 3 }, // 赤バナナ 30pt
+  { cost: 30000, tier: 4 }, // 傷んだバナナ 70pt
+  { cost: 100000, tier: 5 }, // 真っ黒バナナ 150pt
+  { cost: 350000, tier: 6 }, // 銅バナナ 300pt
+  { cost: 1200000, tier: 7 }, // 銀バナナ 600pt
+  { cost: 4000000, tier: 8 }, // 金バナナ 1200pt
+  { cost: 15000000, tier: 9 }, // 氷バナナ 2500pt
+  { cost: 60000000, tier: 10 }, // 桜バナナ 5000pt
+  { cost: 250000000, tier: 11 }, // 溶岩バナナ 10000pt
+  { cost: 1000000000, tier: 12 }, // 伝説バナナ 20000pt
 ];
 
 // オートスポーン（~1.16x ずつ、1〜100本/秒）
