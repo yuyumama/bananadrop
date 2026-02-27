@@ -74,7 +74,7 @@ export const createCoinBody = ({ x, y, viewportWidth, baseUrl }) => {
   return body;
 };
 
-// ショップアイテムの特殊バナナ（円形ボディ）
+// ショップアイテムの特殊バナナ（通常バナナと同じポリゴンボディ）
 export const createSpecialBananaBody = ({
   x,
   y,
@@ -84,14 +84,28 @@ export const createSpecialBananaBody = ({
   baseUrl,
 }) => {
   const isGiant = Math.random() < giantChance;
-  const r = (Math.min(viewportWidth, 430) / 430) * 42 * (isGiant ? 3 : 1);
+  const baseScale = Math.min(viewportWidth, 430) / 3000;
+  const scale = isGiant ? baseScale * 3 : baseScale;
 
-  const body = Matter.Bodies.circle(x, y, r, {
+  const vertices = [
+    { x: 0 * scale, y: 0 * scale },
+    { x: 180 * scale, y: -85 * scale },
+    { x: 400 * scale, y: -105 * scale },
+    { x: 620 * scale, y: -68 * scale },
+    { x: 740 * scale, y: 10 * scale },
+    { x: 590 * scale, y: 75 * scale },
+    { x: 370 * scale, y: 92 * scale },
+    { x: 145 * scale, y: 55 * scale },
+  ];
+
+  const texScale = (2048 / (item.iconSize ?? 1024)) * 0.5 * scale;
+
+  const body = Matter.Bodies.fromVertices(x, y, [vertices], {
     render: {
       sprite: {
         texture: `${baseUrl}${item.icon}`,
-        xScale: (r * 2) / 512,
-        yScale: (r * 2) / 512,
+        xScale: texScale,
+        yScale: texScale,
       },
     },
     restitution: 0.35,
@@ -105,5 +119,6 @@ export const createSpecialBananaBody = ({
   body.shopItemId = item.id;
 
   Matter.Body.setPosition(body, { x, y });
+  Matter.Body.setAngle(body, Math.random() * Math.PI * 2);
   return body;
 };

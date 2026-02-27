@@ -287,6 +287,27 @@ export default function useMatterBananaWorld({
       textCtx.drawImage(bananaCapture, 0, 0);
       textCtx.globalCompositeOperation = 'source-over';
       ctx.drawImage(textWork, 0, 0);
+
+      // デバッグ: 当たり判定のポリゴン輪郭を描画
+      const allBodies = Matter.Composite.allBodies(engine.world);
+      ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+      ctx.lineWidth = 2;
+      for (const body of allBodies) {
+        ctx.strokeStyle = body.isStatic
+          ? 'rgba(0, 128, 255, 0.8)'
+          : 'rgba(255, 0, 0, 0.8)';
+        for (const part of body.parts) {
+          const verts = part.vertices;
+          if (!verts || verts.length < 2) continue;
+          ctx.beginPath();
+          ctx.moveTo(verts[0].x, verts[0].y);
+          for (let k = 1; k < verts.length; k++) {
+            ctx.lineTo(verts[k].x, verts[k].y);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
     });
 
     // 自動左右移動
