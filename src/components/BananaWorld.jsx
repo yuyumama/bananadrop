@@ -57,6 +57,7 @@ const BananaWorld = forwardRef(
     const giantChanceRef = useLatestRef(giantChance);
     const tableWidthRef = useLatestRef(tableWidth);
     const shopPurchasesRef = useLatestRef(shopPurchases);
+    const devModeRef = useLatestRef(devMode);
 
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
@@ -70,6 +71,7 @@ const BananaWorld = forwardRef(
         onEffectRef,
         onCoinRef,
         tableWidth,
+        devModeRef,
       },
     );
 
