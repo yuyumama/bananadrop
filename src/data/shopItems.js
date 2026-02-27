@@ -55,7 +55,7 @@ export const SHOP_ITEMS = [
     label: 'ブラックホールバナナ',
     description: '周囲のバナナを引き寄せる。',
     icon: 'banana_blackhole.png',
-    iconSize: 1442,
+    iconSize: 1024,
     cost: 10,
     costMultiplier: 1.5,
     maxCount: 5,
