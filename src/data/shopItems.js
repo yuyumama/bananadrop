@@ -51,6 +51,22 @@ export const SHOP_ITEMS = [
     },
   },
   {
+    id: 'banana_onekind',
+    label: 'oneバナナ',
+    description:
+      'しばらくの間、スポーンするバナナが1種類に統一される。高ティアのバナナが選ばれやすい。',
+    icon: 'banana_onekind.png',
+    iconSize: 500,
+    cost: 10,
+    costMultiplier: 1.5,
+    maxCount: 5,
+    spawnChancePerBanana: 0.001,
+    effect: {
+      type: 'oneKind',
+      durations: [5, 10, 15, 20, 25],
+    },
+  },
+  {
     id: 'banana_blackhole',
     label: 'ブラックホールバナナ',
     description: '周囲のバナナを引き寄せる。',
