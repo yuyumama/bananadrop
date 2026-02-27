@@ -43,6 +43,7 @@ export default function useMatterBananaWorld({
   onEffectRef,
   onCoinRef,
   tableWidth,
+  devModeRef,
 }) {
   const engineRef = useRef(null);
   const tableRef = useRef(null);
@@ -289,23 +290,24 @@ export default function useMatterBananaWorld({
       ctx.drawImage(textWork, 0, 0);
 
       // デバッグ: 当たり判定のポリゴン輪郭を描画
-      const allBodies = Matter.Composite.allBodies(engine.world);
-      ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
-      ctx.lineWidth = 2;
-      for (const body of allBodies) {
-        ctx.strokeStyle = body.isStatic
-          ? 'rgba(0, 128, 255, 0.8)'
-          : 'rgba(255, 0, 0, 0.8)';
-        for (const part of body.parts) {
-          const verts = part.vertices;
-          if (!verts || verts.length < 2) continue;
-          ctx.beginPath();
-          ctx.moveTo(verts[0].x, verts[0].y);
-          for (let k = 1; k < verts.length; k++) {
-            ctx.lineTo(verts[k].x, verts[k].y);
+      if (devModeRef && devModeRef.current) {
+        const allBodies = Matter.Composite.allBodies(engine.world);
+        ctx.lineWidth = 2;
+        for (const body of allBodies) {
+          ctx.strokeStyle = body.isStatic
+            ? 'rgba(0, 128, 255, 0.8)'
+            : 'rgba(255, 0, 0, 0.8)';
+          for (const part of body.parts) {
+            const verts = part.vertices;
+            if (!verts || verts.length < 2) continue;
+            ctx.beginPath();
+            ctx.moveTo(verts[0].x, verts[0].y);
+            for (let k = 1; k < verts.length; k++) {
+              ctx.lineTo(verts[k].x, verts[k].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
           }
-          ctx.closePath();
-          ctx.stroke();
         }
       }
     });
