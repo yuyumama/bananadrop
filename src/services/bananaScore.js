@@ -20,6 +20,7 @@ export const collectBananaOutcome = ({
     if (finalScore > 0) {
       scoreItems.push({
         score: finalScore,
+        tier: b.bananaTier ?? 1,
         x: Math.max(40, Math.min(screenWidth - 40, x)),
       });
     }

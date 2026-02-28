@@ -13,21 +13,11 @@ import UpgradePanel from './components/ui/UpgradePanel';
 import { TIER_COLORS } from './data/constants/tierColors';
 import { UPGRADE_GROUPS } from './data/constants/upgradeGroups';
 import { PANEL_HEIGHT } from './data/constants/layout';
-import { SHOP_ITEMS } from './data/shopItems';
 import useUpgradeState from './hooks/useUpgradeState';
 import useActiveEffects from './hooks/useActiveEffects';
 
 // oneバナナ着地時にスポーンする「1種類」を決定する
-// 低確率で購入済み特殊バナナも選ばれる
-const pickOneKindSelection = (unlockedTiers, shopPurchases) => {
-  const purchasedSpecials = SHOP_ITEMS.filter(
-    (item) => (shopPurchases[item.id] ?? 0) > 0 && item.id !== 'banana_onekind',
-  );
-  if (purchasedSpecials.length > 0 && Math.random() < 0.01) {
-    const item =
-      purchasedSpecials[Math.floor(Math.random() * purchasedSpecials.length)];
-    return { type: 'special', itemId: item.id };
-  }
+const pickOneKindSelection = (unlockedTiers) => {
   const tier = unlockedTiers[Math.floor(Math.random() * unlockedTiers.length)];
   return { type: 'tier', tier };
 };
@@ -149,6 +139,7 @@ function App() {
     const newTexts = scoreItems.map((item) => ({
       id: ++_textId,
       value: item.score,
+      tier: item.tier,
       x: Math.max(40, Math.min(window.innerWidth - 40, item.x)),
     }));
     setFloatingTexts((prev) => [...prev, ...newTexts]);
@@ -173,7 +164,7 @@ function App() {
     (itemId, pos) => {
       const count = shopPurchases[itemId] ?? 1;
       if (itemId === 'banana_onekind') {
-        const selection = pickOneKindSelection(unlockedTiers, shopPurchases);
+        const selection = pickOneKindSelection(unlockedTiers);
         triggerEffect(itemId, count, { selection });
       } else {
         triggerEffect(itemId, count);
@@ -216,14 +207,7 @@ function App() {
     }
   }, [waterTree, score, devMode]);
 
-  const scoreColor = (score) => {
-    if (score >= 500) return '#ff00ff';
-    if (score >= 100) return '#ffd700';
-    if (score >= 30) return '#c0c0c0';
-    if (score >= 12) return '#cd7f32';
-    if (score >= 3) return '#c8a000';
-    return '#555';
-  };
+  const scoreColor = (tier) => TIER_COLORS[tier - 1] ?? '#555';
 
   // フィーバー残り秒数と進捗
   const feverRemaining = isFever
@@ -568,7 +552,7 @@ function App() {
         <FloatingScoreText
           key={text.id}
           text={text}
-          color={scoreColor(text.value)}
+          color={scoreColor(text.tier)}
         />
       ))}
 
