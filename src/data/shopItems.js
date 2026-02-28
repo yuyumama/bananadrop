@@ -26,11 +26,11 @@ export const SHOP_ITEMS = [
     cost: 10,
     costMultiplier: 1.5,
     maxCount: 5,
-    spawnChancePerBanana: 0.001, // 確率
+    spawnChancePerBanana: 0.0007, // 確率
     effect: {
       type: 'feverTime',
-      duration: 4,
-      maxDuration: 20,
+      duration: 3,
+      maxDuration: 15,
       autoMultiplier: 3,
     },
   },
@@ -42,10 +42,10 @@ export const SHOP_ITEMS = [
     cost: 10,
     costMultiplier: 1.5,
     maxCount: 5,
-    spawnChancePerBanana: 0.001, // 確立
+    spawnChancePerBanana: 0.0007, // 確率
     effect: {
       type: 'allGiant',
-      durations: [3, 4, 6, 7, 10],
+      durations: [2, 3, 4, 5, 7],
     },
   },
   {
@@ -56,10 +56,10 @@ export const SHOP_ITEMS = [
     cost: 10,
     costMultiplier: 1.5,
     maxCount: 5,
-    spawnChancePerBanana: 0.001,
+    spawnChancePerBanana: 0.0007,
     effect: {
       type: 'oneKind',
-      durations: [5, 10, 15, 20, 25],
+      durations: [3, 6, 9, 12, 15],
     },
   },
   {
@@ -70,7 +70,7 @@ export const SHOP_ITEMS = [
     cost: 10,
     costMultiplier: 1.5,
     maxCount: 5,
-    spawnChancePerBanana: 0.001, // 確率
+    spawnChancePerBanana: 0.0007, // 確率
     spawnChanceStacks: true, // 購入数に比例して出現確率が上がる
     // 効果はフィジックスレベルで処理（引力）
   },
