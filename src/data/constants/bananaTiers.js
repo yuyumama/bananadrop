@@ -1,4 +1,3 @@
-// size: 画像ピクセルサイズ（スケール正規化用、基準=2048）
 export const BANANA_TIERS = [
   {
     tier: 1,
@@ -6,9 +5,9 @@ export const BANANA_TIERS = [
     score: 1,
     icon: 'banana_green_02.png',
     textures: [
-      { file: 'banana_green_01.png', size: 1024 },
-      { file: 'banana_green_02.png', size: 1024 },
-      { file: 'banana_green_03.png', size: 1000 },
+      { file: 'banana_green_01.png' },
+      { file: 'banana_green_02.png' },
+      { file: 'banana_green_03.png' },
     ],
   },
   {
@@ -17,9 +16,9 @@ export const BANANA_TIERS = [
     score: 10,
     icon: 'banana_rembg_01.png',
     textures: [
-      { file: 'banana_rembg_01.png', size: 2048 },
-      { file: 'banana_rembg_02.png', size: 1024 },
-      { file: 'banana_rembg_03.png', size: 1280 },
+      { file: 'banana_rembg_01.png' },
+      { file: 'banana_rembg_02.png' },
+      { file: 'banana_rembg_03.png' },
     ],
   },
   {
@@ -27,10 +26,7 @@ export const BANANA_TIERS = [
     name: '赤バナナ',
     score: 30,
     icon: 'banana_red_01.png',
-    textures: [
-      { file: 'banana_red_01.png', size: 500 },
-      { file: 'banana_red_02.png', size: 500 },
-    ],
+    textures: [{ file: 'banana_red_01.png' }, { file: 'banana_red_02.png' }],
   },
   {
     tier: 4,
@@ -38,9 +34,9 @@ export const BANANA_TIERS = [
     score: 70,
     icon: 'banana_ripe_01.png',
     textures: [
-      { file: 'banana_ripe_01.png', size: 1024 },
-      { file: 'banana_ripe_02.png', size: 1024 },
-      { file: 'banana_ripe_03.png', size: 1280 },
+      { file: 'banana_ripe_01.png' },
+      { file: 'banana_ripe_02.png' },
+      { file: 'banana_ripe_03.png' },
     ],
   },
   {
@@ -49,8 +45,8 @@ export const BANANA_TIERS = [
     score: 150,
     icon: 'banana_spoiled_01.png',
     textures: [
-      { file: 'banana_spoiled_01.png', size: 500 },
-      { file: 'banana_spoiled_02.png', size: 500 },
+      { file: 'banana_spoiled_01.png' },
+      { file: 'banana_spoiled_02.png' },
     ],
   },
   {
@@ -59,8 +55,8 @@ export const BANANA_TIERS = [
     score: 300,
     icon: 'banana_copper_01.png',
     textures: [
-      { file: 'banana_copper_01.png', size: 500 },
-      { file: 'banana_copper_02.png', size: 500 },
+      { file: 'banana_copper_01.png' },
+      { file: 'banana_copper_02.png' },
     ],
   },
   {
@@ -69,9 +65,9 @@ export const BANANA_TIERS = [
     score: 600,
     icon: 'banana_silver_01.png',
     textures: [
-      { file: 'banana_silver_01.png', size: 1024 },
-      { file: 'banana_silver_02.png', size: 1024 },
-      { file: 'banana_silver_03.png', size: 1000 },
+      { file: 'banana_silver_01.png' },
+      { file: 'banana_silver_02.png' },
+      { file: 'banana_silver_03.png' },
     ],
   },
   {
@@ -80,9 +76,9 @@ export const BANANA_TIERS = [
     score: 1200,
     icon: 'banana_gold_02.png',
     textures: [
-      { file: 'banana_gold_01.png', size: 1024 },
-      { file: 'banana_gold_02.png', size: 2048 },
-      { file: 'banana_gold_03.png', size: 1024 },
+      { file: 'banana_gold_01.png' },
+      { file: 'banana_gold_02.png' },
+      { file: 'banana_gold_03.png' },
     ],
   },
   {
@@ -90,10 +86,7 @@ export const BANANA_TIERS = [
     name: '氷バナナ',
     score: 2500,
     icon: 'banana_ice_01.png',
-    textures: [
-      { file: 'banana_ice_01.png', size: 500 },
-      { file: 'banana_ice_02.png', size: 500 },
-    ],
+    textures: [{ file: 'banana_ice_01.png' }, { file: 'banana_ice_02.png' }],
   },
   {
     tier: 10,
@@ -101,8 +94,8 @@ export const BANANA_TIERS = [
     score: 5000,
     icon: 'banana_cherryblossom_01.png',
     textures: [
-      { file: 'banana_cherryblossom_01.png', size: 500 },
-      { file: 'banana_cherryblossom_02.png', size: 500 },
+      { file: 'banana_cherryblossom_01.png' },
+      { file: 'banana_cherryblossom_02.png' },
     ],
   },
   {
@@ -110,16 +103,13 @@ export const BANANA_TIERS = [
     name: '溶岩バナナ',
     score: 10000,
     icon: 'banana_lava_01.png',
-    textures: [
-      { file: 'banana_lava_01.png', size: 500 },
-      { file: 'banana_lava_02.png', size: 500 },
-    ],
+    textures: [{ file: 'banana_lava_01.png' }, { file: 'banana_lava_02.png' }],
   },
   {
     tier: 12,
     name: '伝説バナナ',
     score: 20000,
     icon: 'banana_legend.png',
-    textures: [{ file: 'banana_legend.png', size: 1024 }],
+    textures: [{ file: 'banana_legend.png' }],
   },
 ];

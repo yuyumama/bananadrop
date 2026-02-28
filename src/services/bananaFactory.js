@@ -25,7 +25,7 @@ export const createBananaBody = ({
 
   const tier = tiers[Math.floor(Math.random() * tiers.length)];
   const tex = tier.textures[Math.floor(Math.random() * tier.textures.length)];
-  const texScale = (2048 / tex.size) * 0.5 * scale;
+  const texScale = (2048 / 500) * 0.5 * scale;
 
   const banana = Matter.Bodies.fromVertices(x, y, [vertices], {
     render: {
@@ -98,7 +98,7 @@ export const createSpecialBananaBody = ({
     { x: 145 * scale, y: 55 * scale },
   ];
 
-  const texScale = (2048 / (item.iconSize ?? 1024)) * 0.5 * scale;
+  const texScale = (2048 / 500) * 0.5 * scale;
 
   const body = Matter.Bodies.fromVertices(x, y, [vertices], {
     render: {
