@@ -278,7 +278,9 @@ const BananaWorld = forwardRef(
             {/* 行2: スコア調整 */}
             <DebugAdjusterRow
               icon={
-                <span style={{ fontSize: '1rem', color: '#d4af37', lineHeight: 1 }}>
+                <span
+                  style={{ fontSize: '1rem', color: '#d4af37', lineHeight: 1 }}
+                >
                   🍌
                 </span>
               }
