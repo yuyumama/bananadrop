@@ -123,6 +123,13 @@ export default function useUpgradeState() {
     setTreeData((prev) => ({ ...prev, banaCoins: prev.banaCoins + 999 }));
   }, []);
 
+  const adjustCoins = useCallback((delta) => {
+    setTreeData((prev) => ({
+      ...prev,
+      banaCoins: Math.max(0, prev.banaCoins + delta),
+    }));
+  }, []);
+
   const resetUpgrades = useCallback(() => {
     setPurchased(new Set());
     setBananaPerClick(1);
@@ -148,6 +155,7 @@ export default function useUpgradeState() {
     shopPurchases,
     buyShopItem,
     cheatBanaCoins,
+    adjustCoins,
     resetUpgrades,
   };
 }
