@@ -106,6 +106,7 @@ const BananaWorld = forwardRef(
       onAdjustCoins,
       isOneKind = false,
       oneKindSelection = null,
+      onSpecialSpawn,
     },
     ref,
   ) => {
@@ -124,6 +125,7 @@ const BananaWorld = forwardRef(
     const devModeRef = useLatestRef(devMode);
     const isOneKindRef = useLatestRef(isOneKind);
     const oneKindSelectionRef = useLatestRef(oneKindSelection);
+    const onSpecialSpawnRef = useLatestRef(onSpecialSpawn);
 
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
@@ -155,10 +157,11 @@ const BananaWorld = forwardRef(
             : item.spawnChancePerBanana;
           if (Math.random() < chance) {
             spawnSpecialBanana(x, item);
+            onSpecialSpawnRef.current?.(x, item.id);
           }
         });
       },
-      [spawnSpecialBanana, shopPurchasesRef],
+      [spawnSpecialBanana, shopPurchasesRef, onSpecialSpawnRef],
     );
 
     const spawnBananaWithCheck = useCallback(
@@ -171,7 +174,10 @@ const BananaWorld = forwardRef(
             spawnBanana(x, [selection.tier]);
           } else if (selection.type === 'special') {
             const item = SHOP_ITEMS.find((i) => i.id === selection.itemId);
-            if (item) spawnSpecialBanana(x, item);
+            if (item) {
+              spawnSpecialBanana(x, item);
+              onSpecialSpawnRef.current?.(x, item.id);
+            }
           }
         } else {
           spawnBanana(x);
@@ -184,6 +190,7 @@ const BananaWorld = forwardRef(
         trySpawnSpecial,
         isOneKindRef,
         oneKindSelectionRef,
+        onSpecialSpawnRef,
       ],
     );
 
@@ -238,6 +245,7 @@ const BananaWorld = forwardRef(
                   onClick={(e) => {
                     e.stopPropagation();
                     spawnSpecialBanana(window.innerWidth / 2, item);
+                    onSpecialSpawnRef.current?.(window.innerWidth / 2, item.id);
                   }}
                   style={{
                     padding: '6px 14px',

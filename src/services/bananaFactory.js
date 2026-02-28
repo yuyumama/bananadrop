@@ -85,8 +85,8 @@ export const createSpecialBananaBody = ({
   baseUrl,
 }) => {
   const isGiant = Math.random() < giantChance;
-  const baseScale = Math.min(viewportWidth, 430) / 3000;
-  const scale = isGiant ? baseScale * 3 : baseScale;
+  const normalBaseScale = Math.min(viewportWidth, 430) / 3000;
+  const scale = isGiant ? normalBaseScale * 3 : normalBaseScale * 2;
 
   const vertices = [
     { x: 0 * scale, y: 0 * scale },

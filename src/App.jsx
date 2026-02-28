@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
 import FeverBurst from './components/ui/FeverBurst';
+import SpawnFlash from './components/ui/SpawnFlash';
 import FloatingScoreText from './components/ui/FloatingScoreText';
 import ScoreDisplay from './components/ui/ScoreDisplay';
 import BananaTree from './components/ui/BananaTree';
@@ -64,6 +65,7 @@ function App() {
   const [floatingTexts, setFloatingTexts] = useState([]);
   const [clickEffects, setClickEffects] = useState([]);
   const [feverBursts, setFeverBursts] = useState([]);
+  const [spawnFlashes, setSpawnFlashes] = useState([]);
   const [scoreBump, setScoreBump] = useState(false);
   const [perSecond, setPerSecond] = useState(0);
   const [devMode, setDevMode] = useState(false);
@@ -155,6 +157,16 @@ function App() {
     setTimeout(
       () => setClickEffects((prev) => prev.filter((ef) => ef.id !== id)),
       600,
+    );
+  }, []);
+
+  // 特殊バナナがスポーンしたときのエフェクト
+  const handleSpecialSpawn = useCallback((x, itemId) => {
+    const id = ++_textId;
+    setSpawnFlashes((prev) => [...prev, { id, x, itemId }]);
+    setTimeout(
+      () => setSpawnFlashes((prev) => prev.filter((f) => f.id !== id)),
+      1200,
     );
   }, []);
 
@@ -564,6 +576,10 @@ function App() {
         <FeverBurst key={burst.id} burst={burst} />
       ))}
 
+      {spawnFlashes.map((flash) => (
+        <SpawnFlash key={flash.id} flash={flash} />
+      ))}
+
       <UpgradePanel
         groups={UPGRADE_GROUPS}
         purchased={purchased}
@@ -589,6 +605,7 @@ function App() {
         onAdjustCoins={adjustCoins}
         isOneKind={isOneKind}
         oneKindSelection={oneKindSelection}
+        onSpecialSpawn={handleSpecialSpawn}
       />
     </div>
   );
