@@ -157,7 +157,7 @@ const BananaWorld = forwardRef(
             : item.spawnChancePerBanana;
           if (Math.random() < chance) {
             spawnSpecialBanana(x, item);
-            onSpecialSpawnRef.current?.(x);
+            onSpecialSpawnRef.current?.(x, item.id);
           }
         });
       },
@@ -176,7 +176,7 @@ const BananaWorld = forwardRef(
             const item = SHOP_ITEMS.find((i) => i.id === selection.itemId);
             if (item) {
               spawnSpecialBanana(x, item);
-              onSpecialSpawnRef.current?.(x);
+              onSpecialSpawnRef.current?.(x, item.id);
             }
           }
         } else {
@@ -245,7 +245,7 @@ const BananaWorld = forwardRef(
                   onClick={(e) => {
                     e.stopPropagation();
                     spawnSpecialBanana(window.innerWidth / 2, item);
-                    onSpecialSpawnRef.current?.(window.innerWidth / 2);
+                    onSpecialSpawnRef.current?.(window.innerWidth / 2, item.id);
                   }}
                   style={{
                     padding: '6px 14px',

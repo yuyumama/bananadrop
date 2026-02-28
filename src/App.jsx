@@ -161,9 +161,9 @@ function App() {
   }, []);
 
   // 特殊バナナがスポーンしたときのエフェクト
-  const handleSpecialSpawn = useCallback((x) => {
+  const handleSpecialSpawn = useCallback((x, itemId) => {
     const id = ++_textId;
-    setSpawnFlashes((prev) => [...prev, { id, x }]);
+    setSpawnFlashes((prev) => [...prev, { id, x, itemId }]);
     setTimeout(
       () => setSpawnFlashes((prev) => prev.filter((f) => f.id !== id)),
       1200,
