@@ -16,6 +16,65 @@ const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
 const RIM_RISE = 40;
 
+function DebugAdjusterRow({ icon, steps, onAdjust }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        background: 'rgba(255,255,255,0.75)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1.5px dashed rgba(212,175,55,0.5)',
+        borderRadius: 20,
+        padding: '4px 8px',
+        boxShadow: '0 2px 8px rgba(132,122,100,0.12)',
+      }}
+    >
+      {icon}
+      {steps.map(({ label, delta }) => (
+        <button
+          key={label}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAdjust(delta);
+          }}
+          style={{
+            padding: '3px 8px',
+            background: 'rgba(255,255,255,0.85)',
+            color: '#4a4a4a',
+            fontWeight: 700,
+            fontSize: '0.68rem',
+            border: '1px solid rgba(212,175,55,0.35)',
+            borderRadius: 12,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow =
+              '0 4px 12px rgba(212,175,55,0.25)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+          onMouseDown={(e) => {
+            e.currentTarget.style.transform = 'translateY(0) scale(0.97)';
+          }}
+          onMouseUp={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+          }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const resolvePointerX = (event) => {
   if (event && event.touches && event.touches.length > 0) {
     return event.touches[0].clientX;
@@ -217,146 +276,46 @@ const BananaWorld = forwardRef(
             </div>
 
             {/* 行2: スコア調整 */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                background: 'rgba(255,255,255,0.75)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1.5px dashed rgba(212,175,55,0.5)',
-                borderRadius: 20,
-                padding: '4px 8px',
-                boxShadow: '0 2px 8px rgba(132,122,100,0.12)',
-              }}
-            >
-              <span
-                style={{ fontSize: '1rem', color: '#d4af37', lineHeight: 1 }}
-              >
-                🍌
-              </span>
-              {[
+            <DebugAdjusterRow
+              icon={
+                <span style={{ fontSize: '1rem', color: '#d4af37', lineHeight: 1 }}>
+                  🍌
+                </span>
+              }
+              steps={[
                 { label: '-100000', delta: -100000 },
                 { label: '-10000', delta: -10000 },
                 { label: '-1000', delta: -1000 },
                 { label: '+1000', delta: 1000 },
                 { label: '+10000', delta: 10000 },
                 { label: '+100000', delta: 100000 },
-              ].map(({ label, delta }) => (
-                <button
-                  key={label}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAdjustScore?.(delta);
-                  }}
-                  style={{
-                    padding: '3px 8px',
-                    background: 'rgba(255,255,255,0.85)',
-                    color: '#4a4a4a',
-                    fontWeight: 700,
-                    fontSize: '0.68rem',
-                    border: '1px solid rgba(212,175,55,0.35)',
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow =
-                      '0 4px 12px rgba(212,175,55,0.25)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                  onMouseDown={(e) => {
-                    e.currentTarget.style.transform =
-                      'translateY(0) scale(0.97)';
-                  }}
-                  onMouseUp={(e) => {
-                    e.currentTarget.style.transform =
-                      'translateY(-2px) scale(1)';
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+              ]}
+              onAdjust={onAdjustScore}
+            />
 
             {/* 行3: バナコイン調整 */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                background: 'rgba(255,255,255,0.75)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1.5px dashed rgba(212,175,55,0.5)',
-                borderRadius: 20,
-                padding: '4px 8px',
-                boxShadow: '0 2px 8px rgba(132,122,100,0.12)',
-              }}
-            >
-              <img
-                src={`${import.meta.env.BASE_URL}coin.png`}
-                alt="バナコイン"
-                style={{
-                  width: 18,
-                  height: 18,
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 1px 3px rgba(212,175,55,0.5))',
-                  flexShrink: 0,
-                }}
-              />
-              {[
+            <DebugAdjusterRow
+              icon={
+                <img
+                  src={`${import.meta.env.BASE_URL}coin.png`}
+                  alt="バナコイン"
+                  style={{
+                    width: 18,
+                    height: 18,
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 1px 3px rgba(212,175,55,0.5))',
+                    flexShrink: 0,
+                  }}
+                />
+              }
+              steps={[
                 { label: '-100', delta: -100 },
                 { label: '-10', delta: -10 },
                 { label: '+10', delta: 10 },
                 { label: '+100', delta: 100 },
-              ].map(({ label, delta }) => (
-                <button
-                  key={label}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAdjustCoins?.(delta);
-                  }}
-                  style={{
-                    padding: '3px 8px',
-                    background: 'rgba(255,255,255,0.85)',
-                    color: '#4a4a4a',
-                    fontWeight: 700,
-                    fontSize: '0.68rem',
-                    border: '1px solid rgba(212,175,55,0.35)',
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow =
-                      '0 4px 12px rgba(212,175,55,0.25)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                  onMouseDown={(e) => {
-                    e.currentTarget.style.transform =
-                      'translateY(0) scale(0.97)';
-                  }}
-                  onMouseUp={(e) => {
-                    e.currentTarget.style.transform =
-                      'translateY(-2px) scale(1)';
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+              ]}
+              onAdjust={onAdjustCoins}
+            />
           </div>
         )}
 
