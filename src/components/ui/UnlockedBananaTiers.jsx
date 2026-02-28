@@ -6,7 +6,6 @@ const SectionLabel = ({ children }) => (
       color: 'var(--text-muted)',
       letterSpacing: '0.1em',
       textTransform: 'uppercase',
-      alignSelf: 'flex-end',
       marginBottom: -2,
     }}
   >
@@ -23,6 +22,9 @@ function UnlockedBananaTiers({
   isAllGiant,
   blackholeBananaCount,
 }) {
+  const hasSpecial =
+    nuiBananaCount > 0 || magicBananaCount > 0 || blackholeBananaCount > 0;
+
   return (
     <div
       className="banana-ui-block"
@@ -32,22 +34,160 @@ function UnlockedBananaTiers({
         right: 24,
         zIndex: 10,
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 10,
-        maxWidth: '300px',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 12,
+        maxHeight: 'calc(100vh - 110px - 120px)',
       }}
     >
+      {/* 特殊アイテムセクション（1体以上購入済みの場合のみ） */}
+      {hasSpecial && (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: 6,
+          }}
+        >
+          <SectionLabel>Special</SectionLabel>
+          {nuiBananaCount > 0 && (
+            <div
+              className="glass-panel"
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                color: '#ff8c00',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                userSelect: 'none',
+                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                borderLeft: '3px solid #ff8c00',
+                background: isFever
+                  ? 'rgba(255, 140, 0, 0.15)'
+                  : 'rgba(255, 255, 255, 0.8)',
+                boxShadow: isFever
+                  ? '0 2px 12px rgba(255, 140, 0, 0.3)'
+                  : '0 2px 10px rgba(0,0,0,0.05)',
+              }}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}banana_nui.png`}
+                alt="ぬいバナナ"
+                style={{ width: 24, height: 24, objectFit: 'contain' }}
+              />
+              <span>ぬいバナナ</span>
+              <span
+                style={{
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  color: '#ff8c00',
+                  marginLeft: 'auto',
+                  paddingLeft: 8,
+                  opacity: 0.8,
+                }}
+              >
+                ×{nuiBananaCount}
+              </span>
+            </div>
+          )}
+          {magicBananaCount > 0 && (
+            <div
+              className="glass-panel"
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                color: '#9333ea',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                userSelect: 'none',
+                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                borderLeft: '3px solid #a855f7',
+                background: isAllGiant
+                  ? 'rgba(168, 85, 247, 0.15)'
+                  : 'rgba(255, 255, 255, 0.8)',
+                boxShadow: isAllGiant
+                  ? '0 2px 12px rgba(168, 85, 247, 0.3)'
+                  : '0 2px 10px rgba(0,0,0,0.05)',
+              }}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}banana_magic.png`}
+                alt="マジックバナナ"
+                style={{ width: 24, height: 24, objectFit: 'contain' }}
+              />
+              <span>マジックバナナ</span>
+              <span
+                style={{
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  color: '#a855f7',
+                  marginLeft: 'auto',
+                  paddingLeft: 8,
+                  opacity: 0.8,
+                }}
+              >
+                ×{magicBananaCount}
+              </span>
+            </div>
+          )}
+          {blackholeBananaCount > 0 && (
+            <div
+              className="glass-panel"
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                color: '#1e3a5f',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                userSelect: 'none',
+                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                borderLeft: '3px solid #3b82f6',
+                background: 'rgba(255, 255, 255, 0.8)',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+              }}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}banana_blackhole.png`}
+                alt="ブラックホールバナナ"
+                style={{ width: 24, height: 24, objectFit: 'contain' }}
+              />
+              <span>ブラックホール</span>
+              <span
+                style={{
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  color: '#3b82f6',
+                  marginLeft: 'auto',
+                  paddingLeft: 8,
+                  opacity: 0.8,
+                }}
+              >
+                ×{blackholeBananaCount}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* バナナ種別セクション */}
-      <SectionLabel>Bananas</SectionLabel>
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 6,
           alignItems: 'flex-end',
+          gap: 6,
+          overflowY: 'auto',
+          maxHeight: 'calc(100vh - 110px - 120px)',
         }}
       >
+        <SectionLabel>Bananas</SectionLabel>
         {unlockedTiers.map((tier) => (
           <div
             key={tier.tier}
@@ -96,159 +236,6 @@ function UnlockedBananaTiers({
           </div>
         ))}
       </div>
-
-      {/* 特殊アイテムセクション（1体以上購入済みの場合のみ） */}
-      {(nuiBananaCount > 0 ||
-        magicBananaCount > 0 ||
-        blackholeBananaCount > 0) && (
-        <>
-          <div
-            style={{
-              width: '100%',
-              height: 1,
-              background: 'rgba(0,0,0,0.07)',
-              alignSelf: 'stretch',
-              marginTop: 2,
-              marginBottom: -2,
-            }}
-          />
-          <SectionLabel>Special</SectionLabel>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 6,
-              alignItems: 'flex-end',
-            }}
-          >
-            {nuiBananaCount > 0 && (
-              <div
-                className="glass-panel"
-                style={{
-                  padding: '6px 14px',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  color: '#ff8c00',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  userSelect: 'none',
-                  transition:
-                    'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  borderLeft: '3px solid #ff8c00',
-                  background: isFever
-                    ? 'rgba(255, 140, 0, 0.15)'
-                    : 'rgba(255, 255, 255, 0.8)',
-                  boxShadow: isFever
-                    ? '0 2px 12px rgba(255, 140, 0, 0.3)'
-                    : '0 2px 10px rgba(0,0,0,0.05)',
-                }}
-              >
-                <img
-                  src={`${import.meta.env.BASE_URL}banana_nui.png`}
-                  alt="ぬいバナナ"
-                  style={{ width: 24, height: 24, objectFit: 'contain' }}
-                />
-                <span>ぬいバナナ</span>
-                <span
-                  style={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    color: '#ff8c00',
-                    marginLeft: 'auto',
-                    paddingLeft: 8,
-                    opacity: 0.8,
-                  }}
-                >
-                  ×{nuiBananaCount}
-                </span>
-              </div>
-            )}
-            {magicBananaCount > 0 && (
-              <div
-                className="glass-panel"
-                style={{
-                  padding: '6px 14px',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  color: '#9333ea',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  userSelect: 'none',
-                  transition:
-                    'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  borderLeft: '3px solid #a855f7',
-                  background: isAllGiant
-                    ? 'rgba(168, 85, 247, 0.15)'
-                    : 'rgba(255, 255, 255, 0.8)',
-                  boxShadow: isAllGiant
-                    ? '0 2px 12px rgba(168, 85, 247, 0.3)'
-                    : '0 2px 10px rgba(0,0,0,0.05)',
-                }}
-              >
-                <img
-                  src={`${import.meta.env.BASE_URL}banana_magic.png`}
-                  alt="マジックバナナ"
-                  style={{ width: 24, height: 24, objectFit: 'contain' }}
-                />
-                <span>マジックバナナ</span>
-                <span
-                  style={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    color: '#a855f7',
-                    marginLeft: 'auto',
-                    paddingLeft: 8,
-                    opacity: 0.8,
-                  }}
-                >
-                  ×{magicBananaCount}
-                </span>
-              </div>
-            )}
-            {blackholeBananaCount > 0 && (
-              <div
-                className="glass-panel"
-                style={{
-                  padding: '6px 14px',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  color: '#1e3a5f',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  userSelect: 'none',
-                  transition:
-                    'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  borderLeft: '3px solid #3b82f6',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-                }}
-              >
-                <img
-                  src={`${import.meta.env.BASE_URL}banana_blackhole.png`}
-                  alt="ブラックホールバナナ"
-                  style={{ width: 24, height: 24, objectFit: 'contain' }}
-                />
-                <span>ブラックホール</span>
-                <span
-                  style={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    color: '#3b82f6',
-                    marginLeft: 'auto',
-                    paddingLeft: 8,
-                    opacity: 0.8,
-                  }}
-                >
-                  ×{blackholeBananaCount}
-                </span>
-              </div>
-            )}
-          </div>
-        </>
-      )}
     </div>
   );
 }
