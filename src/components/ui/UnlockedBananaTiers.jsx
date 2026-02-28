@@ -21,9 +21,14 @@ function UnlockedBananaTiers({
   magicBananaCount,
   isAllGiant,
   blackholeBananaCount,
+  onekindBananaCount,
+  isOneKind,
 }) {
   const hasSpecial =
-    nuiBananaCount > 0 || magicBananaCount > 0 || blackholeBananaCount > 0;
+    nuiBananaCount > 0 ||
+    magicBananaCount > 0 ||
+    blackholeBananaCount > 0 ||
+    onekindBananaCount > 0;
 
   return (
     <div
@@ -170,6 +175,48 @@ function UnlockedBananaTiers({
                 }}
               >
                 ×{blackholeBananaCount}
+              </span>
+            </div>
+          )}
+          {onekindBananaCount > 0 && (
+            <div
+              className="glass-panel"
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                color: '#e11d48',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                userSelect: 'none',
+                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                borderLeft: '3px solid #e11d48',
+                background: isOneKind
+                  ? 'rgba(225, 29, 72, 0.15)'
+                  : 'rgba(255, 255, 255, 0.8)',
+                boxShadow: isOneKind
+                  ? '0 2px 12px rgba(225, 29, 72, 0.3)'
+                  : '0 2px 10px rgba(0,0,0,0.05)',
+              }}
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}banana_onekind.png`}
+                alt="oneバナナ"
+                style={{ width: 24, height: 24, objectFit: 'contain' }}
+              />
+              <span>oneバナナ</span>
+              <span
+                style={{
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  color: '#e11d48',
+                  marginLeft: 'auto',
+                  paddingLeft: 8,
+                  opacity: 0.8,
+                }}
+              >
+                ×{onekindBananaCount}
               </span>
             </div>
           )}

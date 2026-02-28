@@ -301,6 +301,8 @@ function App() {
         magicBananaCount={shopPurchases['banana_magic'] ?? 0}
         isAllGiant={isAllGiant}
         blackholeBananaCount={shopPurchases['banana_blackhole'] ?? 0}
+        onekindBananaCount={shopPurchases['banana_onekind'] ?? 0}
+        isOneKind={isOneKind}
       />
       <ShopButton banaCoins={banaCoins} onOpen={() => setIsShopOpen(true)} />
       {isShopOpen && (
