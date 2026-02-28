@@ -50,7 +50,7 @@ function App() {
     addBanaCoin,
     shopPurchases,
     buyShopItem,
-    cheatBanaCoins,
+    adjustCoins,
     resetUpgrades,
   } = useUpgradeState();
 
@@ -84,19 +84,12 @@ function App() {
     const handleKeyDown = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'D') {
         e.preventDefault();
-        setDevMode((prev) => {
-          const next = !prev;
-          if (next) {
-            setScore(99999999);
-            cheatBanaCoins();
-          }
-          return next;
-        });
+        setDevMode((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cheatBanaCoins]);
+  }, []);
 
   // ツリーレベルアップ時にバナコインをスポーン
   const prevTreeLevelRef = useRef(null);
@@ -211,6 +204,10 @@ function App() {
     },
     [buyUpgrade, score, devMode],
   );
+
+  const handleAdjustScore = useCallback((delta) => {
+    setScore((s) => Math.max(0, s + delta));
+  }, []);
 
   const handleWaterTree = useCallback(() => {
     const cost = waterTree(score);
@@ -604,6 +601,8 @@ function App() {
         shopPurchases={shopPurchases}
         devMode={devMode}
         onResetUpgrades={resetUpgrades}
+        onAdjustScore={handleAdjustScore}
+        onAdjustCoins={adjustCoins}
         isOneKind={isOneKind}
         oneKindSelection={oneKindSelection}
       />
