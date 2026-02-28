@@ -283,12 +283,12 @@ const BananaWorld = forwardRef(
                 </span>
               }
               steps={[
-                { label: '-100000', delta: -100000 },
-                { label: '-10000', delta: -10000 },
-                { label: '-1000', delta: -1000 },
-                { label: '+1000', delta: 1000 },
-                { label: '+10000', delta: 10000 },
-                { label: '+100000', delta: 100000 },
+                { label: '-100,000', delta: -100000 },
+                { label: '-10,000', delta: -10000 },
+                { label: '-1,000', delta: -1000 },
+                { label: '+1,000', delta: 1000 },
+                { label: '+10,000', delta: 10000 },
+                { label: '+100,000', delta: 100000 },
               ]}
               onAdjust={onAdjustScore}
             />
