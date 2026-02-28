@@ -18,25 +18,18 @@ import useUpgradeState from './hooks/useUpgradeState';
 import useActiveEffects from './hooks/useActiveEffects';
 
 // oneバナナ着地時にスポーンする「1種類」を決定する
-// 高ティアほど選ばれやすく、低確率で購入済み特殊バナナも選ばれる
+// 低確率で購入済み特殊バナナも選ばれる
 const pickOneKindSelection = (unlockedTiers, shopPurchases) => {
   const purchasedSpecials = SHOP_ITEMS.filter(
     (item) => (shopPurchases[item.id] ?? 0) > 0 && item.id !== 'banana_onekind',
   );
-  if (purchasedSpecials.length > 0 && Math.random() < 0.1) {
+  if (purchasedSpecials.length > 0 && Math.random() < 0.01) {
     const item =
       purchasedSpecials[Math.floor(Math.random() * purchasedSpecials.length)];
     return { type: 'special', itemId: item.id };
   }
-  // ティアインデックスの2乗で重み付け（高ティアほど出やすい）
-  const weights = unlockedTiers.map((_, i) => (i + 1) ** 2);
-  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-  let r = Math.random() * totalWeight;
-  for (let i = 0; i < unlockedTiers.length; i++) {
-    r -= weights[i];
-    if (r <= 0) return { type: 'tier', tier: unlockedTiers[i] };
-  }
-  return { type: 'tier', tier: unlockedTiers[unlockedTiers.length - 1] };
+  const tier = unlockedTiers[Math.floor(Math.random() * unlockedTiers.length)];
+  return { type: 'tier', tier };
 };
 
 let _textId = 0;

@@ -54,7 +54,7 @@ export const SHOP_ITEMS = [
     id: 'banana_onekind',
     label: 'oneバナナ',
     description:
-      'しばらくの間、スポーンするバナナが1種類に統一される。高ティアのバナナが選ばれやすい。',
+      '一定時間スポーンするバナナが1種類に統一される。',
     icon: 'banana_onekind.png',
     iconSize: 500,
     cost: 10,
