@@ -16,7 +16,8 @@ export default function useActiveEffects() {
 
   // アイテム ID と所持数を受け取って対応するエフェクトを発動
   // count を掛けた分だけ効果時間を延長する
-  const triggerEffect = useCallback((itemId, count = 1) => {
+  // extraData: エフェクトオブジェクトに追加するデータ（例: { selection } for oneKind）
+  const triggerEffect = useCallback((itemId, count = 1, extraData = {}) => {
     const item = SHOP_ITEMS.find((s) => s.id === itemId);
     if (!item?.effect) return;
 
@@ -30,6 +31,7 @@ export default function useActiveEffects() {
         endTime: Date.now() + totalDuration * 1000,
         duration: totalDuration,
         autoMultiplier: autoMultiplier ?? 1,
+        ...extraData,
       },
     ]);
   }, []);
@@ -42,6 +44,7 @@ export default function useActiveEffects() {
 
   const feverEffect = effects.find((e) => e.type === 'feverTime');
   const allGiantEffect = effects.find((e) => e.type === 'allGiant');
+  const oneKindEffect = effects.find((e) => e.type === 'oneKind');
 
   return {
     effects,
@@ -53,5 +56,9 @@ export default function useActiveEffects() {
     isAllGiant: Boolean(allGiantEffect),
     allGiantEndTime: allGiantEffect?.endTime ?? 0,
     allGiantDuration: allGiantEffect?.duration ?? 0,
+    isOneKind: Boolean(oneKindEffect),
+    oneKindEndTime: oneKindEffect?.endTime ?? 0,
+    oneKindDuration: oneKindEffect?.duration ?? 0,
+    oneKindSelection: oneKindEffect?.selection ?? null,
   };
 }

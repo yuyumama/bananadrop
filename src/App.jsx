@@ -13,8 +13,24 @@ import UpgradePanel from './components/ui/UpgradePanel';
 import { TIER_COLORS } from './data/constants/tierColors';
 import { UPGRADE_GROUPS } from './data/constants/upgradeGroups';
 import { PANEL_HEIGHT } from './data/constants/layout';
+import { SHOP_ITEMS } from './data/shopItems';
 import useUpgradeState from './hooks/useUpgradeState';
 import useActiveEffects from './hooks/useActiveEffects';
+
+// oneバナナ着地時にスポーンする「1種類」を決定する
+// 低確率で購入済み特殊バナナも選ばれる
+const pickOneKindSelection = (unlockedTiers, shopPurchases) => {
+  const purchasedSpecials = SHOP_ITEMS.filter(
+    (item) => (shopPurchases[item.id] ?? 0) > 0 && item.id !== 'banana_onekind',
+  );
+  if (purchasedSpecials.length > 0 && Math.random() < 0.01) {
+    const item =
+      purchasedSpecials[Math.floor(Math.random() * purchasedSpecials.length)];
+    return { type: 'special', itemId: item.id };
+  }
+  const tier = unlockedTiers[Math.floor(Math.random() * unlockedTiers.length)];
+  return { type: 'tier', tier };
+};
 
 let _textId = 0;
 
@@ -47,6 +63,10 @@ function App() {
     isAllGiant,
     allGiantEndTime,
     allGiantDuration,
+    isOneKind,
+    oneKindEndTime,
+    oneKindDuration,
+    oneKindSelection,
   } = useActiveEffects();
 
   const bananaWorldRef = useRef(null);
@@ -159,7 +179,12 @@ function App() {
   const handleEffect = useCallback(
     (itemId, pos) => {
       const count = shopPurchases[itemId] ?? 1;
-      triggerEffect(itemId, count);
+      if (itemId === 'banana_onekind') {
+        const selection = pickOneKindSelection(unlockedTiers, shopPurchases);
+        triggerEffect(itemId, count, { selection });
+      } else {
+        triggerEffect(itemId, count);
+      }
 
       if (pos) {
         const burstId = ++_textId;
@@ -173,7 +198,7 @@ function App() {
         );
       }
     },
-    [shopPurchases, triggerEffect],
+    [shopPurchases, unlockedTiers, triggerEffect],
   );
 
   const handleBuyUpgrade = useCallback(
@@ -214,6 +239,21 @@ function App() {
           Math.min(
             100,
             ((feverEndTime - Date.now()) / (feverDuration * 1000)) * 100,
+          ),
+        )
+      : 0;
+
+  // oneKind 残り秒数と進捗
+  const oneKindRemaining = isOneKind
+    ? Math.max(0, Math.ceil((oneKindEndTime - Date.now()) / 1000))
+    : 0;
+  const oneKindPercent =
+    isOneKind && oneKindDuration > 0
+      ? Math.max(
+          0,
+          Math.min(
+            100,
+            ((oneKindEndTime - Date.now()) / (oneKindDuration * 1000)) * 100,
           ),
         )
       : 0;
@@ -413,6 +453,74 @@ function App() {
         </>
       )}
 
+      {/* oneKind：上部カウントダウンバー + 中央ラベル */}
+      {isOneKind && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              top: [isFever, isAllGiant].filter(Boolean).length * 5,
+              left: 0,
+              right: 0,
+              height: 5,
+              zIndex: 200,
+              background: 'rgba(0,0,0,0.06)',
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${oneKindPercent}%`,
+                background: 'linear-gradient(90deg, #06b6d4, #3b82f6, #06b6d4)',
+                backgroundSize: '200% 100%',
+                boxShadow:
+                  '0 0 12px rgba(6,182,212,0.8), 0 0 4px rgba(59,130,246,0.6)',
+                borderRadius: '0 3px 3px 0',
+                transition: 'width 0.5s linear',
+                animation: 'feverBarShimmer 2s linear infinite',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              position: 'fixed',
+              top: 10 + [isFever, isAllGiant].filter(Boolean).length * 26,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 201,
+              pointerEvents: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'rgba(6, 182, 212, 0.12)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(6,182,212,0.3)',
+              borderRadius: 20,
+              padding: '4px 14px',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              color: '#0891b2',
+              whiteSpace: 'nowrap',
+              letterSpacing: '0.04em',
+            }}
+          >
+            <span style={{ fontSize: '0.85rem' }}>🍌</span>
+            <span>oneバナナ</span>
+            <span
+              style={{
+                opacity: 0.65,
+                fontWeight: 600,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {oneKindRemaining}s
+            </span>
+          </div>
+        </>
+      )}
+
       <BananaTree
         score={score}
         treeLevel={treeLevel}
@@ -494,6 +602,8 @@ function App() {
         shopPurchases={shopPurchases}
         devMode={devMode}
         onResetUpgrades={resetUpgrades}
+        isOneKind={isOneKind}
+        oneKindSelection={oneKindSelection}
       />
     </div>
   );

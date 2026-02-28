@@ -104,14 +104,14 @@ export default function useMatterBananaWorld({
   }, []);
 
   const spawnBanana = useCallback(
-    (x) => {
+    (x, forcedTiers) => {
       if (!engineRef.current) return;
 
       const y = -200;
       const banana = createBananaBody({
         x,
         y,
-        tiers: unlockedTiersRef.current,
+        tiers: forcedTiers ?? unlockedTiersRef.current,
         giantChance: giantChanceRef.current,
         viewportWidth: window.innerWidth,
         baseUrl: import.meta.env.BASE_URL,

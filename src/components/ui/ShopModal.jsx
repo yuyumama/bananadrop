@@ -374,6 +374,46 @@ export default function ShopModal({
                     </div>
                   )}
 
+                  {/* oneKind: 効果時間表示 */}
+                  {item.effect?.type === 'oneKind' && (
+                    <div
+                      style={{
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        color: '#0369a1',
+                        marginBottom: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      {count === 0 ? (
+                        <span
+                          style={{
+                            color: 'var(--text-muted)',
+                            fontWeight: 500,
+                          }}
+                        >
+                          購入で 🍌 {getEffectDuration(item.effect, 1)}s 統一
+                        </span>
+                      ) : (
+                        <>
+                          <span>
+                            🍌 現在 {getEffectDuration(item.effect, count)}s
+                            効果
+                          </span>
+                          {!isMaxed && (
+                            <span style={{ color: '#0284c7', fontWeight: 600 }}>
+                              → 次購入で{' '}
+                              {getEffectDuration(item.effect, count + 1)}s
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+
                   {/* allGiant: 効果時間表示 */}
                   {item.effect?.type === 'allGiant' && (
                     <div

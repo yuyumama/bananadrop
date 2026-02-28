@@ -43,6 +43,8 @@ const BananaWorld = forwardRef(
       shopPurchases = {},
       devMode = false,
       onResetUpgrades,
+      isOneKind = false,
+      oneKindSelection = null,
     },
     ref,
   ) => {
@@ -59,6 +61,8 @@ const BananaWorld = forwardRef(
     const tableWidthRef = useLatestRef(tableWidth);
     const shopPurchasesRef = useLatestRef(shopPurchases);
     const devModeRef = useLatestRef(devMode);
+    const isOneKindRef = useLatestRef(isOneKind);
+    const oneKindSelectionRef = useLatestRef(oneKindSelection);
 
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
@@ -98,10 +102,28 @@ const BananaWorld = forwardRef(
 
     const spawnBananaWithCheck = useCallback(
       (x) => {
-        spawnBanana(x);
-        trySpawnSpecial(x);
+        const selection = isOneKindRef.current
+          ? oneKindSelectionRef.current
+          : null;
+        if (selection) {
+          if (selection.type === 'tier') {
+            spawnBanana(x, [selection.tier]);
+          } else if (selection.type === 'special') {
+            const item = SHOP_ITEMS.find((i) => i.id === selection.itemId);
+            if (item) spawnSpecialBanana(x, item);
+          }
+        } else {
+          spawnBanana(x);
+          trySpawnSpecial(x);
+        }
       },
-      [spawnBanana, trySpawnSpecial],
+      [
+        spawnBanana,
+        spawnSpecialBanana,
+        trySpawnSpecial,
+        isOneKindRef,
+        oneKindSelectionRef,
+      ],
     );
 
     useAutoSpawn({ autoSpawnRate, spawnBanana: spawnBananaWithCheck });
