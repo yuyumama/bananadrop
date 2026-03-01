@@ -19,6 +19,11 @@ export default function BananaTree({
   waterCount,
   onWater,
   devMode,
+  chosenSkills = [],
+  pendingChoice = null,
+  onChooseSkill,
+  waterBoostPercent = 20,
+  waterCostDiscount = 0,
 }) {
   const [showLevelUp, setShowLevelUp] = useState(false);
   const prevLevelRef = useRef(treeLevel);
@@ -30,7 +35,7 @@ export default function BananaTree({
   const currentStage = TREE_STAGES[stageIndex];
   const isGold = stageIndex >= 5;
 
-  const cost = getWaterCost(waterCount);
+  const cost = Math.round(getWaterCost(waterCount) * (1 - waterCostDiscount));
   const canAfford = score >= cost || devMode;
   const maxGrowth = getMaxGrowth(treeLevel);
   const progress = Math.min(100, Math.max(0, (treeGrowth / maxGrowth) * 100));
@@ -50,6 +55,8 @@ export default function BananaTree({
     }
     prevLevelRef.current = treeLevel;
   }, [treeLevel]);
+
+  const accentColor = isGold ? 'var(--accent-gold)' : '#4caf50';
 
   return (
     <div
@@ -73,34 +80,6 @@ export default function BananaTree({
         animation: showLevelUp ? 'levelUpFlash 0.8s ease-out' : undefined,
       }}
     >
-      {/* Level-up coin pop-up */}
-      {showLevelUp && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '6%',
-            left: '32%',
-            color: 'var(--accent-gold)',
-            fontWeight: 900,
-            fontSize: '0.85rem',
-            whiteSpace: 'nowrap',
-            pointerEvents: 'none',
-            zIndex: 20,
-            animation: 'seedPopUp 2s ease-out forwards',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          <span>コイン</span>
-          <img
-            src={coinSrc}
-            alt="coin"
-            style={{ width: 18, height: 18, objectFit: 'contain' }}
-          />
-        </div>
-      )}
-
       {/* Top: tree image + level badge */}
       <div
         style={{
@@ -274,7 +253,7 @@ export default function BananaTree({
               size={14}
               fill={canAfford ? 'rgba(255,255,255,0.25)' : 'none'}
             />
-            水やり +20%
+            水やり +{waterBoostPercent}%
           </button>
           <span
             style={{
@@ -291,6 +270,165 @@ export default function BananaTree({
             <span style={{ fontSize: '0.8em' }}>🍌</span>
             <span>{cost.toLocaleString()}</span>
           </span>
+        </div>
+
+        {/* Tree skills section */}
+        <div
+          style={{
+            width: '100%',
+            borderTop: '1px solid rgba(0,0,0,0.06)',
+            paddingTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+          }}
+        >
+          {/* ── 選択済みスキル一覧（常時表示） ── */}
+          {chosenSkills.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <div
+                style={{
+                  fontSize: '0.52rem',
+                  fontWeight: 700,
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.08em',
+                }}
+              >
+                スキル
+              </div>
+              {chosenSkills.map((skill) => (
+                <div
+                  key={skill.id}
+                  style={{ display: 'flex', alignItems: 'center', gap: 5 }}
+                >
+                  <span style={{ fontSize: '0.7rem', lineHeight: 1 }}>
+                    {skill.icon}
+                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span
+                      style={{
+                        fontSize: '0.56rem',
+                        fontWeight: 800,
+                        color: accentColor,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {skill.name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '0.48rem',
+                        fontWeight: 600,
+                        color: 'var(--text-muted)',
+                        lineHeight: 1.2,
+                        whiteSpace: 'pre-line',
+                      }}
+                    >
+                      {skill.description}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── スキル選択中（所持スキルの下に表示） ── */}
+          {pendingChoice && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+                marginTop: chosenSkills.length > 0 ? 4 : 0,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '0.52rem',
+                  fontWeight: 800,
+                  color: '#ff9800',
+                  letterSpacing: '0.06em',
+                  textAlign: 'center',
+                }}
+              >
+                🌟 スキル選択
+              </div>
+              <div style={{ display: 'flex', gap: 5 }}>
+                {pendingChoice.map((skill) => (
+                  <button
+                    key={skill.id}
+                    onClick={() => onChooseSkill(skill)}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 3,
+                      padding: '8px 3px',
+                      borderRadius: 12,
+                      border: '1px solid rgba(76,175,80,0.3)',
+                      background: 'rgba(76,175,80,0.07)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(76,175,80,0.18)';
+                      e.currentTarget.style.transform = 'scale(1.03)';
+                      e.currentTarget.style.boxShadow =
+                        '0 2px 8px rgba(76,175,80,0.25)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(76,175,80,0.07)';
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>
+                      {skill.icon}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '0.54rem',
+                        fontWeight: 800,
+                        color: '#4caf50',
+                        textAlign: 'center',
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {skill.name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '0.46rem',
+                        fontWeight: 600,
+                        color: 'var(--text-muted)',
+                        textAlign: 'center',
+                        lineHeight: 1.3,
+                        whiteSpace: 'pre-line',
+                      }}
+                    >
+                      {skill.description}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── スキル未解放ヒント ── */}
+          {!pendingChoice && chosenSkills.length === 0 && (
+            <div
+              style={{
+                fontSize: '0.5rem',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                opacity: 0.5,
+                textAlign: 'center',
+              }}
+            >
+              LV.5でスキル解放
+            </div>
+          )}
         </div>
       </div>
     </div>

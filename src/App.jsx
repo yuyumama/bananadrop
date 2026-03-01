@@ -41,6 +41,9 @@ function App() {
     waterCount,
     waterTree,
     addBanaCoin,
+    treeChosenSkills,
+    treePendingChoice,
+    chooseTreeSkill,
     shopPurchases,
     buyShopItem,
     adjustCoins,
@@ -61,6 +64,26 @@ function App() {
     oneKindDuration,
     oneKindSelection,
   } = useActiveEffects();
+
+  // 選択済みスキルのボーナスを集計
+  const treeWaterBonus = treeChosenSkills.reduce(
+    (sum, s) => sum + (s.waterBoost ?? 0),
+    0,
+  );
+  const treeWaterCostDiscount = Math.min(
+    treeChosenSkills.reduce((sum, s) => sum + (s.waterCostDiscount ?? 0), 0),
+    0.9, // 最大90%割引
+  );
+  // レベルアップ時コイン数（ref 経由で stale closure を回避）
+  const coinsPerLevelUpRef = useRef(1);
+  coinsPerLevelUpRef.current =
+    1 + treeChosenSkills.reduce((sum, s) => sum + (s.coinsPerLevelUp ?? 0), 0);
+  // コイン回収時スコアボーナス（ref 経由で stale closure を回避）
+  const coinScoreBonusRef = useRef(0);
+  coinScoreBonusRef.current = treeChosenSkills.reduce(
+    (sum, s) => sum + (s.coinScoreBonus ?? 0),
+    0,
+  );
 
   const bananaWorldRef = useRef(null);
 
@@ -86,7 +109,7 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // ツリーレベルアップ時にバナコインをスポーン
+  // ツリーレベルアップ時にバナコインをスポーン（coinsPerLevelUp 個）
   const prevTreeLevelRef = useRef(null);
   useEffect(() => {
     if (prevTreeLevelRef.current === null) {
@@ -94,13 +117,17 @@ function App() {
       return;
     }
     if (treeLevel > prevTreeLevelRef.current) {
-      const x = 80 + Math.random() * (window.innerWidth - 160);
-      bananaWorldRef.current?.spawnCoin(x);
-
-      const id = ++_textId;
-      setCoinFlashes((prev) => [...prev, { id, x }]);
+      const count = coinsPerLevelUpRef.current;
+      const newFlashes = [];
+      for (let i = 0; i < count; i++) {
+        const x = 80 + Math.random() * (window.innerWidth - 160);
+        bananaWorldRef.current?.spawnCoin(x);
+        newFlashes.push({ id: ++_textId, x });
+      }
+      setCoinFlashes((prev) => [...prev, ...newFlashes]);
+      const flashIds = new Set(newFlashes.map((f) => f.id));
       setTimeout(
-        () => setCoinFlashes((prev) => prev.filter((f) => f.id !== id)),
+        () => setCoinFlashes((prev) => prev.filter((f) => !flashIds.has(f.id))),
         1800,
       );
     }
@@ -112,6 +139,9 @@ function App() {
   const handleCoinCollected = useCallback(
     (x) => {
       addBanaCoin();
+      if (coinScoreBonusRef.current > 0) {
+        setScore((s) => s + coinScoreBonusRef.current);
+      }
       const id = ++_textId;
       const clampedX = Math.max(
         60,
@@ -223,11 +253,16 @@ function App() {
   }, []);
 
   const handleWaterTree = useCallback(() => {
-    const cost = waterTree(score, devMode);
+    const cost = waterTree(
+      score,
+      devMode,
+      0.2 + treeWaterBonus,
+      1 - treeWaterCostDiscount,
+    );
     if (cost !== false && !devMode) {
       setScore((currentScore) => currentScore - cost);
     }
-  }, [waterTree, score, devMode]);
+  }, [waterTree, score, devMode, treeWaterBonus, treeWaterCostDiscount]);
 
   const scoreColor = (tier) => TIER_COLORS[tier - 1] ?? '#555';
 
@@ -533,6 +568,11 @@ function App() {
         waterCount={waterCount}
         onWater={handleWaterTree}
         devMode={devMode}
+        chosenSkills={treeChosenSkills}
+        pendingChoice={treePendingChoice}
+        onChooseSkill={chooseTreeSkill}
+        waterBoostPercent={Math.round((0.2 + treeWaterBonus) * 100)}
+        waterCostDiscount={treeWaterCostDiscount}
       />
       {floatingCoins.map((coin) => (
         <div
