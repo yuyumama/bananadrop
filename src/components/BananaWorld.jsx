@@ -1,4 +1,5 @@
 import {
+  useState,
   useRef,
   useMemo,
   useCallback,
@@ -6,6 +7,7 @@ import {
   useImperativeHandle,
 } from 'react';
 import TrayVisual from './ui/TrayVisual';
+import DebugPanel from './ui/DebugPanel';
 import useAutoSpawn from '../hooks/useAutoSpawn';
 import useLatestRef from '../hooks/useLatestRef';
 import useMatterBananaWorld from '../hooks/useMatterBananaWorld';
@@ -15,65 +17,6 @@ import { SHOP_ITEMS } from '../data/shopItems';
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
 const RIM_RISE = 40;
-
-function DebugAdjusterRow({ icon, steps, onAdjust }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        background: 'rgba(255,255,255,0.75)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        border: '1.5px dashed rgba(212,175,55,0.5)',
-        borderRadius: 20,
-        padding: '4px 8px',
-        boxShadow: '0 2px 8px rgba(132,122,100,0.12)',
-      }}
-    >
-      {icon}
-      {steps.map(({ label, delta }) => (
-        <button
-          key={label}
-          onClick={(e) => {
-            e.stopPropagation();
-            onAdjust(delta);
-          }}
-          style={{
-            padding: '3px 8px',
-            background: 'rgba(255,255,255,0.85)',
-            color: '#4a4a4a',
-            fontWeight: 700,
-            fontSize: '0.68rem',
-            border: '1px solid rgba(212,175,55,0.35)',
-            borderRadius: 12,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow =
-              '0 4px 12px rgba(212,175,55,0.25)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-          onMouseDown={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) scale(0.97)';
-          }}
-          onMouseUp={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
-          }}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 const resolvePointerX = (event) => {
   if (event && event.touches && event.touches.length > 0) {
@@ -124,12 +67,20 @@ const BananaWorld = forwardRef(
     const giantChanceRef = useLatestRef(giantChance);
     const tableWidthRef = useLatestRef(tableWidth);
     const shopPurchasesRef = useLatestRef(shopPurchases);
-    const devModeRef = useLatestRef(devMode);
     const isOneKindRef = useLatestRef(isOneKind);
     const oneKindSelectionRef = useLatestRef(oneKindSelection);
     const onSpecialSpawnRef = useLatestRef(onSpecialSpawn);
     const treeMutationRateBonusRef = useLatestRef(treeMutationRateBonus);
     const treeCriticalClickChanceRef = useLatestRef(treeCriticalClickChance);
+
+    // デバッグ用: スポーンするバナナの種類を固定
+    // null = OFF, { type: 'tier', tier: tierObj } or { type: 'special', item: shopItem }
+    const [debugForcedBanana, setDebugForcedBanana] = useState(null);
+    const debugForcedBananaRef = useLatestRef(debugForcedBanana);
+
+    // デバッグ用: 当たり判定ポリゴンの表示切替
+    const [showCollisionBounds, setShowCollisionBounds] = useState(true);
+    const showCollisionBoundsRef = useLatestRef(showCollisionBounds);
 
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
@@ -143,7 +94,7 @@ const BananaWorld = forwardRef(
         onEffectRef,
         onCoinRef,
         tableWidth,
-        devModeRef,
+        showCollisionBoundsRef,
       },
     );
 
@@ -176,6 +127,18 @@ const BananaWorld = forwardRef(
 
     const spawnBananaWithCheck = useCallback(
       (x) => {
+        // デバッグモード: 固定バナナが選択されている場合
+        const forced = debugForcedBananaRef.current;
+        if (forced) {
+          if (forced.type === 'tier') {
+            spawnBanana(x, [forced.tier]);
+          } else if (forced.type === 'special') {
+            spawnSpecialBanana(x, forced.item);
+            onSpecialSpawnRef.current?.(x, forced.item.id);
+          }
+          return;
+        }
+
         const selection = isOneKindRef.current
           ? oneKindSelectionRef.current
           : null;
@@ -201,6 +164,7 @@ const BananaWorld = forwardRef(
         isOneKindRef,
         oneKindSelectionRef,
         onSpecialSpawnRef,
+        debugForcedBananaRef,
       ],
     );
 
@@ -208,6 +172,13 @@ const BananaWorld = forwardRef(
 
     const handleDataClick = (e) => {
       const x = resolvePointerX(e);
+
+      // デバッグ固定バナナ選択中は1つだけスポーン
+      if (debugForcedBananaRef.current) {
+        spawnBananaWithCheck(x);
+        return;
+      }
+
       const isCritical = Math.random() < treeCriticalClickChanceRef.current;
       const count = bananaPerClickRef.current + (isCritical ? 30 : 0);
       for (let i = 0; i < count; i++) {
@@ -239,110 +210,15 @@ const BananaWorld = forwardRef(
         />
         {/* 開発者モード: デバッグコントロール */}
         {devMode && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 12,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 10,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 6,
-              pointerEvents: 'auto',
-            }}
-          >
-            {/* 行1: 特殊バナナ即スポーン + リセット */}
-            <div style={{ display: 'flex', gap: 8 }}>
-              {SHOP_ITEMS.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    spawnSpecialBanana(window.innerWidth / 2, item);
-                    onSpecialSpawnRef.current?.(window.innerWidth / 2, item.id);
-                  }}
-                  style={{
-                    padding: '6px 14px',
-                    background: 'rgba(255,140,0,0.85)',
-                    color: '#fff',
-                    fontWeight: 800,
-                    fontSize: '0.75rem',
-                    border: 'none',
-                    borderRadius: 20,
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {item.label}
-                </button>
-              ))}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onResetUpgrades?.();
-                }}
-                style={{
-                  padding: '6px 14px',
-                  background: 'rgba(220,50,50,0.85)',
-                  color: '#fff',
-                  fontWeight: 800,
-                  fontSize: '0.75rem',
-                  border: 'none',
-                  borderRadius: 20,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                リセット
-              </button>
-            </div>
-
-            {/* 行2: スコア調整 */}
-            <DebugAdjusterRow
-              icon={
-                <span
-                  style={{ fontSize: '1rem', color: '#d4af37', lineHeight: 1 }}
-                >
-                  🍌
-                </span>
-              }
-              steps={[
-                { label: '-100,000', delta: -100000 },
-                { label: '-10,000', delta: -10000 },
-                { label: '-1,000', delta: -1000 },
-                { label: '+1,000', delta: 1000 },
-                { label: '+10,000', delta: 10000 },
-                { label: '+100,000', delta: 100000 },
-              ]}
-              onAdjust={onAdjustScore}
-            />
-
-            {/* 行3: バナコイン調整 */}
-            <DebugAdjusterRow
-              icon={
-                <img
-                  src={`${import.meta.env.BASE_URL}coin.png`}
-                  alt="バナコイン"
-                  style={{
-                    width: 18,
-                    height: 18,
-                    objectFit: 'contain',
-                    filter: 'drop-shadow(0 1px 3px rgba(212,175,55,0.5))',
-                    flexShrink: 0,
-                  }}
-                />
-              }
-              steps={[
-                { label: '-100', delta: -100 },
-                { label: '-10', delta: -10 },
-                { label: '+10', delta: 10 },
-                { label: '+100', delta: 100 },
-              ]}
-              onAdjust={onAdjustCoins}
-            />
-          </div>
+          <DebugPanel
+            debugForcedBanana={debugForcedBanana}
+            onSelectForcedBanana={setDebugForcedBanana}
+            onAdjustScore={onAdjustScore}
+            onAdjustCoins={onAdjustCoins}
+            onResetUpgrades={onResetUpgrades}
+            showCollisionBounds={showCollisionBounds}
+            onToggleCollisionBounds={() => setShowCollisionBounds((v) => !v)}
+          />
         )}
 
         {/* Matter.jsキャンバス（バナナはここに描画、バーより前） */}

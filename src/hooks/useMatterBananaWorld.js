@@ -43,7 +43,7 @@ export default function useMatterBananaWorld({
   onEffectRef,
   onCoinRef,
   tableWidth,
-  devModeRef,
+  showCollisionBoundsRef,
 }) {
   const engineRef = useRef(null);
   const tableRef = useRef(null);
@@ -290,7 +290,7 @@ export default function useMatterBananaWorld({
       ctx.drawImage(textWork, 0, 0);
 
       // デバッグ: 当たり判定のポリゴン輪郭を描画
-      if (devModeRef && devModeRef.current) {
+      if (showCollisionBoundsRef && showCollisionBoundsRef.current) {
         const allBodies = Matter.Composite.allBodies(engine.world);
         ctx.lineWidth = 2;
         for (const body of allBodies) {
