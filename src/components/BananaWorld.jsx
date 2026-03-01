@@ -107,6 +107,8 @@ const BananaWorld = forwardRef(
       isOneKind = false,
       oneKindSelection = null,
       onSpecialSpawn,
+      treeMutationRateBonus = 0,
+      treeCriticalClickChance = 0,
     },
     ref,
   ) => {
@@ -126,6 +128,8 @@ const BananaWorld = forwardRef(
     const isOneKindRef = useLatestRef(isOneKind);
     const oneKindSelectionRef = useLatestRef(oneKindSelection);
     const onSpecialSpawnRef = useLatestRef(onSpecialSpawn);
+    const treeMutationRateBonusRef = useLatestRef(treeMutationRateBonus);
+    const treeCriticalClickChanceRef = useLatestRef(treeCriticalClickChance);
 
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
@@ -152,16 +156,22 @@ const BananaWorld = forwardRef(
         SHOP_ITEMS.forEach((item) => {
           const count = shopPurchasesRef.current?.[item.id] ?? 0;
           if (count === 0) return;
-          const chance = item.spawnChanceStacks
+          let chance = item.spawnChanceStacks
             ? item.spawnChancePerBanana * count
             : item.spawnChancePerBanana;
+          chance *= 1 + treeMutationRateBonusRef.current;
           if (Math.random() < chance) {
             spawnSpecialBanana(x, item);
             onSpecialSpawnRef.current?.(x, item.id);
           }
         });
       },
-      [spawnSpecialBanana, shopPurchasesRef, onSpecialSpawnRef],
+      [
+        spawnSpecialBanana,
+        shopPurchasesRef,
+        onSpecialSpawnRef,
+        treeMutationRateBonusRef,
+      ],
     );
 
     const spawnBananaWithCheck = useCallback(
@@ -198,9 +208,15 @@ const BananaWorld = forwardRef(
 
     const handleDataClick = (e) => {
       const x = resolvePointerX(e);
-      const count = bananaPerClickRef.current;
+      const isCritical = Math.random() < treeCriticalClickChanceRef.current;
+      const count = bananaPerClickRef.current + (isCritical ? 30 : 0);
       for (let i = 0; i < count; i++) {
-        const offset = (i - (count - 1) / 2) * 40;
+        let offset = 0;
+        if (isCritical && i >= bananaPerClickRef.current) {
+          offset = (Math.random() - 0.5) * 150;
+        } else {
+          offset = (i - (bananaPerClickRef.current - 1) / 2) * 40;
+        }
         spawnBananaWithCheck(x + offset);
       }
     };
