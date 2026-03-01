@@ -187,7 +187,7 @@ function App() {
         const burstId = ++_textId;
         setFeverBursts((prev) => [
           ...prev,
-          { id: burstId, x: pos.x, y: pos.y },
+          { id: burstId, x: pos.x, y: pos.y, itemId },
         ]);
         setTimeout(
           () => setFeverBursts((prev) => prev.filter((b) => b.id !== burstId)),

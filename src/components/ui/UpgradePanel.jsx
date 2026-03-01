@@ -23,7 +23,7 @@ function UpgradePanel({ groups, purchased, score, onBuy, devMode }) {
       }}
     >
       {groups.map((group) => {
-        const { currentLabel, nextItem, affordable } =
+        const { currentLabel, nextItem, affordable, level, maxLevel } =
           buildGroupUpgradeViewModel({
             group,
             purchased,
@@ -40,6 +40,8 @@ function UpgradePanel({ groups, purchased, score, onBuy, devMode }) {
             affordable={affordable}
             onBuy={onBuy}
             score={score}
+            level={level}
+            maxLevel={maxLevel}
           />
         );
       })}
