@@ -25,14 +25,11 @@ const pickTwoFromStage = (stageIndex) => {
   return shuffled.length === 1 ? [shuffled[0]] : [shuffled[0], shuffled[1]];
 };
 
-/**
- * 新レベル到達時にスキル解放が必要か調べ、必要なら pendingChoice を返す。
- * 5レベルごと（=画像変化タイミング）にスキルを提示する。
- */
 const computeSkillUpdate = (prev, newLevel) => {
   if (prev.pendingChoice) return {};
   const stagesDue = Math.floor(newLevel / 5);
-  const stagesProcessed = prev.chosenSkills.length;
+  // how many stage choices we have made
+  const stagesProcessed = prev.chosenStages ?? prev.chosenSkills.length;
   if (stagesDue <= stagesProcessed) return {};
   return { pendingChoice: pickTwoFromStage(stagesProcessed) };
 };
@@ -52,6 +49,7 @@ export default function useUpgradeState() {
     banaCoins: 0,
     waterCount: 0,
     chosenSkills: [], // 選択済みスキルの配列
+    chosenStages: 0, // 選択を完了したステージ数
     pendingChoice: null, // null | skill[] 選択待ちの候補（4択）
   });
 
@@ -162,12 +160,17 @@ export default function useUpgradeState() {
   const chooseTreeSkill = useCallback((skill) => {
     setTreeData((prev) => {
       const newChosen = [...prev.chosenSkills, skill];
+      const newChosenStages =
+        (prev.chosenStages ?? prev.chosenSkills.length) + 1;
       const stagesDue = Math.floor(prev.level / 5);
       const newPending =
-        stagesDue > newChosen.length
-          ? pickTwoFromStage(newChosen.length)
-          : null;
-      return { ...prev, chosenSkills: newChosen, pendingChoice: newPending };
+        stagesDue > newChosenStages ? pickTwoFromStage(newChosenStages) : null;
+      return {
+        ...prev,
+        chosenSkills: newChosen,
+        chosenStages: newChosenStages,
+        pendingChoice: newPending,
+      };
     });
   }, []);
 

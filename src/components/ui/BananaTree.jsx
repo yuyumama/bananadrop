@@ -280,117 +280,177 @@ export default function BananaTree({
             paddingTop: 8,
             display: 'flex',
             flexDirection: 'column',
-            gap: 4,
+            gap: 6,
           }}
         >
-          {/* ── 選択済みスキル一覧（常時表示） ── */}
-          {chosenSkills.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <div
+          {/* ── ステージ進捗ドット ── */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+            }}
+          >
+            {Array.from({ length: 6 }, (_, i) => {
+              const isDone = i < chosenSkills.length;
+              const isPending = pendingChoice && i === chosenSkills.length;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    width: isDone ? 8 : isPending ? 9 : 5,
+                    height: isDone ? 8 : isPending ? 9 : 5,
+                    borderRadius: '50%',
+                    flexShrink: 0,
+                    background: isDone
+                      ? accentColor
+                      : isPending
+                        ? '#ff9800'
+                        : 'rgba(0,0,0,0.1)',
+                    boxShadow: isDone
+                      ? `0 0 5px ${isGold ? 'rgba(212,175,55,0.6)' : 'rgba(76,175,80,0.5)'}`
+                      : 'none',
+                    transition: 'all 0.35s ease',
+                    animation: isPending
+                      ? 'skillPulse 1s ease-in-out infinite'
+                      : undefined,
+                  }}
+                />
+              );
+            })}
+            {!pendingChoice && chosenSkills.length < 6 && (
+              <span
                 style={{
-                  fontSize: '0.52rem',
-                  fontWeight: 700,
+                  marginLeft: 3,
+                  fontSize: '0.42rem',
+                  fontWeight: 600,
                   color: 'var(--text-muted)',
-                  letterSpacing: '0.08em',
+                  opacity: 0.55,
                 }}
               >
-                スキル
-              </div>
+                LV.{(chosenSkills.length + 1) * 5}
+              </span>
+            )}
+          </div>
+
+          {/* ── 選択済みスキル（効果テキスト表示） ── */}
+          {chosenSkills.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {chosenSkills.map((skill) => (
                 <div
                   key={skill.id}
                   style={{ display: 'flex', alignItems: 'center', gap: 5 }}
                 >
-                  <span style={{ fontSize: '0.7rem', lineHeight: 1 }}>
+                  <span
+                    style={{
+                      fontSize: '0.78rem',
+                      lineHeight: 1,
+                      flexShrink: 0,
+                    }}
+                  >
                     {skill.icon}
                   </span>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span
-                      style={{
-                        fontSize: '0.56rem',
-                        fontWeight: 800,
-                        color: accentColor,
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      {skill.name}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '0.48rem',
-                        fontWeight: 600,
-                        color: 'var(--text-muted)',
-                        lineHeight: 1.2,
-                        whiteSpace: 'pre-line',
-                      }}
-                    >
-                      {skill.description}
-                    </span>
-                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.58rem',
+                      fontWeight: 700,
+                      color: 'var(--text-muted)',
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {skill.description.replace(/\n/g, ' ')}
+                  </span>
                 </div>
               ))}
             </div>
           )}
 
-          {/* ── スキル選択中（所持スキルの下に表示） ── */}
+          {/* ── スキル選択中 ── */}
           {pendingChoice && (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-                marginTop: chosenSkills.length > 0 ? 4 : 0,
-              }}
-            >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {/* セパレータ */}
               <div
                 style={{
-                  fontSize: '0.52rem',
-                  fontWeight: 800,
-                  color: '#ff9800',
-                  letterSpacing: '0.06em',
-                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
               >
-                🌟 スキル選択
+                <div
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    background: 'rgba(255,152,0,0.25)',
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: '0.48rem',
+                    fontWeight: 700,
+                    color: '#ff9800',
+                    letterSpacing: '0.05em',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  スキルを選択
+                </span>
+                <div
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    background: 'rgba(255,152,0,0.25)',
+                  }}
+                />
               </div>
-              <div style={{ display: 'flex', gap: 5 }}>
+
+              {/* 2列グリッドの選択カード */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 5,
+                }}
+              >
                 {pendingChoice.map((skill) => (
                   <button
                     key={skill.id}
                     onClick={() => onChooseSkill(skill)}
                     style={{
-                      flex: 1,
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       gap: 3,
-                      padding: '8px 3px',
+                      padding: '10px 4px 8px',
                       borderRadius: 12,
-                      border: '1px solid rgba(76,175,80,0.3)',
-                      background: 'rgba(76,175,80,0.07)',
+                      border: '1px solid rgba(0,0,0,0.07)',
+                      background: 'rgba(255,255,255,0.85)',
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease',
+                      transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(76,175,80,0.18)';
-                      e.currentTarget.style.transform = 'scale(1.03)';
+                      e.currentTarget.style.transform = 'translateY(-3px)';
                       e.currentTarget.style.boxShadow =
-                        '0 2px 8px rgba(76,175,80,0.25)';
+                        '0 8px 20px rgba(255,152,0,0.22)';
+                      e.currentTarget.style.borderColor = 'rgba(255,152,0,0.5)';
+                      e.currentTarget.style.background = '#fff';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(76,175,80,0.07)';
-                      e.currentTarget.style.transform = 'scale(1)';
-                      e.currentTarget.style.boxShadow = 'none';
+                      e.currentTarget.style.transform = '';
+                      e.currentTarget.style.boxShadow = '';
+                      e.currentTarget.style.borderColor = 'rgba(0,0,0,0.07)';
+                      e.currentTarget.style.background =
+                        'rgba(255,255,255,0.85)';
                     }}
                   >
-                    <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>
+                    <span style={{ fontSize: '1.3rem', lineHeight: 1 }}>
                       {skill.icon}
                     </span>
                     <span
                       style={{
                         fontSize: '0.54rem',
                         fontWeight: 800,
-                        color: '#4caf50',
+                        color: '#2d2d2d',
                         textAlign: 'center',
                         lineHeight: 1.2,
                       }}
@@ -399,11 +459,11 @@ export default function BananaTree({
                     </span>
                     <span
                       style={{
-                        fontSize: '0.46rem',
+                        fontSize: '0.44rem',
                         fontWeight: 600,
-                        color: 'var(--text-muted)',
+                        color: '#888',
                         textAlign: 'center',
-                        lineHeight: 1.3,
+                        lineHeight: 1.35,
                         whiteSpace: 'pre-line',
                       }}
                     >

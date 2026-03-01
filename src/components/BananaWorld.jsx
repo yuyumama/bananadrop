@@ -209,7 +209,7 @@ const BananaWorld = forwardRef(
     const handleDataClick = (e) => {
       const x = resolvePointerX(e);
       const isCritical = Math.random() < treeCriticalClickChanceRef.current;
-      const count = bananaPerClickRef.current + (isCritical ? 15 : 0);
+      const count = bananaPerClickRef.current + (isCritical ? 30 : 0);
       for (let i = 0; i < count; i++) {
         let offset = 0;
         if (isCritical && i >= bananaPerClickRef.current) {

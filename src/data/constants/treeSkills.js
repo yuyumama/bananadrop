@@ -16,9 +16,9 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's1_growth',
       name: '若芽の息吹',
-      description: '成長速度 +20%',
+      description: '成長速度 +100%',
       icon: '🌱',
-      growthBonus: 0.2,
+      growthBonus: 1.0,
     },
     {
       id: 's1_water_cost',
@@ -48,9 +48,9 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's2_growth',
       name: '大地の鼓動',
-      description: '成長速度 +40%',
+      description: '成長速度 +200%',
       icon: '🌿',
-      growthBonus: 0.4,
+      growthBonus: 2.0,
     },
     {
       id: 's2_water_cost',
@@ -87,9 +87,9 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's3_growth',
       name: '豊穣の根',
-      description: '成長速度 +100%',
+      description: '成長速度 +500%',
       icon: '🌳',
-      growthBonus: 1.0,
+      growthBonus: 5.0,
     },
     {
       id: 's3_water_boost',
@@ -119,9 +119,9 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's4_growth',
       name: '神木の根',
-      description: '成長速度 +150%',
+      description: '成長速度 +1000%',
       icon: '🌲',
-      growthBonus: 1.5,
+      growthBonus: 10.0,
     },
     {
       id: 's4_water_cost',
@@ -183,9 +183,9 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's6_growth',
       name: '光の根',
-      description: '成長速度 +300%',
+      description: '成長速度 +3000%',
       icon: '💫',
-      growthBonus: 3.0,
+      growthBonus: 30.0,
     },
     {
       id: 's6_water_cost',
