@@ -20,7 +20,8 @@ const SKILL_TYPE_THEMES = {
     text: '#2e7d32',
     glow: 'rgba(76,175,80,0.35)',
     dot: '#4caf50',
-    cardBg: 'linear-gradient(135deg, rgba(76,175,80,0.12) 0%, rgba(165,214,120,0.08) 100%)',
+    cardBg:
+      'linear-gradient(135deg, rgba(76,175,80,0.12) 0%, rgba(165,214,120,0.08) 100%)',
   },
   waterCostDiscount: {
     bg: 'rgba(0,188,212,0.12)',
@@ -28,7 +29,8 @@ const SKILL_TYPE_THEMES = {
     text: '#006064',
     glow: 'rgba(0,188,212,0.35)',
     dot: '#00bcd4',
-    cardBg: 'linear-gradient(135deg, rgba(0,188,212,0.12) 0%, rgba(100,220,240,0.08) 100%)',
+    cardBg:
+      'linear-gradient(135deg, rgba(0,188,212,0.12) 0%, rgba(100,220,240,0.08) 100%)',
   },
   waterBoost: {
     bg: 'rgba(30,136,229,0.12)',
@@ -36,7 +38,8 @@ const SKILL_TYPE_THEMES = {
     text: '#1565c0',
     glow: 'rgba(30,136,229,0.35)',
     dot: '#1e88e5',
-    cardBg: 'linear-gradient(135deg, rgba(30,136,229,0.12) 0%, rgba(100,181,246,0.08) 100%)',
+    cardBg:
+      'linear-gradient(135deg, rgba(30,136,229,0.12) 0%, rgba(100,181,246,0.08) 100%)',
   },
   coinsPerLevelUp: {
     bg: 'rgba(212,175,55,0.13)',
@@ -44,7 +47,8 @@ const SKILL_TYPE_THEMES = {
     text: '#b8860b',
     glow: 'rgba(212,175,55,0.4)',
     dot: '#d4af37',
-    cardBg: 'linear-gradient(135deg, rgba(212,175,55,0.13) 0%, rgba(255,230,100,0.08) 100%)',
+    cardBg:
+      'linear-gradient(135deg, rgba(212,175,55,0.13) 0%, rgba(255,230,100,0.08) 100%)',
   },
   mutationRateBonus: {
     bg: 'rgba(156,39,176,0.11)',
@@ -52,7 +56,8 @@ const SKILL_TYPE_THEMES = {
     text: '#6a1b9a',
     glow: 'rgba(156,39,176,0.35)',
     dot: '#9c27b0',
-    cardBg: 'linear-gradient(135deg, rgba(156,39,176,0.11) 0%, rgba(206,147,216,0.08) 100%)',
+    cardBg:
+      'linear-gradient(135deg, rgba(156,39,176,0.11) 0%, rgba(206,147,216,0.08) 100%)',
   },
   criticalClickChance: {
     bg: 'rgba(255,87,34,0.11)',
@@ -60,7 +65,8 @@ const SKILL_TYPE_THEMES = {
     text: '#bf360c',
     glow: 'rgba(255,87,34,0.38)',
     dot: '#ff5722',
-    cardBg: 'linear-gradient(135deg, rgba(255,87,34,0.11) 0%, rgba(255,171,145,0.08) 100%)',
+    cardBg:
+      'linear-gradient(135deg, rgba(255,87,34,0.11) 0%, rgba(255,171,145,0.08) 100%)',
   },
 };
 
@@ -122,7 +128,6 @@ export default function BananaTree({
     prevLevelRef.current = treeLevel;
   }, [treeLevel]);
 
-  const accentColor = isGold ? 'var(--accent-gold)' : '#4caf50';
 
   return (
     <>
@@ -316,8 +321,7 @@ export default function BananaTree({
                 if (canAfford) e.currentTarget.style.transform = 'scale(0.95)';
               }}
               onMouseUp={(e) => {
-                if (canAfford)
-                  e.currentTarget.style.transform = 'scale(1.05)';
+                if (canAfford) e.currentTarget.style.transform = 'scale(1.05)';
               }}
             >
               <Droplets
@@ -427,7 +431,11 @@ export default function BananaTree({
                       }}
                     >
                       <span
-                        style={{ fontSize: '0.75rem', lineHeight: 1, flexShrink: 0 }}
+                        style={{
+                          fontSize: '0.75rem',
+                          lineHeight: 1,
+                          flexShrink: 0,
+                        }}
                       >
                         {skill.icon}
                       </span>
@@ -470,13 +478,37 @@ export default function BananaTree({
                     justifyContent: 'center',
                     gap: 6,
                     padding: '5px 0',
-                    background: 'linear-gradient(135deg, rgba(255,152,0,0.1) 0%, rgba(255,183,77,0.15) 100%)',
+                    background:
+                      'linear-gradient(135deg, rgba(255,152,0,0.1) 0%, rgba(255,183,77,0.15) 100%)',
                     borderBottom: '1px solid rgba(255,152,0,0.15)',
                   }}
                 >
-                  <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#ffb74d' }} />
-                  <span style={{ fontSize: '0.6rem', fontWeight: 800, color: '#f57c00', letterSpacing: '0.06em' }}>SKILL UNLOCKED</span>
-                  <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#ffb74d' }} />
+                  <div
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: '50%',
+                      background: '#ffb74d',
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '0.6rem',
+                      fontWeight: 800,
+                      color: '#f57c00',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
+                    SKILL UNLOCKED
+                  </span>
+                  <div
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: '50%',
+                      background: '#ffb74d',
+                    }}
+                  />
                 </div>
 
                 {/* リスト部分 */}
@@ -494,7 +526,9 @@ export default function BananaTree({
                           gap: 8,
                           padding: '10px 10px',
                           border: 'none',
-                          borderBottom: isLast ? 'none' : '1px solid rgba(0,0,0,0.04)',
+                          borderBottom: isLast
+                            ? 'none'
+                            : '1px solid rgba(0,0,0,0.04)',
                           background: 'transparent',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
@@ -509,14 +543,41 @@ export default function BananaTree({
                           e.currentTarget.style.paddingLeft = '10px';
                         }}
                       >
-                        <div style={{ fontSize: '1.2rem', filter: `drop-shadow(0 2px 4px ${theme.glow})`, flexShrink: 0 }}>
+                        <div
+                          style={{
+                            fontSize: '1.2rem',
+                            filter: `drop-shadow(0 2px 4px ${theme.glow})`,
+                            flexShrink: 0,
+                          }}
+                        >
                           {skill.icon}
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: theme.text, lineHeight: 1.1 }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: '0.65rem',
+                              fontWeight: 800,
+                              color: theme.text,
+                              lineHeight: 1.1,
+                            }}
+                          >
                             {skill.name}
                           </span>
-                          <span style={{ fontSize: '0.5rem', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1.25, opacity: 0.8 }}>
+                          <span
+                            style={{
+                              fontSize: '0.5rem',
+                              fontWeight: 600,
+                              color: 'var(--text-muted)',
+                              lineHeight: 1.25,
+                              opacity: 0.8,
+                            }}
+                          >
                             {skill.description.replace(/\n/g, ' ')}
                           </span>
                         </div>
@@ -544,8 +605,6 @@ export default function BananaTree({
           </div>
         </div>
       </div>
-
-
     </>
   );
 }
