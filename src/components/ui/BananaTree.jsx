@@ -211,7 +211,7 @@ export default function BananaTree({
                 height: 22,
                 objectFit: 'contain',
                 flexShrink: 0,
-                animation: 'coinGlow 2s ease-in-out infinite',
+                animation: 'treeCoinGlow 2s ease-in-out infinite',
                 opacity: progress >= 95 ? 1 : 0.45,
                 transition: 'opacity 0.5s',
               }}

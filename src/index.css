@@ -599,6 +599,85 @@ body {
   }
 }
 
+@keyframes treeCoinGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.4));
+    transform: scale(0.9);
+  }
+
+  50% {
+    filter: drop-shadow(0 0 12px rgba(212, 175, 55, 1));
+    transform: scale(1.15);
+  }
+}
+
+@keyframes coinPopGlow {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes coinSparkleSpin {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+
+  30% {
+    transform: translate(-50%, -50%) scale(1) rotate(90deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+@keyframes coinRingExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+    border-width: 4px;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+@keyframes coinMiniBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty)))
+      scale(0.3);
+    opacity: 0;
+  }
+}
+
 /* Custom Scrollbar for premium feel */
 ::-webkit-scrollbar {
   width: 6px;

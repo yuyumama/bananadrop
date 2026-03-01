@@ -3,6 +3,7 @@ import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
 import FeverBurst from './components/ui/FeverBurst';
 import SpawnFlash from './components/ui/SpawnFlash';
+import CoinSpawnFlash from './components/ui/CoinSpawnFlash';
 import FloatingScoreText from './components/ui/FloatingScoreText';
 import ScoreDisplay from './components/ui/ScoreDisplay';
 import BananaTree from './components/ui/BananaTree';
@@ -67,6 +68,7 @@ function App() {
   const [clickEffects, setClickEffects] = useState([]);
   const [feverBursts, setFeverBursts] = useState([]);
   const [spawnFlashes, setSpawnFlashes] = useState([]);
+  const [coinFlashes, setCoinFlashes] = useState([]);
   const [scoreBump, setScoreBump] = useState(false);
   const [perSecond, setPerSecond] = useState(0);
   const [devMode, setDevMode] = useState(false);
@@ -94,6 +96,13 @@ function App() {
     if (treeLevel > prevTreeLevelRef.current) {
       const x = 80 + Math.random() * (window.innerWidth - 160);
       bananaWorldRef.current?.spawnCoin(x);
+
+      const id = ++_textId;
+      setCoinFlashes((prev) => [...prev, { id, x }]);
+      setTimeout(
+        () => setCoinFlashes((prev) => prev.filter((f) => f.id !== id)),
+        1800,
+      );
     }
     prevTreeLevelRef.current = treeLevel;
   }, [treeLevel]);
@@ -214,8 +223,8 @@ function App() {
   }, []);
 
   const handleWaterTree = useCallback(() => {
-    const cost = waterTree(score);
-    if (cost && !devMode) {
+    const cost = waterTree(score, devMode);
+    if (cost !== false && !devMode) {
       setScore((currentScore) => currentScore - cost);
     }
   }, [waterTree, score, devMode]);
@@ -580,6 +589,10 @@ function App() {
 
       {spawnFlashes.map((flash) => (
         <SpawnFlash key={flash.id} flash={flash} />
+      ))}
+
+      {coinFlashes.map((flash) => (
+        <CoinSpawnFlash key={flash.id} flash={flash} />
       ))}
 
       <UpgradePanel
