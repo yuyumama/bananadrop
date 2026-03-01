@@ -355,6 +355,19 @@ body {
   }
 }
 
+@keyframes upgradeGlow {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.15);
+  }
+
+  50% {
+    box-shadow:
+      0 4px 20px rgba(212, 175, 55, 0.38),
+      0 0 0 2px rgba(212, 175, 55, 0.1);
+  }
+}
+
 @keyframes feverBurst {
   0% {
     transform: translate(-50%, -50%) scale(0);

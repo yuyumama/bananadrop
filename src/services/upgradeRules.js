@@ -39,6 +39,8 @@ export function buildGroupUpgradeViewModel({
 }) {
   const items = group.items;
   const purchasedItems = items.filter((upgrade) => purchased.has(upgrade.id));
+  const level = purchasedItems.length;
+  const maxLevel = items.length;
 
   const currentLabel =
     purchasedItems.length > 0
@@ -61,5 +63,7 @@ export function buildGroupUpgradeViewModel({
     currentLabel,
     nextItem,
     affordable,
+    level,
+    maxLevel,
   };
 }
