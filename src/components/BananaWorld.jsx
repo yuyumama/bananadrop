@@ -67,7 +67,6 @@ const BananaWorld = forwardRef(
     const giantChanceRef = useLatestRef(giantChance);
     const tableWidthRef = useLatestRef(tableWidth);
     const shopPurchasesRef = useLatestRef(shopPurchases);
-    const devModeRef = useLatestRef(devMode);
     const isOneKindRef = useLatestRef(isOneKind);
     const oneKindSelectionRef = useLatestRef(oneKindSelection);
     const onSpecialSpawnRef = useLatestRef(onSpecialSpawn);
@@ -78,6 +77,10 @@ const BananaWorld = forwardRef(
     // null = OFF, { type: 'tier', tier: tierObj } or { type: 'special', item: shopItem }
     const [debugForcedBanana, setDebugForcedBanana] = useState(null);
     const debugForcedBananaRef = useLatestRef(debugForcedBanana);
+
+    // デバッグ用: 当たり判定ポリゴンの表示切替
+    const [showCollisionBounds, setShowCollisionBounds] = useState(true);
+    const showCollisionBoundsRef = useLatestRef(showCollisionBounds);
 
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
@@ -91,7 +94,7 @@ const BananaWorld = forwardRef(
         onEffectRef,
         onCoinRef,
         tableWidth,
-        devModeRef,
+        showCollisionBoundsRef,
       },
     );
 
@@ -213,6 +216,8 @@ const BananaWorld = forwardRef(
             onAdjustScore={onAdjustScore}
             onAdjustCoins={onAdjustCoins}
             onResetUpgrades={onResetUpgrades}
+            showCollisionBounds={showCollisionBounds}
+            onToggleCollisionBounds={() => setShowCollisionBounds((v) => !v)}
           />
         )}
 

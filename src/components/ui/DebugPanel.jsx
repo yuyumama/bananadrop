@@ -131,6 +131,8 @@ export default function DebugPanel({
   onAdjustScore,
   onAdjustCoins,
   onResetUpgrades,
+  showCollisionBounds,
+  onToggleCollisionBounds,
 }) {
   const [expanded, setExpanded] = useState(true);
 
@@ -291,6 +293,22 @@ export default function DebugPanel({
                   {label}
                 </HoverButton>
               ))}
+            </GlassRow>
+            <GlassRow>
+              <HoverButton
+                onClick={onToggleCollisionBounds}
+                style={{
+                  ...ADJUSTER_BUTTON_STYLE,
+                  background: showCollisionBounds
+                    ? 'rgba(0, 128, 255, 0.2)'
+                    : 'rgba(255,255,255,0.85)',
+                  border: showCollisionBounds
+                    ? '1px solid rgba(0, 128, 255, 0.5)'
+                    : ADJUSTER_BUTTON_STYLE.border,
+                }}
+              >
+                🔲 当たり判定
+              </HoverButton>
             </GlassRow>
             <GlassRow>
               <HoverButton
