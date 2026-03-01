@@ -80,7 +80,7 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's3_coins',
       name: '双子の実',
-      description: 'レベルアップ時\nバナコイン +1',
+      description: 'レベルアップ時 バナコイン+1',
       icon: '🍋',
       coinsPerLevelUp: 1,
     },
@@ -112,7 +112,7 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's4_coins',
       name: '豊穣祈願',
-      description: 'レベルアップ時\nバナコイン +2',
+      description: 'レベルアップ時 バナコイン+2',
       icon: '🌻',
       coinsPerLevelUp: 2,
     },
@@ -144,7 +144,7 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's5_coins',
       name: '天の恵み',
-      description: 'レベルアップ時\nバナコイン +3',
+      description: 'レベルアップ時 バナコイン+3',
       icon: '🌟',
       coinsPerLevelUp: 3,
     },
@@ -176,7 +176,7 @@ export const TREE_SKILL_STAGES = [
     {
       id: 's6_coins',
       name: '奇跡の大樹',
-      description: 'レベルアップ時\nバナコイン +5',
+      description: 'レベルアップ時 バナコイン+5',
       icon: '🌈',
       coinsPerLevelUp: 5,
     },

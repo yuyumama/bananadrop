@@ -531,7 +531,7 @@ export default function BananaTree({
             {!pendingChoice && chosenSkills.length === 0 && (
               <div
                 style={{
-                  fontSize: '0.5rem',
+                  fontSize: '0.7rem',
                   fontWeight: 600,
                   color: 'var(--text-muted)',
                   opacity: 0.5,
