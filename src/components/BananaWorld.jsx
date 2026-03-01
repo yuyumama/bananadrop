@@ -1,4 +1,5 @@
 import {
+  useState,
   useRef,
   useMemo,
   useCallback,
@@ -11,6 +12,7 @@ import useLatestRef from '../hooks/useLatestRef';
 import useMatterBananaWorld from '../hooks/useMatterBananaWorld';
 import { getTablePx } from '../services/bananaWorldGeometry';
 import { SHOP_ITEMS } from '../data/shopItems';
+import { BANANA_TIERS } from '../data/constants/bananaTiers';
 
 const TABLE_HEIGHT = 20;
 const TABLE_WIDTH_RATIO = 0.4;
@@ -131,6 +133,11 @@ const BananaWorld = forwardRef(
     const treeMutationRateBonusRef = useLatestRef(treeMutationRateBonus);
     const treeCriticalClickChanceRef = useLatestRef(treeCriticalClickChance);
 
+    // デバッグ用: スポーンするバナナの種類を固定
+    // null = OFF, { type: 'tier', tier: tierObj } or { type: 'special', item: shopItem }
+    const [debugForcedBanana, setDebugForcedBanana] = useState(null);
+    const debugForcedBananaRef = useLatestRef(debugForcedBanana);
+
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
         sceneRef,
@@ -176,6 +183,18 @@ const BananaWorld = forwardRef(
 
     const spawnBananaWithCheck = useCallback(
       (x) => {
+        // デバッグモード: 固定バナナが選択されている場合
+        const forced = debugForcedBananaRef.current;
+        if (forced) {
+          if (forced.type === 'tier') {
+            spawnBanana(x, [forced.tier]);
+          } else if (forced.type === 'special') {
+            spawnSpecialBanana(x, forced.item);
+            onSpecialSpawnRef.current?.(x, forced.item.id);
+          }
+          return;
+        }
+
         const selection = isOneKindRef.current
           ? oneKindSelectionRef.current
           : null;
@@ -201,6 +220,7 @@ const BananaWorld = forwardRef(
         isOneKindRef,
         oneKindSelectionRef,
         onSpecialSpawnRef,
+        debugForcedBananaRef,
       ],
     );
 
@@ -208,6 +228,13 @@ const BananaWorld = forwardRef(
 
     const handleDataClick = (e) => {
       const x = resolvePointerX(e);
+
+      // デバッグ固定バナナ選択中は1つだけスポーン
+      if (debugForcedBananaRef.current) {
+        spawnBananaWithCheck(x);
+        return;
+      }
+
       const isCritical = Math.random() < treeCriticalClickChanceRef.current;
       const count = bananaPerClickRef.current + (isCritical ? 30 : 0);
       for (let i = 0; i < count; i++) {
@@ -253,50 +280,209 @@ const BananaWorld = forwardRef(
               pointerEvents: 'auto',
             }}
           >
-            {/* 行1: 特殊バナナ即スポーン + リセット */}
-            <div style={{ display: 'flex', gap: 8 }}>
-              {SHOP_ITEMS.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    spawnSpecialBanana(window.innerWidth / 2, item);
-                    onSpecialSpawnRef.current?.(window.innerWidth / 2, item.id);
-                  }}
-                  style={{
-                    padding: '6px 14px',
-                    background: 'rgba(255,140,0,0.85)',
-                    color: '#fff',
-                    fontWeight: 800,
-                    fontSize: '0.75rem',
-                    border: 'none',
-                    borderRadius: 20,
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {item.label}
-                </button>
-              ))}
+            {/* 行1: バナナスポーン種類セレクター */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                background: 'rgba(255,255,255,0.75)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1.5px dashed rgba(212,175,55,0.5)',
+                borderRadius: 20,
+                padding: '4px 6px',
+                boxShadow: '0 2px 8px rgba(132,122,100,0.12)',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                maxWidth: '90vw',
+              }}
+            >
+              {/* OFF ボタン */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onResetUpgrades?.();
+                  setDebugForcedBanana(null);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow =
+                    '0 4px 12px rgba(212,175,55,0.25)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(0.97)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
                 }}
                 style={{
-                  padding: '6px 14px',
-                  background: 'rgba(220,50,50,0.85)',
-                  color: '#fff',
-                  fontWeight: 800,
-                  fontSize: '0.75rem',
-                  border: 'none',
-                  borderRadius: 20,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 1,
+                  padding: '3px 4px',
+                  background: !debugForcedBanana
+                    ? 'rgba(212,175,55,0.3)'
+                    : 'rgba(255,255,255,0.85)',
+                  color: '#4a4a4a',
+                  fontWeight: 700,
+                  fontSize: '0.55rem',
+                  border: !debugForcedBanana
+                    ? '1.5px solid rgba(212,175,55,0.7)'
+                    : '1.5px solid rgba(212,175,55,0.35)',
+                  borderRadius: 10,
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
+                  minWidth: 36,
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               >
-                リセット
+                <span
+                  style={{
+                    fontSize: '0.85rem',
+                    display: 'block',
+                    height: 20,
+                    lineHeight: '20px',
+                  }}
+                >
+                  🚫
+                </span>
+                <span>OFF</span>
               </button>
+
+              {/* 通常バナナ12種 */}
+              {BANANA_TIERS.map((tier) => {
+                const isSelected =
+                  debugForcedBanana?.type === 'tier' &&
+                  debugForcedBanana.tier.tier === tier.tier;
+                return (
+                  <button
+                    key={`tier-${tier.tier}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDebugForcedBanana({ type: 'tier', tier });
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 12px rgba(212,175,55,0.25)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                    onMouseDown={(e) => {
+                      e.currentTarget.style.transform =
+                        'translateY(0) scale(0.97)';
+                    }}
+                    onMouseUp={(e) => {
+                      e.currentTarget.style.transform =
+                        'translateY(-2px) scale(1)';
+                    }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 1,
+                      padding: '3px 4px',
+                      background: isSelected
+                        ? 'rgba(212,175,55,0.3)'
+                        : 'rgba(255,255,255,0.85)',
+                      color: '#4a4a4a',
+                      fontWeight: 700,
+                      fontSize: '0.55rem',
+                      border: isSelected
+                        ? '1.5px solid rgba(212,175,55,0.7)'
+                        : '1.5px solid rgba(212,175,55,0.35)',
+                      borderRadius: 10,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      minWidth: 36,
+                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}
+                  >
+                    <img
+                      src={`${import.meta.env.BASE_URL}${tier.icon}`}
+                      alt={tier.name}
+                      style={{
+                        width: 20,
+                        height: 20,
+                        objectFit: 'contain',
+                      }}
+                    />
+                    <span>{tier.name}</span>
+                  </button>
+                );
+              })}
+
+              {/* スペシャルバナナ4種 */}
+              {SHOP_ITEMS.map((item) => {
+                const isSelected =
+                  debugForcedBanana?.type === 'special' &&
+                  debugForcedBanana.item.id === item.id;
+                return (
+                  <button
+                    key={`special-${item.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDebugForcedBanana({ type: 'special', item });
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 12px rgba(255,140,0,0.25)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                    onMouseDown={(e) => {
+                      e.currentTarget.style.transform =
+                        'translateY(0) scale(0.97)';
+                    }}
+                    onMouseUp={(e) => {
+                      e.currentTarget.style.transform =
+                        'translateY(-2px) scale(1)';
+                    }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 1,
+                      padding: '3px 4px',
+                      background: isSelected
+                        ? 'rgba(255,140,0,0.3)'
+                        : 'rgba(255,255,255,0.85)',
+                      color: '#4a4a4a',
+                      fontWeight: 700,
+                      fontSize: '0.55rem',
+                      border: isSelected
+                        ? '1.5px solid rgba(255,140,0,0.7)'
+                        : '1.5px solid rgba(212,175,55,0.35)',
+                      borderRadius: 10,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      minWidth: 36,
+                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}
+                  >
+                    <img
+                      src={`${import.meta.env.BASE_URL}${item.icon}`}
+                      alt={item.label}
+                      style={{
+                        width: 20,
+                        height: 20,
+                        objectFit: 'contain',
+                      }}
+                    />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* 行2: スコア調整 */}
@@ -319,29 +505,66 @@ const BananaWorld = forwardRef(
               onAdjust={onAdjustScore}
             />
 
-            {/* 行3: バナコイン調整 */}
-            <DebugAdjusterRow
-              icon={
-                <img
-                  src={`${import.meta.env.BASE_URL}coin.png`}
-                  alt="バナコイン"
-                  style={{
-                    width: 18,
-                    height: 18,
-                    objectFit: 'contain',
-                    filter: 'drop-shadow(0 1px 3px rgba(212,175,55,0.5))',
-                    flexShrink: 0,
-                  }}
-                />
-              }
-              steps={[
-                { label: '-100', delta: -100 },
-                { label: '-10', delta: -10 },
-                { label: '+10', delta: 10 },
-                { label: '+100', delta: 100 },
-              ]}
-              onAdjust={onAdjustCoins}
-            />
+            {/* 行3: バナコイン調整 + リセット */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <DebugAdjusterRow
+                icon={
+                  <img
+                    src={`${import.meta.env.BASE_URL}coin.png`}
+                    alt="バナコイン"
+                    style={{
+                      width: 18,
+                      height: 18,
+                      objectFit: 'contain',
+                      filter: 'drop-shadow(0 1px 3px rgba(212,175,55,0.5))',
+                      flexShrink: 0,
+                    }}
+                  />
+                }
+                steps={[
+                  { label: '-100', delta: -100 },
+                  { label: '-10', delta: -10 },
+                  { label: '+10', delta: 10 },
+                  { label: '+100', delta: 100 },
+                ]}
+                onAdjust={onAdjustCoins}
+              />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onResetUpgrades?.();
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow =
+                    '0 4px 12px rgba(220,50,50,0.25)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(0.97)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+                }}
+                style={{
+                  padding: '3px 8px',
+                  background: 'rgba(255,255,255,0.85)',
+                  color: '#c33',
+                  fontWeight: 700,
+                  fontSize: '0.68rem',
+                  border: '1px solid rgba(220,50,50,0.4)',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                🔄 リセット
+              </button>
+            </div>
           </div>
         )}
 
