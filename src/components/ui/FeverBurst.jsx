@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const ITEM_COLORS = {
   banana_nui: { main: '255,140,0', light: '255,215,0', outer: '255,107,53' },
   banana_magic: {
@@ -25,36 +27,55 @@ const DEFAULT_COLOR = {
 
 function FeverBurst({ burst }) {
   const color = ITEM_COLORS[burst.itemId] ?? DEFAULT_COLOR;
-  const { main, light } = color;
+  const { main, light, outer } = color;
+
+  // 放射状に広がるパーティクルを生成（初回のみ）
+  const [particles] = useState(() =>
+    Array.from({ length: 16 }).map((_, i) => {
+      const angle = (i * 360) / 16 + (Math.random() * 20 - 10);
+      const dist = 70 + Math.random() * 90;
+      const size = 6 + Math.random() * 10;
+      const delay = Math.random() * 0.15;
+      return {
+        id: i,
+        angle,
+        tx: Math.cos((angle * Math.PI) / 180) * dist,
+        ty: Math.sin((angle * Math.PI) / 180) * dist,
+        size,
+        delay,
+      };
+    }),
+  );
 
   return (
     <>
-      {/* 着地点を中心とした画面グロー */}
+      {/* 画面全体の衝撃フラッシュ */}
       <div
         style={{
           position: 'fixed',
           inset: 0,
-          background: `radial-gradient(ellipse at ${burst.x}px ${burst.y}px, rgba(${main},0.22) 0%, transparent 55%)`,
+          background: `radial-gradient(ellipse at center 90%, rgba(${main},0.4) 0%, transparent 80%)`,
           pointerEvents: 'none',
           zIndex: 19,
-          animation: 'impactOverlay 0.65s ease-out forwards',
+          animation:
+            'impactOverlay 0.8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards',
         }}
       />
 
-      {/* 中央フラッシュ（塗りつぶし） */}
+      {/* 衝撃波の中心コア（強烈な白抜け） */}
       <div
         style={{
           position: 'fixed',
           left: burst.x,
           top: burst.y,
-          width: 24,
-          height: 24,
+          width: 40,
+          height: 40,
           borderRadius: '50%',
-          background: `rgba(${light}, 1)`,
-          boxShadow: `0 0 32px 10px rgba(${main},0.75)`,
+          background: `rgba(255, 255, 255, 1)`,
+          boxShadow: `0 0 50px 20px rgba(${light},1), 0 0 100px 40px rgba(${main},0.8)`,
           pointerEvents: 'none',
           zIndex: 22,
-          animation: 'impactCore 0.5s ease-out forwards',
+          animation: 'impactCore 0.6s cubic-bezier(0.1, 0.8, 0.2, 1) forwards',
         }}
       />
 
@@ -64,49 +85,73 @@ function FeverBurst({ burst }) {
           position: 'fixed',
           left: burst.x,
           top: burst.y,
-          width: 20,
-          height: 20,
-          borderRadius: '50%',
-          background: `rgba(${main}, 0.32)`,
-          pointerEvents: 'none',
-          zIndex: 21,
-          animation:
-            'impactShockwave 0.9s cubic-bezier(0.1, 0.6, 0.2, 1) forwards',
-        }}
-      />
-
-      {/* リング1 */}
-      <div
-        style={{
-          position: 'fixed',
-          left: burst.x,
-          top: burst.y,
           width: 30,
           height: 30,
           borderRadius: '50%',
-          border: `3px solid rgba(${main},0.9)`,
-          boxShadow: `0 0 12px rgba(${main},0.6)`,
+          background: `radial-gradient(circle, rgba(${main},0.6) 0%, rgba(${outer},0.2) 70%, transparent 100%)`,
           pointerEvents: 'none',
-          zIndex: 20,
-          animation: 'impactRing 0.75s ease-out forwards',
+          zIndex: 21,
+          animation:
+            'impactShockwave 0.8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards',
         }}
       />
 
-      {/* リング2（遅延） */}
+      {/* 鋭い横方向の光（十字の横線） */}
       <div
         style={{
           position: 'fixed',
           left: burst.x,
           top: burst.y,
-          width: 20,
-          height: 20,
-          borderRadius: '50%',
-          border: `2px solid rgba(${light},0.75)`,
+          width: 600,
+          height: 16,
+          background: `radial-gradient(ellipse at center, rgba(${light},1) 0%, rgba(${main},0) 70%)`,
           pointerEvents: 'none',
-          zIndex: 20,
-          animation: 'impactRing 1.0s ease-out 0.07s forwards',
+          zIndex: 22,
+          transform: 'translate(-50%, -50%)',
+          animation:
+            'horizontalFlash 0.6s cubic-bezier(0.1, 0.8, 0.2, 1) forwards',
         }}
       />
+
+      {/* 鋭い縦方向の光（十字の縦線） */}
+      <div
+        style={{
+          position: 'fixed',
+          left: burst.x,
+          top: burst.y,
+          width: 16,
+          height: 600,
+          background: `radial-gradient(ellipse at center, rgba(${light},1) 0%, rgba(${main},0) 70%)`,
+          pointerEvents: 'none',
+          zIndex: 22,
+          transform: 'translate(-50%, -50%)',
+          animation:
+            'verticalFlash 0.6s cubic-bezier(0.1, 0.8, 0.2, 1) forwards',
+        }}
+      />
+
+      {/* 弾け飛ぶパーティクル */}
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          style={{
+            position: 'fixed',
+            left: burst.x,
+            top: burst.y,
+            width: p.size,
+            height: p.size,
+            borderRadius: '50%',
+            background: `rgba(255, 255, 255, 1)`,
+            boxShadow: `0 0 ${p.size * 2}px rgba(${light},1), 0 0 ${p.size * 4}px rgba(${main},0.8)`,
+            pointerEvents: 'none',
+            zIndex: 23,
+            '--tx': `${p.tx}px`,
+            '--ty': `${p.ty}px`,
+            animation: `particleBurst 0.7s cubic-bezier(0.1, 0.8, 0.2, 1) ${p.delay}s forwards`,
+            opacity: 0,
+          }}
+        />
+      ))}
     </>
   );
 }
