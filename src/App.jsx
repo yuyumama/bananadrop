@@ -37,6 +37,7 @@ function App() {
     treeLevel,
     banaCoins,
     treeGrowth,
+    waterCount,
     waterTree,
     addBanaCoin,
     shopPurchases,
@@ -520,6 +521,7 @@ function App() {
         score={score}
         treeLevel={treeLevel}
         treeGrowth={treeGrowth}
+        waterCount={waterCount}
         onWater={handleWaterTree}
         devMode={devMode}
       />

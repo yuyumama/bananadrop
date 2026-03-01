@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Droplets } from 'lucide-react';
+import { getMaxGrowth, getWaterCost } from '../../hooks/useUpgradeState';
 
 const TREE_STAGES = [
   { label: '種子', color: '#8bc34a' },
@@ -15,6 +16,7 @@ export default function BananaTree({
   score,
   treeLevel,
   treeGrowth,
+  waterCount,
   onWater,
   devMode,
 }) {
@@ -28,9 +30,10 @@ export default function BananaTree({
   const currentStage = TREE_STAGES[stageIndex];
   const isGold = stageIndex >= 5;
 
-  const cost = 100 + treeLevel * 50;
+  const cost = getWaterCost(waterCount);
   const canAfford = score >= cost || devMode;
-  const progress = Math.min(100, Math.max(0, treeGrowth));
+  const maxGrowth = getMaxGrowth(treeLevel);
+  const progress = Math.min(100, Math.max(0, (treeGrowth / maxGrowth) * 100));
 
   const imgSrc = `${import.meta.env.BASE_URL}tree_stage${String(stageIndex).padStart(2, '0')}.png`;
   const coinSrc = `${import.meta.env.BASE_URL}coin.png`;

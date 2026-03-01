@@ -6,6 +6,13 @@ import {
 } from '../services/upgradeRules';
 import { getShopItemCost } from '../data/shopItems';
 
+/** レベルアップに必要な成長値（指数スケーリング） */
+export const getMaxGrowth = (level) => Math.round(100 * Math.pow(1.15, level));
+
+/** 水やり回数に応じたコスト（~4回ごとに2倍） */
+export const getWaterCost = (waterCount) =>
+  Math.round(100 * Math.pow(1.4, waterCount));
+
 export default function useUpgradeState() {
   const [bananaPerClick, setBananaPerClick] = useState(1);
   const [autoSpawnRate, setAutoSpawnRate] = useState(0);
@@ -19,18 +26,20 @@ export default function useUpgradeState() {
     level: 0,
     growth: 0,
     banaCoins: 0,
+    waterCount: 0,
   });
 
-  // 時間経過でツリーが成長 (1秒に1%)
+  // 時間経過でツリーが成長 (1秒に+1)
   useEffect(() => {
     const interval = setInterval(() => {
       setTreeData((prev) => {
+        const maxGrowth = getMaxGrowth(prev.level);
         let newGrowth = prev.growth + 1;
         let newLevel = prev.level;
 
-        if (newGrowth >= 100) {
+        if (newGrowth >= maxGrowth) {
           newLevel += 1;
-          newGrowth -= 100;
+          newGrowth -= maxGrowth;
         }
 
         return {
@@ -72,30 +81,31 @@ export default function useUpgradeState() {
 
   const waterTree = useCallback(
     (currentScore) => {
-      // ツリーのレベルに応じた水やりコスト
-      const cost = 100 + treeData.level * 50;
+      const cost = getWaterCost(treeData.waterCount);
 
       if (currentScore < cost) return false;
 
       setTreeData((prev) => {
-        let newGrowth = prev.growth + 20;
+        const maxGrowth = getMaxGrowth(prev.level);
+        let newGrowth = prev.growth + Math.round(maxGrowth * 0.2);
         let newLevel = prev.level;
 
-        if (newGrowth >= 100) {
+        if (newGrowth >= maxGrowth) {
           newLevel += 1;
-          newGrowth -= 100;
+          newGrowth -= maxGrowth;
         }
 
         return {
           ...prev,
           growth: newGrowth,
           level: newLevel,
+          waterCount: prev.waterCount + 1,
         };
       });
 
       return cost; // 消費したスコアを返す
     },
-    [treeData.level],
+    [treeData.waterCount],
   );
 
   const addBanaCoin = useCallback(() => {
@@ -149,6 +159,7 @@ export default function useUpgradeState() {
     treeLevel: treeData.level,
     banaCoins: treeData.banaCoins,
     treeGrowth: treeData.growth,
+    waterCount: treeData.waterCount,
     waterTree,
     addBanaCoin,
     // Shop

@@ -13,7 +13,7 @@ export const BANANA_TIERS = [
   {
     tier: 2,
     name: '完熟バナナ',
-    score: 10,
+    score: 5,
     icon: 'banana_rembg_01.png',
     textures: [
       { file: 'banana_rembg_01.png' },
@@ -24,14 +24,14 @@ export const BANANA_TIERS = [
   {
     tier: 3,
     name: '赤バナナ',
-    score: 30,
+    score: 15,
     icon: 'banana_red_01.png',
     textures: [{ file: 'banana_red_01.png' }, { file: 'banana_red_02.png' }],
   },
   {
     tier: 4,
     name: '真っ黒バナナ',
-    score: 70,
+    score: 40,
     icon: 'banana_ripe_01.png',
     textures: [
       { file: 'banana_ripe_01.png' },
@@ -42,7 +42,7 @@ export const BANANA_TIERS = [
   {
     tier: 5,
     name: '傷んだバナナ',
-    score: 150,
+    score: 100,
     icon: 'banana_spoiled_01.png',
     textures: [
       { file: 'banana_spoiled_01.png' },
@@ -52,7 +52,7 @@ export const BANANA_TIERS = [
   {
     tier: 6,
     name: '銅バナナ',
-    score: 300,
+    score: 250,
     icon: 'banana_copper_01.png',
     textures: [
       { file: 'banana_copper_01.png' },
