@@ -1,112 +1,155 @@
+import { useState } from 'react';
+
 const ITEM_COLORS = {
-  banana_nui: { main: '255,140,0', light: '255,215,0', outer: '255,107,53' },
+  banana_nui: {
+    main: '255, 185, 80',
+    light: '255, 245, 200',
+    outer: '230, 140, 50',
+    core: '255, 140, 0',
+  },
   banana_magic: {
-    main: '168,85,247',
-    light: '192,132,252',
-    outer: '236,72,153',
+    main: '200, 140, 255',
+    light: '250, 235, 255',
+    outer: '170, 100, 220',
+    core: '150, 80, 255',
   },
   banana_blackhole: {
-    main: '59,130,246',
-    light: '96,165,250',
-    outer: '6,182,212',
+    main: '130, 180, 255',
+    light: '230, 245, 255',
+    outer: '90, 140, 220',
+    core: '80, 120, 255',
   },
   banana_onekind: {
-    main: '225,29,72',
-    light: '251,113,133',
-    outer: '251,146,60',
+    main: '255, 120, 140',
+    light: '255, 230, 235',
+    outer: '220, 80, 100',
+    core: '255, 60, 90',
   },
 };
 
 const DEFAULT_COLOR = {
-  main: '255,140,0',
-  light: '255,215,0',
-  outer: '255,107,53',
+  main: '240, 210, 130',
+  light: '255, 250, 230',
+  outer: '210, 170, 90',
+  core: '220, 160, 60',
 };
 
 function FeverBurst({ burst }) {
   const color = ITEM_COLORS[burst.itemId] ?? DEFAULT_COLOR;
-  const { main, light } = color;
+  const { main, light, core } = color;
+
+  // ティーカップに砂糖を落としたようなどこか上品な波紋と舞い散る細かい光
+  // ただし、より華やかで派手に
+  const [particles] = useState(() =>
+    Array.from({ length: 24 }).map((_, i) => {
+      const angle = (i * 360) / 24 + (Math.random() * 30 - 15);
+      const dist = 60 + Math.random() * 80;
+      const size = 4 + Math.random() * 6;
+      const delay = Math.random() * 0.15;
+      return {
+        id: i,
+        angle,
+        tx: Math.cos((angle * Math.PI) / 180) * dist,
+        ty: Math.sin((angle * Math.PI) / 180) * dist - 20,
+        size,
+        delay,
+      };
+    }),
+  );
 
   return (
     <>
-      {/* 着地点を中心とした画面グロー */}
+      {/* 画面全体のより明るいインパクトフラッシュ */}
       <div
         style={{
           position: 'fixed',
           inset: 0,
-          background: `radial-gradient(ellipse at ${burst.x}px ${burst.y}px, rgba(${main},0.22) 0%, transparent 55%)`,
+          background: `radial-gradient(ellipse at center 90%, rgba(${main},0.25) 0%, transparent 80%)`,
           pointerEvents: 'none',
           zIndex: 19,
-          animation: 'impactOverlay 0.65s ease-out forwards',
+          animation:
+            'elegantFade 1.0s cubic-bezier(0.25, 0.1, 0.25, 1) forwards',
         }}
       />
 
-      {/* 中央フラッシュ（塗りつぶし） */}
+      {/* 中心から滲むより鮮やかで強い光 */}
       <div
         style={{
           position: 'fixed',
           left: burst.x,
           top: burst.y,
-          width: 24,
-          height: 24,
+          width: 120, // 大幅に拡大
+          height: 120,
           borderRadius: '50%',
-          background: `rgba(${light}, 1)`,
-          boxShadow: `0 0 32px 10px rgba(${main},0.75)`,
+          background: `radial-gradient(circle, rgba(${core},1) 0%, rgba(${main},0.8) 20%, rgba(${light},0.4) 50%, transparent 80%)`,
+          transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
           zIndex: 22,
-          animation: 'impactCore 0.5s ease-out forwards',
+          animation:
+            'elegantCore 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards',
         }}
       />
 
-      {/* 大きな衝撃波（塗りつぶし） */}
+      {/* 水面のような静かだがくっきりした波紋 1 */}
       <div
         style={{
           position: 'fixed',
           left: burst.x,
           top: burst.y,
-          width: 20,
-          height: 20,
+          width: 120, // 拡大
+          height: 60,
           borderRadius: '50%',
-          background: `rgba(${main}, 0.32)`,
+          border: `2.5px solid rgba(${light},1)`, // 太く・くっきり
+          boxShadow: `0 0 15px rgba(${main}, 0.8), inset 0 0 10px rgba(${main}, 0.5)`,
+          transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
           zIndex: 21,
           animation:
-            'impactShockwave 0.9s cubic-bezier(0.1, 0.6, 0.2, 1) forwards',
+            'elegantRipple 1.0s cubic-bezier(0.25, 0.1, 0.2, 1) forwards',
         }}
       />
 
-      {/* リング1 */}
+      {/* 水面のような静かな波紋 2 (少し遅れて) */}
       <div
         style={{
           position: 'fixed',
           left: burst.x,
           top: burst.y,
-          width: 30,
-          height: 30,
+          width: 120, // 拡大
+          height: 60,
           borderRadius: '50%',
-          border: `3px solid rgba(${main},0.9)`,
-          boxShadow: `0 0 12px rgba(${main},0.6)`,
+          border: `1.5px solid rgba(${main},0.7)`,
+          transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
-          zIndex: 20,
-          animation: 'impactRing 0.75s ease-out forwards',
+          zIndex: 21,
+          animation:
+            'elegantRipple 1.2s cubic-bezier(0.25, 0.1, 0.2, 1) 0.08s forwards',
+          opacity: 0,
         }}
       />
 
-      {/* リング2（遅延） */}
-      <div
-        style={{
-          position: 'fixed',
-          left: burst.x,
-          top: burst.y,
-          width: 20,
-          height: 20,
-          borderRadius: '50%',
-          border: `2px solid rgba(${light},0.75)`,
-          pointerEvents: 'none',
-          zIndex: 20,
-          animation: 'impactRing 1.0s ease-out 0.07s forwards',
-        }}
-      />
+      {/* 煌めきながらふわりと散る光の粉 */}
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          style={{
+            position: 'fixed',
+            left: burst.x,
+            top: burst.y,
+            width: p.size,
+            height: p.size,
+            borderRadius: '50%',
+            background: `rgba(255, 255, 255, 1)`,
+            boxShadow: `0 0 ${p.size * 2}px rgba(${light}, 1), 0 0 ${p.size * 4}px rgba(${main}, 0.8)`,
+            pointerEvents: 'none',
+            zIndex: 23,
+            '--tx': `${p.tx}px`,
+            '--ty': `${p.ty}px`,
+            animation: `elegantDrift 1.0s cubic-bezier(0.2, 0.6, 0.3, 1) ${p.delay}s forwards`,
+            opacity: 0,
+          }}
+        />
+      ))}
     </>
   );
 }
