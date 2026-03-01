@@ -80,7 +80,7 @@ const BananaWorld = forwardRef(
 
     // デバッグ用: 当たり判定ポリゴンの表示切替
     const [showCollisionBounds, setShowCollisionBounds] = useState(true);
-    const showCollisionBoundsRef = useLatestRef(showCollisionBounds);
+    const showCollisionBoundsRef = useLatestRef(devMode && showCollisionBounds);
 
     const { spawnBanana, spawnSpecialBanana, spawnCoin } = useMatterBananaWorld(
       {
