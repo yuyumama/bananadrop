@@ -43,7 +43,7 @@ export const createBananaBody = ({
   });
 
   banana.label = 'banana';
-  banana.bananaScore = tier.score * (isGiant ? 50 : 1);
+  banana.bananaScore = tier.score * (isGiant ? 30 : 1);
   banana.bananaTier = tier.tier;
   banana.isGiant = isGiant;
 

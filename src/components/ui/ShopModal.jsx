@@ -4,6 +4,7 @@ import {
   getShopItemCost,
   getEffectDuration,
 } from '../../data/shopItems';
+import { getMaxGrowth } from '../../hooks/useUpgradeState';
 
 export default function ShopModal({
   banaCoins,
@@ -15,7 +16,11 @@ export default function ShopModal({
 }) {
   const stageIndex = Math.min(Math.floor(treeLevel / 5), 6);
   const imgSrc = `${import.meta.env.BASE_URL}tree_stage${String(stageIndex).padStart(2, '0')}.png`;
-  const progress = Math.min(100, Math.max(0, treeGrowth ?? 0));
+  const maxGrowth = getMaxGrowth(treeLevel);
+  const progress = Math.min(
+    100,
+    Math.max(0, ((treeGrowth ?? 0) / maxGrowth) * 100),
+  );
 
   return (
     <div
