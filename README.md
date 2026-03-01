@@ -1,16 +1,59 @@
-# React + Vite
+# 🍌 bananadrop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+バナナを落として、スコアを稼ぐブラウザゲームです。
 
-Currently, two official plugins are available:
+**▶ [今すぐ遊ぶ](https://yuyumama.github.io/bananadrop/)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ゲーム概要
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+画面をタップ・クリックするとバナナが落下します。バナナが落下するとスコアが入ります。アップグレードを購入して生産効率を上げ、より多くのバナナを降らせましょう。
 
-## Expanding the ESLint configuration
+## 主要機能
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### バナナティア
+
+バナナには複数のティアがあり、上位ティアほど高いスコアを獲得できます。アップグレードを進めることで新しいティアが解放されます。
+
+### アップグレード
+
+画面下部のパネルからスコアを消費してアップグレードを購入できます。クリック時のバナナ数増加・自動スポーンの高速化など様々な強化が可能です。
+
+### バナナツリー
+
+水をやってバナナツリーを育てましょう。レベルアップするとバナコインが獲得でき、スキルを選択して特殊な強化を得られます。
+
+### ショップ
+
+## バナコインを使ってショップで特殊なバナナを購入できます。
+
+## 技術スタック
+
+- **[Vite](https://vitejs.dev/)** — ビルドツール
+- **[React 19](https://react.dev/)** — UIフレームワーク
+- **[Matter.js](https://brm.io/matter-js/)** — 2D物理エンジン（バナナの落下シミュレーション）
+
+---
+
+## ローカル開発
+
+```bash
+# 依存パッケージのインストール
+npm ci
+
+# 開発サーバーの起動（HMR有効）
+npm run dev
+
+# プロダクションビルド
+npm run build
+
+# ビルド結果のプレビュー
+npm run preview
+
+# Lintチェック
+npm run lint
+
+# コードフォーマット
+npm run format
+```
