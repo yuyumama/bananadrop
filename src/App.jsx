@@ -78,10 +78,14 @@ function App() {
   const coinsPerLevelUpRef = useRef(1);
   coinsPerLevelUpRef.current =
     1 + treeChosenSkills.reduce((sum, s) => sum + (s.coinsPerLevelUp ?? 0), 0);
-  // コイン回収時スコアボーナス（ref 経由で stale closure を回避）
-  const coinScoreBonusRef = useRef(0);
-  coinScoreBonusRef.current = treeChosenSkills.reduce(
-    (sum, s) => sum + (s.coinScoreBonus ?? 0),
+  // 特殊バナナ出現率アップボーナス
+  const treeMutationRateBonus = treeChosenSkills.reduce(
+    (sum, s) => sum + (s.mutationRateBonus ?? 0),
+    0,
+  );
+  // タップ時大量生成ボーナス確率
+  const treeCriticalClickChance = treeChosenSkills.reduce(
+    (sum, s) => sum + (s.criticalClickChance ?? 0),
     0,
   );
 
@@ -139,9 +143,6 @@ function App() {
   const handleCoinCollected = useCallback(
     (x) => {
       addBanaCoin();
-      if (coinScoreBonusRef.current > 0) {
-        setScore((s) => s + coinScoreBonusRef.current);
-      }
       const id = ++_textId;
       const clampedX = Math.max(
         60,
@@ -661,6 +662,8 @@ function App() {
         isOneKind={isOneKind}
         oneKindSelection={oneKindSelection}
         onSpecialSpawn={handleSpecialSpawn}
+        treeMutationRateBonus={treeMutationRateBonus}
+        treeCriticalClickChance={treeCriticalClickChance}
       />
     </div>
   );

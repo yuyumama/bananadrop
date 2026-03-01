@@ -15,7 +15,7 @@ export const getWaterCost = (waterCount) =>
   Math.round(100 * Math.pow(1.4, waterCount));
 
 /**
- * そのステージのプール（3択）からランダムで2つ選んで返す。
+ * そのステージのプール（4択）からランダムで2つ選んで返す。
  * stageIndex は 0 始まり（LV.5 = 0, LV.10 = 1, ...）
  */
 const pickTwoFromStage = (stageIndex) => {
