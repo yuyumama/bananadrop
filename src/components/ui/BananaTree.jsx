@@ -128,7 +128,6 @@ export default function BananaTree({
     prevLevelRef.current = treeLevel;
   }, [treeLevel]);
 
-
   return (
     <>
       {/* ── メインパネル ── */}
