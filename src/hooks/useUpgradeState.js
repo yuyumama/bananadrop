@@ -80,10 +80,10 @@ export default function useUpgradeState() {
   );
 
   const waterTree = useCallback(
-    (currentScore) => {
+    (currentScore, devMode = false) => {
       const cost = getWaterCost(treeData.waterCount);
 
-      if (currentScore < cost) return false;
+      if (!devMode && currentScore < cost) return false;
 
       setTreeData((prev) => {
         const maxGrowth = getMaxGrowth(prev.level);

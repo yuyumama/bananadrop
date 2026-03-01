@@ -72,21 +72,56 @@ function FeverBurst({ burst }) {
         }}
       />
 
+      {/* 着弾時のエレガントな横閃光 */}
+      <div
+        style={{
+          position: 'fixed',
+          left: burst.x,
+          top: burst.y,
+          width: 600,
+          height: 12,
+          background: `radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(${light},0.8) 20%, transparent 70%)`,
+          pointerEvents: 'none',
+          zIndex: 23,
+          transform: 'translate(-50%, -50%)',
+          animation:
+            'elegantFlareHorizontal 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards',
+        }}
+      />
+
       {/* 中心から滲むより鮮やかで強い光 */}
       <div
         style={{
           position: 'fixed',
           left: burst.x,
           top: burst.y,
-          width: 120, // 大幅に拡大
-          height: 120,
+          width: 160, // さらに拡大
+          height: 160,
           borderRadius: '50%',
-          background: `radial-gradient(circle, rgba(${core},1) 0%, rgba(${main},0.8) 20%, rgba(${light},0.4) 50%, transparent 80%)`,
+          background: `radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(${light},0.9) 20%, rgba(${core},0.7) 40%, rgba(${main},0.3) 70%, transparent 80%)`,
           transform: 'translate(-50%, -50%)',
           pointerEvents: 'none',
           zIndex: 22,
           animation:
             'elegantCore 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards',
+        }}
+      />
+
+      {/* 中心の強烈な白い芯 */}
+      <div
+        style={{
+          position: 'fixed',
+          left: burst.x,
+          top: burst.y,
+          width: 60,
+          height: 60,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.6) 40%, transparent 80%)`,
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'none',
+          zIndex: 24,
+          animation:
+            'elegantCore 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards',
         }}
       />
 
