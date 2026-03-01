@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BANANA_TIERS } from '../../data/constants/bananaTiers';
 import { SHOP_ITEMS } from '../../data/shopItems';
 
@@ -131,6 +132,8 @@ export default function DebugPanel({
   onAdjustCoins,
   onResetUpgrades,
 }) {
+  const [expanded, setExpanded] = useState(true);
+
   return (
     <div
       style={{
@@ -146,125 +149,160 @@ export default function DebugPanel({
         pointerEvents: 'auto',
       }}
     >
-      {/* 行1: バナナスポーン種類セレクター */}
-      <GlassRow
+      {/* トグルボタン */}
+      <div
+        className="glass-panel"
         style={{
-          padding: '4px 6px',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          maxWidth: '90vw',
+          padding: '4px 12px',
+          cursor: 'pointer',
+          background: 'rgba(255, 255, 255, 0.85)',
+          border: '1px solid var(--accent-gold-soft)',
+          transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          fontSize: '0.65rem',
+          fontWeight: 700,
+          color: 'var(--text-muted)',
+          letterSpacing: '0.06em',
+          whiteSpace: 'nowrap',
         }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+          e.currentTarget.style.borderColor = 'var(--accent-gold)';
+          e.currentTarget.style.boxShadow =
+            '0 12px 24px rgba(212, 175, 55, 0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1) translateY(0)';
+          e.currentTarget.style.borderColor = 'var(--accent-gold-soft)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
+        }}
+        onClick={() => setExpanded((v) => !v)}
       >
-        {/* OFF ボタン */}
-        <SelectorButton
-          selected={!debugForcedBanana}
-          onClick={() => onSelectForcedBanana(null)}
-          icon={
-            <span
-              style={{
-                fontSize: '0.85rem',
-                display: 'block',
-                height: 20,
-                lineHeight: '20px',
-              }}
-            >
-              🚫
-            </span>
-          }
-          label="OFF"
-        />
-
-        {/* 通常バナナ12種 */}
-        {BANANA_TIERS.map((tier) => (
-          <SelectorButton
-            key={`tier-${tier.tier}`}
-            selected={
-              debugForcedBanana?.type === 'tier' &&
-              debugForcedBanana.tier.tier === tier.tier
-            }
-            onClick={() => onSelectForcedBanana({ type: 'tier', tier })}
-            icon={
-              <img
-                src={`${import.meta.env.BASE_URL}${tier.icon}`}
-                alt={tier.name}
-                style={{ width: 20, height: 20, objectFit: 'contain' }}
-              />
-            }
-            label={tier.name}
-          />
-        ))}
-
-        {/* スペシャルバナナ4種 */}
-        {SHOP_ITEMS.map((item) => (
-          <SelectorButton
-            key={`special-${item.id}`}
-            selected={
-              debugForcedBanana?.type === 'special' &&
-              debugForcedBanana.item.id === item.id
-            }
-            accentColor="255,140,0"
-            onClick={() => onSelectForcedBanana({ type: 'special', item })}
-            icon={
-              <img
-                src={`${import.meta.env.BASE_URL}${item.icon}`}
-                alt={item.label}
-                style={{ width: 20, height: 20, objectFit: 'contain' }}
-              />
-            }
-            label={item.label}
-          />
-        ))}
-      </GlassRow>
-
-      {/* 行2: スコア調整 */}
-      <GlassRow>
-        <span style={{ fontSize: '1rem', color: '#d4af37', lineHeight: 1 }}>
-          🍌
-        </span>
-        {SCORE_STEPS.map(({ label, delta }) => (
-          <HoverButton
-            key={label}
-            onClick={() => onAdjustScore(delta)}
-            style={ADJUSTER_BUTTON_STYLE}
-          >
-            {label}
-          </HoverButton>
-        ))}
-      </GlassRow>
-
-      {/* 行3: バナコイン調整 + リセット */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <GlassRow>
-          <img
-            src={`${import.meta.env.BASE_URL}coin.png`}
-            alt="バナコイン"
-            style={{
-              width: 18,
-              height: 18,
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 1px 3px rgba(212,175,55,0.5))',
-              flexShrink: 0,
-            }}
-          />
-          {COIN_STEPS.map(({ label, delta }) => (
-            <HoverButton
-              key={label}
-              onClick={() => onAdjustCoins(delta)}
-              style={ADJUSTER_BUTTON_STYLE}
-            >
-              {label}
-            </HoverButton>
-          ))}
-        </GlassRow>
-        <GlassRow>
-          <HoverButton
-            onClick={() => onResetUpgrades?.()}
-            style={ADJUSTER_BUTTON_STYLE}
-          >
-            🔄 リセット
-          </HoverButton>
-        </GlassRow>
+        🛠 Debug {expanded ? '▲' : '▼'}
       </div>
+
+      {expanded && (
+        <>
+          {/* 行1: バナナスポーン種類セレクター */}
+          <GlassRow
+            style={{
+              padding: '4px 6px',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              maxWidth: '90vw',
+            }}
+          >
+            {/* OFF ボタン */}
+            <SelectorButton
+              selected={!debugForcedBanana}
+              onClick={() => onSelectForcedBanana(null)}
+              icon={
+                <span
+                  style={{
+                    fontSize: '0.85rem',
+                    display: 'block',
+                    height: 20,
+                    lineHeight: '20px',
+                  }}
+                >
+                  🚫
+                </span>
+              }
+              label="OFF"
+            />
+
+            {/* 通常バナナ12種 */}
+            {BANANA_TIERS.map((tier) => (
+              <SelectorButton
+                key={`tier-${tier.tier}`}
+                selected={
+                  debugForcedBanana?.type === 'tier' &&
+                  debugForcedBanana.tier.tier === tier.tier
+                }
+                onClick={() => onSelectForcedBanana({ type: 'tier', tier })}
+                icon={
+                  <img
+                    src={`${import.meta.env.BASE_URL}${tier.icon}`}
+                    alt={tier.name}
+                    style={{ width: 20, height: 20, objectFit: 'contain' }}
+                  />
+                }
+                label={tier.name}
+              />
+            ))}
+
+            {/* スペシャルバナナ4種 */}
+            {SHOP_ITEMS.map((item) => (
+              <SelectorButton
+                key={`special-${item.id}`}
+                selected={
+                  debugForcedBanana?.type === 'special' &&
+                  debugForcedBanana.item.id === item.id
+                }
+                accentColor="255,140,0"
+                onClick={() => onSelectForcedBanana({ type: 'special', item })}
+                icon={
+                  <img
+                    src={`${import.meta.env.BASE_URL}${item.icon}`}
+                    alt={item.label}
+                    style={{ width: 20, height: 20, objectFit: 'contain' }}
+                  />
+                }
+                label={item.label}
+              />
+            ))}
+          </GlassRow>
+
+          {/* 行2: スコア調整 */}
+          <GlassRow>
+            <span style={{ fontSize: '1rem', color: '#d4af37', lineHeight: 1 }}>
+              🍌
+            </span>
+            {SCORE_STEPS.map(({ label, delta }) => (
+              <HoverButton
+                key={label}
+                onClick={() => onAdjustScore(delta)}
+                style={ADJUSTER_BUTTON_STYLE}
+              >
+                {label}
+              </HoverButton>
+            ))}
+          </GlassRow>
+
+          {/* 行3: バナコイン調整 + リセット */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <GlassRow>
+              <img
+                src={`${import.meta.env.BASE_URL}coin.png`}
+                alt="バナコイン"
+                style={{
+                  width: 18,
+                  height: 18,
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 1px 3px rgba(212,175,55,0.5))',
+                  flexShrink: 0,
+                }}
+              />
+              {COIN_STEPS.map(({ label, delta }) => (
+                <HoverButton
+                  key={label}
+                  onClick={() => onAdjustCoins(delta)}
+                  style={ADJUSTER_BUTTON_STYLE}
+                >
+                  {label}
+                </HoverButton>
+              ))}
+            </GlassRow>
+            <GlassRow>
+              <HoverButton
+                onClick={() => onResetUpgrades?.()}
+                style={ADJUSTER_BUTTON_STYLE}
+              >
+                🔄 リセット
+              </HoverButton>
+            </GlassRow>
+          </div>
+        </>
+      )}
     </div>
   );
 }
