@@ -153,6 +153,8 @@ export default function BananaTree({
           gap: 10,
           userSelect: 'none',
           width: 160,
+          maxHeight: 'calc(100vh - 130px - 120px)',
+          boxSizing: 'border-box',
           borderRadius: '24px',
           border: isGold
             ? '1px solid var(--accent-gold-soft)'
@@ -221,6 +223,8 @@ export default function BananaTree({
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
+            flex: 1,
+            minHeight: 0,
           }}
         >
           {/* Growth bar + coin goal */}
@@ -364,6 +368,9 @@ export default function BananaTree({
               display: 'flex',
               flexDirection: 'column',
               gap: 6,
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
             }}
           >
             {/* ── ステージ進捗ドット ── */}
