@@ -1,3 +1,13 @@
+/**
+ * Renders a fixed-position score display showing the total score, per-second rate, and an optional developer badge.
+ *
+ * @param {object} props - Component props.
+ * @param {number} props.score - Total score to display (formatted with locale separators).
+ * @param {number} props.perSecond - Points gained per second; displayed as `+{perSecond}/秒`.
+ * @param {*} props.scoreBump - Truthy value causes the short "scoreBump" animation; falsy disables it.
+ * @param {boolean} props.devMode - When true, shows a "STUDIO" badge next to the score.
+ * @returns {JSX.Element} The rendered score display element.
+ */
 function ScoreDisplay({ score, perSecond, scoreBump, devMode }) {
   return (
     <div
@@ -22,7 +32,9 @@ function ScoreDisplay({ score, perSecond, scoreBump, devMode }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: '1.2rem', color: '#d4af37' }}>🍌</span>
+        <span style={{ fontSize: '1.2rem', color: 'var(--accent-gold)' }}>
+          🍌
+        </span>
         <span
           style={{
             fontSize: '1.4rem',

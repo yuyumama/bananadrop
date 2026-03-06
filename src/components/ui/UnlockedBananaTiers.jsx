@@ -13,6 +13,25 @@ const SectionLabel = ({ children }) => (
   </div>
 );
 
+/**
+ * Render a fixed-position UI block showing unlocked banana tiers and purchased special banana items.
+ *
+ * Renders a "Special" column when any special-item counts are greater than zero and always renders a
+ * "Bananas" column listing each unlocked tier with its icon, name, and score. Visual styling (colors,
+ * borders, hover/background states) is driven by the provided color arrays and boolean flags.
+ *
+ * @param {Object} props
+ * @param {Array<{tier: number, name: string, icon: string, score: number}>} props.unlockedTiers - Array of unlocked tier objects; `tier` is 1-based and used to index `tierColors`.
+ * @param {string[]} props.tierColors - Array of color strings indexed by `tier - 1` to style each tier row.
+ * @param {number} props.nuiBananaCount - Count of "ぬいバナナ" special items.
+ * @param {boolean} props.isFever - When true, applies fever visual styling to the nui item.
+ * @param {number} props.magicBananaCount - Count of "マジックバナナ" special items.
+ * @param {boolean} props.isAllGiant - When true, applies giant visual styling to the magic item.
+ * @param {number} props.blackholeBananaCount - Count of "ブラックホール" special items.
+ * @param {number} props.onekindBananaCount - Count of "oneバナナ" special items.
+ * @param {boolean} props.isOneKind - When true, applies one-kind visual styling to the one-banana item.
+ * @returns {JSX.Element} The rendered UI element containing special items (conditionally) and the list of unlocked banana tiers.
+ */
 function UnlockedBananaTiers({
   unlockedTiers,
   tierColors,
@@ -63,15 +82,15 @@ function UnlockedBananaTiers({
                 padding: '6px 14px',
                 fontSize: '0.75rem',
                 fontWeight: 800,
-                color: '#ff8c00',
+                color: 'var(--special-nui)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
                 userSelect: 'none',
                 transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                borderLeft: '3px solid #ff8c00',
+                borderLeft: '3px solid var(--special-nui)',
                 background: isFever
-                  ? 'rgba(255, 140, 0, 0.15)'
+                  ? 'var(--special-nui-light)'
                   : 'rgba(255, 255, 255, 0.8)',
                 boxShadow: isFever
                   ? '0 2px 12px rgba(255, 140, 0, 0.3)'
@@ -88,7 +107,7 @@ function UnlockedBananaTiers({
                 style={{
                   fontSize: '0.65rem',
                   fontWeight: 700,
-                  color: '#ff8c00',
+                  color: 'var(--special-nui)',
                   marginLeft: 'auto',
                   paddingLeft: 8,
                   opacity: 0.8,
@@ -105,13 +124,13 @@ function UnlockedBananaTiers({
                 padding: '6px 14px',
                 fontSize: '0.75rem',
                 fontWeight: 800,
-                color: '#9333ea',
+                color: 'var(--special-magic)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
                 userSelect: 'none',
                 transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                borderLeft: '3px solid #a855f7',
+                borderLeft: '3px solid var(--special-magic-light)',
                 background: isAllGiant
                   ? 'rgba(168, 85, 247, 0.15)'
                   : 'rgba(255, 255, 255, 0.8)',
@@ -130,7 +149,7 @@ function UnlockedBananaTiers({
                 style={{
                   fontSize: '0.65rem',
                   fontWeight: 700,
-                  color: '#a855f7',
+                  color: 'var(--special-magic-light)',
                   marginLeft: 'auto',
                   paddingLeft: 8,
                   opacity: 0.8,
@@ -147,13 +166,13 @@ function UnlockedBananaTiers({
                 padding: '6px 14px',
                 fontSize: '0.75rem',
                 fontWeight: 800,
-                color: '#1e3a5f',
+                color: 'var(--special-blackhole-dark)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
                 userSelect: 'none',
                 transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                borderLeft: '3px solid #3b82f6',
+                borderLeft: '3px solid var(--special-blackhole)',
                 background: 'rgba(255, 255, 255, 0.8)',
                 boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
               }}
@@ -168,7 +187,7 @@ function UnlockedBananaTiers({
                 style={{
                   fontSize: '0.65rem',
                   fontWeight: 700,
-                  color: '#3b82f6',
+                  color: 'var(--special-blackhole)',
                   marginLeft: 'auto',
                   paddingLeft: 8,
                   opacity: 0.8,
@@ -185,13 +204,13 @@ function UnlockedBananaTiers({
                 padding: '6px 14px',
                 fontSize: '0.75rem',
                 fontWeight: 800,
-                color: '#e11d48',
+                color: 'var(--special-onekind)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
                 userSelect: 'none',
                 transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                borderLeft: '3px solid #e11d48',
+                borderLeft: '3px solid var(--special-onekind)',
                 background: isOneKind
                   ? 'rgba(225, 29, 72, 0.15)'
                   : 'rgba(255, 255, 255, 0.8)',
@@ -210,7 +229,7 @@ function UnlockedBananaTiers({
                 style={{
                   fontSize: '0.65rem',
                   fontWeight: 700,
-                  color: '#e11d48',
+                  color: 'var(--special-onekind)',
                   marginLeft: 'auto',
                   paddingLeft: 8,
                   opacity: 0.8,

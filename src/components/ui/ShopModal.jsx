@@ -6,6 +6,22 @@ import {
 } from '../../data/shopItems';
 import { getMaxGrowth } from '../../hooks/useUpgradeState';
 
+/**
+ * Render a modal storefront UI for purchasing in-game shop items.
+ *
+ * Renders a full-screen overlay containing the player's tree summary (level, growth progress, coin balance)
+ * and a list of shop items with purchase controls, counts, effect summaries, and cost indicators.
+ *
+ * @param {Object} props - Component props.
+ * @param {number} props.banaCoins - Current banana coin balance.
+ * @param {Record<string, number>} props.shopPurchases - Map of shop item id to how many times it has been purchased.
+ * @param {(item: any) => void} props.onBuy - Callback invoked with the item when a purchase is attempted.
+ * @param {() => void} props.onClose - Callback invoked to close the modal (also called when overlay is clicked).
+ * @param {number} props.treeLevel - Current banana tree level (used to derive stage image and max growth).
+ * @param {number | undefined} props.treeGrowth - Current growth progress toward the next banana coin.
+ *
+ * @returns {JSX.Element} A JSX element representing the shop modal UI.
+ */
 export default function ShopModal({
   banaCoins,
   shopPurchases,
@@ -106,7 +122,7 @@ export default function ShopModal({
           style={{
             borderRadius: '18px',
             background: 'linear-gradient(135deg, #f6fef0, #fffde7)',
-            border: '1px solid rgba(139,195,74,0.25)',
+            border: '1px solid var(--status-maxed-border)',
             padding: '14px 16px',
             display: 'flex',
             alignItems: 'center',
@@ -151,8 +167,8 @@ export default function ShopModal({
                 style={{
                   fontSize: '0.68rem',
                   fontWeight: 700,
-                  color: '#8bc34a',
-                  background: 'rgba(139,195,74,0.12)',
+                  color: 'var(--status-maxed-light)',
+                  background: 'var(--status-maxed-bg)',
                   padding: '1px 8px',
                   borderRadius: 8,
                 }}
@@ -178,7 +194,7 @@ export default function ShopModal({
               <div
                 style={{
                   height: 5,
-                  background: 'rgba(0,0,0,0.07)',
+                  background: 'var(--progress-bg)',
                   borderRadius: 3,
                   overflow: 'hidden',
                 }}
@@ -187,7 +203,8 @@ export default function ShopModal({
                   style={{
                     height: '100%',
                     width: `${progress}%`,
-                    background: 'linear-gradient(90deg, #8bc34a, #c6e05a)',
+                    background:
+                      'linear-gradient(90deg, var(--status-maxed-light), #c6e05a)',
                     borderRadius: 3,
                     transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
@@ -263,7 +280,7 @@ export default function ShopModal({
                   background: isMaxed
                     ? 'linear-gradient(135deg, #f0fae8, #e8f5e0)'
                     : 'linear-gradient(135deg, #fffef5, #fffbe8)',
-                  border: `1.5px solid ${isMaxed ? 'rgba(76,175,80,0.25)' : 'var(--accent-gold-soft)'}`,
+                  border: `1.5px solid ${isMaxed ? 'var(--status-maxed-border)' : 'var(--accent-gold-soft)'}`,
                 }}
               >
                 {/* Item image */}
@@ -306,8 +323,8 @@ export default function ShopModal({
                         style={{
                           fontSize: '0.6rem',
                           fontWeight: 800,
-                          color: '#4caf50',
-                          background: 'rgba(76,175,80,0.1)',
+                          color: 'var(--status-maxed)',
+                          background: 'var(--status-maxed-bg)',
                           padding: '1px 7px',
                           borderRadius: 8,
                           letterSpacing: '0.04em',
@@ -336,7 +353,7 @@ export default function ShopModal({
                       style={{
                         fontSize: '0.68rem',
                         fontWeight: 700,
-                        color: '#1e3a5f',
+                        color: 'var(--effect-spawn-chance)',
                         marginBottom: 8,
                         display: 'flex',
                         alignItems: 'center',
@@ -364,7 +381,12 @@ export default function ShopModal({
                             %
                           </span>
                           {!isMaxed && (
-                            <span style={{ color: '#3b82f6', fontWeight: 600 }}>
+                            <span
+                              style={{
+                                color: 'var(--effect-spawn-chance-next)',
+                                fontWeight: 600,
+                              }}
+                            >
                               → 次購入で{' '}
                               {(
                                 item.spawnChancePerBanana *
@@ -385,7 +407,7 @@ export default function ShopModal({
                       style={{
                         fontSize: '0.68rem',
                         fontWeight: 700,
-                        color: '#0369a1',
+                        color: 'var(--effect-onekind)',
                         marginBottom: 8,
                         display: 'flex',
                         alignItems: 'center',
@@ -409,7 +431,12 @@ export default function ShopModal({
                             効果
                           </span>
                           {!isMaxed && (
-                            <span style={{ color: '#0284c7', fontWeight: 600 }}>
+                            <span
+                              style={{
+                                color: 'var(--effect-onekind-next)',
+                                fontWeight: 600,
+                              }}
+                            >
                               → 次購入で{' '}
                               {getEffectDuration(item.effect, count + 1)}s
                             </span>
@@ -425,7 +452,7 @@ export default function ShopModal({
                       style={{
                         fontSize: '0.68rem',
                         fontWeight: 700,
-                        color: '#9333ea',
+                        color: 'var(--special-magic)',
                         marginBottom: 8,
                         display: 'flex',
                         alignItems: 'center',
@@ -449,7 +476,12 @@ export default function ShopModal({
                             効果
                           </span>
                           {!isMaxed && (
-                            <span style={{ color: '#a855f7', fontWeight: 600 }}>
+                            <span
+                              style={{
+                                color: 'var(--special-magic-light)',
+                                fontWeight: 600,
+                              }}
+                            >
                               → 次購入で{' '}
                               {getEffectDuration(item.effect, count + 1)}s
                             </span>
@@ -465,7 +497,7 @@ export default function ShopModal({
                       style={{
                         fontSize: '0.68rem',
                         fontWeight: 700,
-                        color: '#ff8c00',
+                        color: 'var(--special-nui)',
                         marginBottom: 8,
                         display: 'flex',
                         alignItems: 'center',

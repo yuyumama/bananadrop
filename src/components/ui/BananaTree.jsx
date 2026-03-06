@@ -3,13 +3,13 @@ import { Droplets } from 'lucide-react';
 import { getMaxGrowth, getWaterCost } from '../../hooks/useUpgradeState';
 
 const TREE_STAGES = [
-  { label: '種子', color: '#8bc34a' },
-  { label: '芽吹き', color: '#7cb342' },
-  { label: '若苗', color: '#558b2f' },
-  { label: '若葉', color: '#4caf50' },
-  { label: '成長期', color: '#388e3c' },
-  { label: '開花', color: '#a5d240' },
-  { label: '成熟', color: '#d4af37' },
+  { label: '種子', color: 'var(--tree-green-1)' },
+  { label: '芽吹き', color: 'var(--tree-green-2)' },
+  { label: '若苗', color: 'var(--tree-green-3)' },
+  { label: '若葉', color: 'var(--tree-green-4)' },
+  { label: '成長期', color: 'var(--tree-green-5)' },
+  { label: '開花', color: 'var(--tree-green-6)' },
+  { label: '成熟', color: 'var(--accent-gold)' },
 ];
 
 // スキル種別ごとのカラーテーマ
@@ -84,6 +84,27 @@ function getSkillTheme(skill) {
   return key ? SKILL_TYPE_THEMES[key] : FALLBACK_THEME;
 }
 
+/**
+ * Render the BananaTree UI panel showing current stage, growth progress, watering control, and skill selection.
+ *
+ * Renders a floating, themed tree panel that displays the tree image and level, progress toward the next coin,
+ * a water action button with cost and affordability state, stage skill progress dots, chosen skill badges, and
+ * an optional floating skill selection panel when a skill unlock is pending.
+ *
+ * @param {object} props - Component props.
+ * @param {number} props.score - Player's current score used to pay for watering.
+ * @param {number} props.treeLevel - Current tree level (integer).
+ * @param {number} props.treeGrowth - Current accumulated growth toward the next reward.
+ * @param {number} props.waterCount - Number of times water has been used (affects cost calculation).
+ * @param {() => void} props.onWater - Callback invoked when the water button is pressed (only called if affordable).
+ * @param {boolean} props.devMode - When true, bypasses affordability checks for development.
+ * @param {Array<object>} [props.chosenSkills=[]] - Array of already chosen skill objects (each should include at least `id`, `icon`, `name`, `description`, and `type`).
+ * @param {Array<object>|null} [props.pendingChoice=null] - Array of skill options presented for selection when unlocking, or null when none pending.
+ * @param {(skill: object) => void} props.onChooseSkill - Callback invoked with the selected skill from `pendingChoice`.
+ * @param {number} [props.waterBoostPercent=20] - Percentage growth boost applied when watering (display only).
+ * @param {number} [props.waterCostDiscount=0] - Fractional discount applied to water cost (0..1).
+ * @returns {JSX.Element} The rendered BananaTree component UI.
+ */
 export default function BananaTree({
   score,
   treeLevel,
@@ -129,15 +150,23 @@ export default function BananaTree({
   }, [treeLevel]);
 
   return (
-    <>
+    <div
+      style={{
+        position: 'fixed',
+        top: 130,
+        left: 24,
+        zIndex: 10,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 8,
+        pointerEvents: 'none',
+      }}
+    >
       {/* ── メインパネル ── */}
       <div
         className="glass-panel"
         style={{
-          position: 'fixed',
-          top: 130,
-          left: 24,
-          zIndex: 10,
           padding: '14px 16px',
           display: 'flex',
           flexDirection: 'column',
@@ -150,6 +179,7 @@ export default function BananaTree({
             ? '1px solid var(--accent-gold-soft)'
             : '1px solid var(--glass-border)',
           animation: showLevelUp ? 'levelUpFlash 0.8s ease-out' : undefined,
+          pointerEvents: 'auto',
         }}
       >
         {/* Top: tree image + level badge */}
@@ -194,7 +224,7 @@ export default function BananaTree({
                 color: currentStage.color,
                 background: isGold
                   ? 'rgba(212,175,55,0.14)'
-                  : 'rgba(76,175,80,0.1)',
+                  : 'var(--status-maxed-bg)',
                 padding: '1px 8px',
                 borderRadius: 10,
                 letterSpacing: '0.05em',
@@ -237,7 +267,7 @@ export default function BananaTree({
                 style={{
                   flex: 1,
                   height: 7,
-                  background: 'rgba(0,0,0,0.07)',
+                  background: 'var(--progress-bg)',
                   borderRadius: 4,
                   overflow: 'hidden',
                 }}
@@ -292,14 +322,14 @@ export default function BananaTree({
                 width: '100%',
                 justifyContent: 'center',
                 background: canAfford
-                  ? 'linear-gradient(135deg, #64B5F6 0%, #1E88E5 100%)'
-                  : '#ececec',
-                color: canAfford ? '#fff' : '#bbb',
+                  ? 'linear-gradient(135deg, var(--accent-gold-soft) 0%, var(--accent-gold) 100%)'
+                  : 'var(--disabled-bg)',
+                color: canAfford ? '#fff' : 'var(--disabled-text)',
                 fontSize: '0.7rem',
                 fontWeight: 800,
                 cursor: canAfford ? 'pointer' : 'not-allowed',
                 boxShadow: canAfford
-                  ? '0 3px 10px rgba(30,136,229,0.3)'
+                  ? '0 3px 10px var(--accent-gold-glow)'
                   : 'none',
                 transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
               }}
@@ -307,13 +337,13 @@ export default function BananaTree({
                 if (canAfford) {
                   e.currentTarget.style.transform = 'scale(1.05)';
                   e.currentTarget.style.boxShadow =
-                    '0 5px 14px rgba(30,136,229,0.4)';
+                    '0 5px 14px rgba(212,175,55,0.4)';
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
                 e.currentTarget.style.boxShadow = canAfford
-                  ? '0 3px 10px rgba(30,136,229,0.3)'
+                  ? '0 3px 10px rgba(212,175,55,0.25)'
                   : 'none';
               }}
               onMouseDown={(e) => {
@@ -372,7 +402,7 @@ export default function BananaTree({
                 const dotColor = isDone
                   ? getSkillTheme(chosenSkills[i]).dot
                   : isPending
-                    ? '#ff9800'
+                    ? 'var(--pending-orange)'
                     : 'rgba(0,0,0,0.1)';
                 return (
                   <div
@@ -454,138 +484,7 @@ export default function BananaTree({
               </div>
             )}
 
-            {/* ── スキル選択中（モダンデザイン） ── */}
-            {pendingChoice && (
-              <div
-                style={{
-                  width: '100%',
-                  marginTop: 6,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  borderRadius: 12,
-                  background: 'rgba(255, 255, 255, 0.4)',
-                  border: '1px solid rgba(0,0,0,0.05)',
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-                }}
-              >
-                {/* ヘッダー部分 */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 6,
-                    padding: '5px 0',
-                    background:
-                      'linear-gradient(135deg, rgba(255,152,0,0.1) 0%, rgba(255,183,77,0.15) 100%)',
-                    borderBottom: '1px solid rgba(255,152,0,0.15)',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 4,
-                      height: 4,
-                      borderRadius: '50%',
-                      background: '#ffb74d',
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '0.6rem',
-                      fontWeight: 800,
-                      color: '#f57c00',
-                      letterSpacing: '0.06em',
-                    }}
-                  >
-                    SKILL UNLOCKED
-                  </span>
-                  <div
-                    style={{
-                      width: 4,
-                      height: 4,
-                      borderRadius: '50%',
-                      background: '#ffb74d',
-                    }}
-                  />
-                </div>
-
-                {/* リスト部分 */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {pendingChoice.map((skill, idx) => {
-                    const theme = getSkillTheme(skill);
-                    const isLast = idx === pendingChoice.length - 1;
-                    return (
-                      <button
-                        key={skill.id}
-                        onClick={() => onChooseSkill(skill)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 8,
-                          padding: '10px 10px',
-                          border: 'none',
-                          borderBottom: isLast
-                            ? 'none'
-                            : '1px solid rgba(0,0,0,0.04)',
-                          background: 'transparent',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          textAlign: 'left',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = theme.bg;
-                          e.currentTarget.style.paddingLeft = '14px';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.paddingLeft = '10px';
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: '1.2rem',
-                            filter: `drop-shadow(0 2px 4px ${theme.glow})`,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {skill.icon}
-                        </div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 2,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: '0.65rem',
-                              fontWeight: 800,
-                              color: theme.text,
-                              lineHeight: 1.1,
-                            }}
-                          >
-                            {skill.name}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '0.5rem',
-                              fontWeight: 600,
-                              color: 'var(--text-muted)',
-                              lineHeight: 1.25,
-                              opacity: 0.8,
-                            }}
-                          >
-                            {skill.description.replace(/\n/g, ' ')}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            {/* スキル選択中の場合はパネル外にフローティング表示 */}
 
             {/* ── スキル未解放ヒント ── */}
             {!pendingChoice && chosenSkills.length === 0 && (
@@ -604,6 +503,144 @@ export default function BananaTree({
           </div>
         </div>
       </div>
-    </>
+
+      {/* ── スキル選択パネル（ツリーパネルの直下） ── */}
+      {pendingChoice && (
+        <div
+          className="glass-panel"
+          style={{
+            width: 192,
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: 16,
+            overflow: 'hidden',
+            border: '1px solid rgba(255,152,0,0.25)',
+            boxShadow:
+              '0 8px 32px rgba(255,152,0,0.12), 0 2px 10px rgba(0,0,0,0.06)',
+            animation: 'slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            userSelect: 'none',
+            pointerEvents: 'auto',
+          }}
+        >
+          {/* ヘッダー部分 */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              padding: '7px 0',
+              background:
+                'linear-gradient(135deg, rgba(255,152,0,0.1) 0%, rgba(255,183,77,0.15) 100%)',
+              borderBottom: '1px solid rgba(255,152,0,0.15)',
+            }}
+          >
+            <div
+              style={{
+                width: 4,
+                height: 4,
+                borderRadius: '50%',
+                background: 'var(--pending-orange-light)',
+              }}
+            />
+            <span
+              style={{
+                fontSize: '0.6rem',
+                fontWeight: 800,
+                color: 'var(--pending-orange-dark)',
+                letterSpacing: '0.06em',
+              }}
+            >
+              SKILL UNLOCKED
+            </span>
+            <div
+              style={{
+                width: 4,
+                height: 4,
+                borderRadius: '50%',
+                background: 'var(--pending-orange-light)',
+              }}
+            />
+          </div>
+
+          {/* リスト部分 */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {pendingChoice.map((skill, idx) => {
+              const theme = getSkillTheme(skill);
+              const isLast = idx === pendingChoice.length - 1;
+              return (
+                <button
+                  key={skill.id}
+                  onClick={() => onChooseSkill(skill)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 12px',
+                    border: 'none',
+                    borderBottom: isLast
+                      ? 'none'
+                      : '1px solid rgba(0,0,0,0.04)',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'left',
+                    animation: `slideInRight 0.3s ease both`,
+                    animationDelay: `${idx * 0.06}s`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = theme.bg;
+                    e.currentTarget.style.paddingLeft = '16px';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.paddingLeft = '12px';
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: '1.2rem',
+                      filter: `drop-shadow(0 2px 4px ${theme.glow})`,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {skill.icon}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 2,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        color: theme.text,
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {skill.name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '0.5rem',
+                        fontWeight: 600,
+                        color: 'var(--text-muted)',
+                        lineHeight: 1.25,
+                        opacity: 0.8,
+                      }}
+                    >
+                      {skill.description.replace(/\n/g, ' ')}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
