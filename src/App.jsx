@@ -474,7 +474,7 @@ function App() {
               padding: '4px 14px',
               fontSize: '0.7rem',
               fontWeight: 800,
-              color: '#9333ea',
+              color: 'var(--special-magic)',
               whiteSpace: 'nowrap',
               letterSpacing: '0.04em',
             }}
@@ -587,7 +587,7 @@ function App() {
             fontSize: '1.6rem',
             fontWeight: 900,
             fontFamily: '"Outfit", sans-serif',
-            color: '#d4af37',
+            color: 'var(--accent-gold)',
             pointerEvents: 'none',
             animation:
               'floatUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',

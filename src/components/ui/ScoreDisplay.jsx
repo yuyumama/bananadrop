@@ -22,7 +22,9 @@ function ScoreDisplay({ score, perSecond, scoreBump, devMode }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: '1.2rem', color: '#d4af37' }}>🍌</span>
+        <span style={{ fontSize: '1.2rem', color: 'var(--accent-gold)' }}>
+          🍌
+        </span>
         <span
           style={{
             fontSize: '1.4rem',

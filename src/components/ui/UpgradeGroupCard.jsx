@@ -31,7 +31,7 @@ function UpgradeGroupCard({
           borderRadius: 12,
           border: `1.5px solid ${
             isMaxed
-              ? 'rgba(76,175,80,0.35)'
+              ? 'var(--status-maxed-border)'
               : affordable
                 ? 'var(--accent-gold)'
                 : 'rgba(0,0,0,0.08)'
@@ -109,7 +109,7 @@ function UpgradeGroupCard({
             padding: '5px 7px 4px',
             borderBottom: `1px solid ${
               isMaxed
-                ? 'rgba(76,175,80,0.12)'
+                ? 'var(--status-maxed-bg)'
                 : affordable
                   ? 'rgba(212,175,55,0.18)'
                   : 'rgba(0,0,0,0.05)'
@@ -124,7 +124,7 @@ function UpgradeGroupCard({
               style={{
                 fontSize: '0.58rem',
                 fontWeight: 700,
-                color: isMaxed ? '#4caf50' : 'var(--text-muted)',
+                color: isMaxed ? 'var(--status-maxed)' : 'var(--text-muted)',
                 letterSpacing: '0.03em',
                 whiteSpace: 'nowrap',
               }}
@@ -143,7 +143,7 @@ function UpgradeGroupCard({
                   ? 'var(--accent-gold)'
                   : 'rgba(0,0,0,0.3)',
               background: isMaxed
-                ? 'rgba(76,175,80,0.1)'
+                ? 'var(--status-maxed-bg)'
                 : affordable
                   ? 'rgba(212,175,55,0.14)'
                   : 'rgba(0,0,0,0.05)',
@@ -176,7 +176,7 @@ function UpgradeGroupCard({
               style={{
                 fontSize: '0.65rem',
                 fontWeight: 800,
-                color: '#4caf50',
+                color: 'var(--status-maxed)',
                 letterSpacing: '0.08em',
               }}
             >
@@ -286,7 +286,7 @@ function UpgradeGroupCard({
               left: 0,
               right: 0,
               height: 6,
-              background: 'rgba(0,0,0,0.07)',
+              background: 'var(--progress-bg)',
             }}
           >
             <div
@@ -294,7 +294,7 @@ function UpgradeGroupCard({
                 height: '100%',
                 width: `${progress}%`,
                 background: affordable
-                  ? 'linear-gradient(to right, #ffe57a, #f4b400)'
+                  ? 'linear-gradient(to right, var(--accent-gold-light), var(--accent-gold))'
                   : 'linear-gradient(to right, #ddd0a0, #c8a830)',
                 transition: 'width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)',
                 boxShadow:
