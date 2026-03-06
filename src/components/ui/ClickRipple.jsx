@@ -8,7 +8,7 @@ function ClickRipple({ effect }) {
         width: 50,
         height: 50,
         borderRadius: '50%',
-        border: '3px solid rgba(255, 200, 0, 0.9)',
+        border: '3px solid var(--ripple-color)',
         pointerEvents: 'none',
         zIndex: 20,
         animation: 'ripple 0.6s ease-out forwards',

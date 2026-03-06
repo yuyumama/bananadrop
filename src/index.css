@@ -19,6 +19,53 @@
   --glass-border: rgba(255, 255, 255, 0.8);
   --shadow-soft: 0 8px 32px 0 rgba(132, 122, 100, 0.15);
 
+  /* Gold variants */
+  --accent-gold-dark: #b8860b;
+  --accent-gold-light: #ffe066;
+  --accent-gold-glow: rgba(212, 175, 55, 0.25);
+
+  /* Special banana type colors */
+  --special-nui: #ff8c00;
+  --special-nui-light: rgba(255, 140, 0, 0.15);
+  --special-magic: #9333ea;
+  --special-magic-light: #a855f7;
+  --special-blackhole: #3b82f6;
+  --special-blackhole-dark: #1e3a5f;
+  --special-onekind: #e11d48;
+
+  /* Status colors */
+  --status-maxed: #4caf50;
+  --status-maxed-light: #8bc34a;
+  --status-maxed-bg: rgba(76, 175, 80, 0.1);
+  --status-maxed-border: rgba(76, 175, 80, 0.35);
+
+  /* Tree stage greens */
+  --tree-green-1: #8bc34a;
+  --tree-green-2: #7cb342;
+  --tree-green-3: #558b2f;
+  --tree-green-4: #4caf50;
+  --tree-green-5: #388e3c;
+  --tree-green-6: #a5d240;
+
+  /* Progress & disabled */
+  --progress-bg: rgba(0, 0, 0, 0.07);
+  --disabled-bg: #f5f5f5;
+  --disabled-text: #bbb;
+
+  /* Pending / skill-unlock state */
+  --pending-orange: #ff9800;
+  --pending-orange-dark: #f57c00;
+  --pending-orange-light: #ffb74d;
+
+  /* Shop effect text colors */
+  --effect-spawn-chance: #1e3a5f;
+  --effect-spawn-chance-next: #3b82f6;
+  --effect-onekind: #0369a1;
+  --effect-onekind-next: #0284c7;
+
+  /* Ripple color */
+  --ripple-color: rgba(255, 200, 0, 0.9);
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -126,7 +173,7 @@ body {
   opacity: 0.4;
   cursor: not-allowed;
   filter: grayscale(1);
-  background: #f5f5f5;
+  background: var(--disabled-bg);
   border-color: #ddd;
 }
 
