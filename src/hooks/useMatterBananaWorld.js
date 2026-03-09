@@ -257,37 +257,42 @@ export default function useMatterBananaWorld({
     const runner = Runner.create();
     Runner.run(runner, engine);
 
-    // BANANA テキストリビール
-    const bananaCapture = document.createElement('canvas');
-    const textWork = document.createElement('canvas');
-    bananaCapture.width = window.innerWidth;
-    bananaCapture.height = window.innerHeight;
-    textWork.width = window.innerWidth;
-    textWork.height = window.innerHeight;
-    const captureCtx = bananaCapture.getContext('2d');
-    const textCtx = textWork.getContext('2d');
+    // BANANA テキストリビール（最適化版）
+    // テキストマスクはリサイズ時のみ再描画し、毎フレームではキャッシュを使い回す
+    const textMask = document.createElement('canvas');
+    const workCanvas = document.createElement('canvas');
+    textMask.width = window.innerWidth;
+    textMask.height = window.innerHeight;
+    workCanvas.width = window.innerWidth;
+    workCanvas.height = window.innerHeight;
+    const maskCtx = textMask.getContext('2d');
+    const workCtx = workCanvas.getContext('2d');
+
+    const drawTextMask = (w, h) => {
+      maskCtx.clearRect(0, 0, w, h);
+      maskCtx.font = `900 ${w * 0.18}px "Outfit", sans-serif`;
+      maskCtx.fillStyle = 'rgba(74, 74, 74, 0.95)';
+      maskCtx.textAlign = 'center';
+      maskCtx.textBaseline = 'middle';
+      // ツリーパネル（幅160px + 左24px = 約200px）との重なりを回避するため、やや右寄りに配置
+      const textX = w * 0.55;
+      maskCtx.fillText('BANANA', textX, h / 2);
+    };
+    drawTextMask(window.innerWidth, window.innerHeight);
 
     Matter.Events.on(render, 'afterRender', () => {
       const ctx = render.context;
       const w = render.canvas.width;
       const h = render.canvas.height;
 
-      captureCtx.clearRect(0, 0, w, h);
-      captureCtx.drawImage(render.canvas, 0, 0);
-
-      textCtx.clearRect(0, 0, w, h);
-      textCtx.globalCompositeOperation = 'source-over';
-      textCtx.font = `900 ${w * 0.18}px "Outfit", sans-serif`;
-      textCtx.fillStyle = 'rgba(74, 74, 74, 0.95)'; // var(--text-main) equivalent
-      textCtx.textAlign = 'center';
-      textCtx.textBaseline = 'middle';
-      // ツリーパネル（幅160px + 左24px = 約200px）との重なりを回避するため、やや右寄りに配置
-      const textX = w * 0.55;
-      textCtx.fillText('BANANA', textX, h / 2);
-      textCtx.globalCompositeOperation = 'destination-in';
-      textCtx.drawImage(bananaCapture, 0, 0);
-      textCtx.globalCompositeOperation = 'source-over';
-      ctx.drawImage(textWork, 0, 0);
+      // テキストマスクを描画し、バナナ画像でクリップ（1回のdrawImage合成）
+      workCtx.clearRect(0, 0, w, h);
+      workCtx.globalCompositeOperation = 'source-over';
+      workCtx.drawImage(textMask, 0, 0);
+      workCtx.globalCompositeOperation = 'destination-in';
+      workCtx.drawImage(render.canvas, 0, 0);
+      workCtx.globalCompositeOperation = 'source-over';
+      ctx.drawImage(workCanvas, 0, 0);
 
       // デバッグ: 当たり判定のポリゴン輪郭を描画
       if (showCollisionBoundsRef && showCollisionBoundsRef.current) {
@@ -370,8 +375,26 @@ export default function useMatterBananaWorld({
       const w = window.innerWidth;
       const h = window.innerHeight;
 
+      // 1ループで3種を分類（filter×3 → forEach×1 に削減）
+      const bananas = [];
+      const specials = [];
+      const coins = [];
+      for (let i = 0; i < bodies.length; i++) {
+        const b = bodies[i];
+        switch (b.label) {
+          case 'banana':
+            bananas.push(b);
+            break;
+          case 'special_banana':
+            specials.push(b);
+            break;
+          case 'coin':
+            coins.push(b);
+            break;
+        }
+      }
+
       // 通常バナナ
-      const bananas = bodies.filter((b) => b.label === 'banana');
       const { scoreItems, scoredBodies, lostBodies } = collectBananaOutcome({
         bananas,
         screenWidth: w,
@@ -382,8 +405,8 @@ export default function useMatterBananaWorld({
       if (scoreItems.length > 0) onScoreRef.current?.(scoreItems);
 
       // 特殊バナナ：画面下に落ちたら効果発動、横に出たら消去
-      const specials = bodies.filter((b) => b.label === 'special_banana');
-      specials.forEach((b) => {
+      for (let i = 0; i < specials.length; i++) {
+        const b = specials[i];
         if (b.position.y > h + 200) {
           Composite.remove(engine.world, b);
           onEffectRef.current?.(b.shopItemId, {
@@ -393,27 +416,28 @@ export default function useMatterBananaWorld({
         } else if (b.position.x < -200 || b.position.x > w + 200) {
           Composite.remove(engine.world, b);
         }
-      });
+      }
 
       // バナコイン：画面下に落ちたら収集、横に出たら消去
-      const coins = bodies.filter((b) => b.label === 'coin');
-      coins.forEach((coin) => {
+      for (let i = 0; i < coins.length; i++) {
+        const coin = coins[i];
         if (coin.position.y > h + 100) {
           Composite.remove(engine.world, coin);
           onCoinRef.current?.(coin.position.x);
         } else if (coin.position.x < -200 || coin.position.x > w + 200) {
           Composite.remove(engine.world, coin);
         }
-      });
+      }
     });
 
     const handleResize = () => {
       render.canvas.width = window.innerWidth;
       render.canvas.height = window.innerHeight;
-      bananaCapture.width = window.innerWidth;
-      bananaCapture.height = window.innerHeight;
-      textWork.width = window.innerWidth;
-      textWork.height = window.innerHeight;
+      textMask.width = window.innerWidth;
+      textMask.height = window.innerHeight;
+      workCanvas.width = window.innerWidth;
+      workCanvas.height = window.innerHeight;
+      drawTextMask(window.innerWidth, window.innerHeight);
 
       if (tableRef.current) {
         Composite.remove(engine.world, tableRef.current);

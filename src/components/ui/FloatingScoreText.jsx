@@ -21,6 +21,8 @@ function FloatingScoreText({ text, color }) {
         color,
         pointerEvents: 'none',
         animation: 'floatUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+        willChange: 'transform, opacity',
+        contain: 'layout style',
         textShadow:
           '0 2px 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 215, 0, 0.4)',
         display: 'flex',
