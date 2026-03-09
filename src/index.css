@@ -100,6 +100,14 @@ body {
   border-radius: 16px;
 }
 
+/* ツリーパネル内スキルセクションのスクロールバーを非表示 */
+.glass-panel *::-webkit-scrollbar {
+  display: none;
+}
+.glass-panel * {
+  scrollbar-width: none;
+}
+
 /* バナナドラッグ中はUI要素がマウスイベントを奪わないようにする */
 .banana-dragging .glass-panel,
 .banana-dragging .banana-ui-block {
