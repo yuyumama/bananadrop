@@ -26,6 +26,11 @@ const pickOneKindSelection = (unlockedTiers) => {
 
 let _textId = 0;
 
+const MAX_FLOATING_TEXTS = 15;
+const MAX_CLICK_EFFECTS = 5;
+const MAX_SPAWN_FLASHES = 3;
+const MAX_FEVER_BURSTS = 3;
+
 function App() {
   const [score, setScore] = useState(0);
   const {
@@ -172,6 +177,10 @@ function App() {
     return () => clearInterval(id);
   }, []);
 
+  // スコアテキストをフレーム単位でバッチ集約し、DOM要素数を削減
+  const scoreBatchRef = useRef([]);
+  const scoreRafRef = useRef(0);
+
   const handleScore = useCallback((scoreItems) => {
     const total = scoreItems.reduce((sum, item) => sum + item.score, 0);
     setScore((s) => s + total);
@@ -179,22 +188,62 @@ function App() {
     setScoreBump(true);
     setTimeout(() => setScoreBump(false), 300);
 
-    const newTexts = scoreItems.map((item) => ({
-      id: ++_textId,
-      value: item.score,
-      tier: item.tier,
-      x: Math.max(40, Math.min(window.innerWidth - 40, item.x)),
-    }));
-    setFloatingTexts((prev) => [...prev, ...newTexts]);
-    setTimeout(() => {
-      const ids = new Set(newTexts.map((t) => t.id));
-      setFloatingTexts((prev) => prev.filter((t) => !ids.has(t.id)));
-    }, 1200);
+    // バッチに追加し、次フレームでまとめてDOM生成
+    scoreBatchRef.current.push(...scoreItems);
+    if (!scoreRafRef.current) {
+      scoreRafRef.current = requestAnimationFrame(() => {
+        scoreRafRef.current = 0;
+        const batch = scoreBatchRef.current;
+        scoreBatchRef.current = [];
+        if (batch.length === 0) return;
+
+        // 同フレーム内のスコアをX位置で近いもの同士にまとめる（最大8個）
+        const merged = [];
+        const sorted = batch.sort((a, b) => a.x - b.x);
+        let current = { ...sorted[0] };
+        for (let i = 1; i < sorted.length; i++) {
+          const item = sorted[i];
+          if (Math.abs(item.x - current.x) < 60 && merged.length < 7) {
+            current.score += item.score;
+          } else {
+            merged.push(current);
+            current = { ...item };
+          }
+        }
+        merged.push(current);
+        // 最大8個に制限
+        const limited = merged.length > 8 ? merged.slice(0, 8) : merged;
+
+        const newTexts = limited.map((item) => ({
+          id: ++_textId,
+          value: item.score,
+          tier: item.tier,
+          x: Math.max(40, Math.min(window.innerWidth - 40, item.x)),
+        }));
+
+        setFloatingTexts((prev) => {
+          const combined = [...prev, ...newTexts];
+          // 同時表示上限を超えた分は古いものから削除
+          return combined.length > MAX_FLOATING_TEXTS
+            ? combined.slice(combined.length - MAX_FLOATING_TEXTS)
+            : combined;
+        });
+        setTimeout(() => {
+          const ids = new Set(newTexts.map((t) => t.id));
+          setFloatingTexts((prev) => prev.filter((t) => !ids.has(t.id)));
+        }, 1200);
+      });
+    }
   }, []);
 
   const handleClick = useCallback((e) => {
     const id = ++_textId;
-    setClickEffects((prev) => [...prev, { id, x: e.clientX, y: e.clientY }]);
+    setClickEffects((prev) => {
+      const next = [...prev, { id, x: e.clientX, y: e.clientY }];
+      return next.length > MAX_CLICK_EFFECTS
+        ? next.slice(next.length - MAX_CLICK_EFFECTS)
+        : next;
+    });
     setTimeout(
       () => setClickEffects((prev) => prev.filter((ef) => ef.id !== id)),
       600,
@@ -204,7 +253,12 @@ function App() {
   // 特殊バナナがスポーンしたときのエフェクト
   const handleSpecialSpawn = useCallback((x, itemId) => {
     const id = ++_textId;
-    setSpawnFlashes((prev) => [...prev, { id, x, itemId }]);
+    setSpawnFlashes((prev) => {
+      const next = [...prev, { id, x, itemId }];
+      return next.length > MAX_SPAWN_FLASHES
+        ? next.slice(next.length - MAX_SPAWN_FLASHES)
+        : next;
+    });
     setTimeout(
       () => setSpawnFlashes((prev) => prev.filter((f) => f.id !== id)),
       1200,
@@ -225,10 +279,12 @@ function App() {
 
       if (pos) {
         const burstId = ++_textId;
-        setFeverBursts((prev) => [
-          ...prev,
-          { id: burstId, x: pos.x, y: pos.y, itemId },
-        ]);
+        setFeverBursts((prev) => {
+          const next = [...prev, { id: burstId, x: pos.x, y: pos.y, itemId }];
+          return next.length > MAX_FEVER_BURSTS
+            ? next.slice(next.length - MAX_FEVER_BURSTS)
+            : next;
+        });
         setTimeout(
           () => setFeverBursts((prev) => prev.filter((b) => b.id !== burstId)),
           1100,
@@ -591,6 +647,8 @@ function App() {
             pointerEvents: 'none',
             animation:
               'floatUpFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+            willChange: 'transform, opacity',
+            contain: 'layout style',
             textShadow:
               '0 2px 10px rgba(255,215,0,0.6), 0 0 20px rgba(255,215,0,0.3)',
             display: 'flex',

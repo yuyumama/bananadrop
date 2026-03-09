@@ -35,7 +35,7 @@ function SpawnFlash({ flash }) {
 
   // 上品ながらも派手に広がる多めのパーティクル
   const [particles] = useState(() =>
-    Array.from({ length: 16 }).map((_, i) => ({
+    Array.from({ length: 6 }).map((_, i) => ({
       id: i,
       ox: (Math.random() - 0.5) * 80,
       oy: Math.random() * 80 + 20,
@@ -56,6 +56,7 @@ function SpawnFlash({ flash }) {
           background: `radial-gradient(circle at 50% 20%, rgba(${main},0.3) 0%, transparent 75%)`,
           pointerEvents: 'none',
           zIndex: 19,
+          willChange: 'opacity',
           animation:
             'elegantFade 1.0s cubic-bezier(0.25, 0.1, 0.25, 1) forwards',
         }}
@@ -178,6 +179,7 @@ function SpawnFlash({ flash }) {
             '--ox': `${p.ox}px`,
             '--oy': `${p.oy}px`,
             '--sway': `${p.sway}px`,
+            willChange: 'transform, opacity',
             animation: `elegantRise ${p.duration}s cubic-bezier(0.4, 0, 0.2, 1) ${p.delay}s forwards`,
             opacity: 0,
           }}
