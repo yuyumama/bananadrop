@@ -125,20 +125,9 @@ const BananaWorld = forwardRef(
       ],
     );
 
-    const spawnBananaWithCheck = useCallback(
+    // 通常スポーン（oneKind判定 + 通常ランダム）
+    const spawnNormal = useCallback(
       (x) => {
-        // デバッグモード: 固定バナナが選択されている場合
-        const forced = debugForcedBananaRef.current;
-        if (forced) {
-          if (forced.type === 'tier') {
-            spawnBanana(x, [forced.tier]);
-          } else if (forced.type === 'special') {
-            spawnSpecialBanana(x, forced.item);
-            onSpecialSpawnRef.current?.(x, forced.item.id);
-          }
-          return;
-        }
-
         const selection = isOneKindRef.current
           ? oneKindSelectionRef.current
           : null;
@@ -164,11 +153,35 @@ const BananaWorld = forwardRef(
         isOneKindRef,
         oneKindSelectionRef,
         onSpecialSpawnRef,
+      ],
+    );
+
+    // 手動クリック用: デバッグ固定バナナを優先、なければ通常スポーン
+    const spawnBananaWithCheck = useCallback(
+      (x) => {
+        const forced = debugForcedBananaRef.current;
+        if (forced) {
+          if (forced.type === 'tier') {
+            spawnBanana(x, [forced.tier]);
+          } else if (forced.type === 'special') {
+            spawnSpecialBanana(x, forced.item);
+            onSpecialSpawnRef.current?.(x, forced.item.id);
+          }
+          return;
+        }
+        spawnNormal(x);
+      },
+      [
+        spawnBanana,
+        spawnSpecialBanana,
+        spawnNormal,
+        onSpecialSpawnRef,
         debugForcedBananaRef,
       ],
     );
 
-    useAutoSpawn({ autoSpawnRate, spawnBanana: spawnBananaWithCheck });
+    // オートスポーンはデバッグ選択を無視し、常に通常スポーンを使用
+    useAutoSpawn({ autoSpawnRate, spawnBanana: spawnNormal });
 
     const handleDataClick = (e) => {
       const x = resolvePointerX(e);
