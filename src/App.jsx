@@ -203,7 +203,7 @@ function App() {
         let current = { ...sorted[0] };
         for (let i = 1; i < sorted.length; i++) {
           const item = sorted[i];
-          if (Math.abs(item.x - current.x) < 60 && merged.length < 7) {
+          if (Math.abs(item.x - current.x) < 60) {
             current.score += item.score;
           } else {
             merged.push(current);
