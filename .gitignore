@@ -15,6 +15,13 @@ dist-ssr
 # Claude Code
 .claude/
 
+# Terraform
+infra/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
