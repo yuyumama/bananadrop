@@ -15,6 +15,9 @@ dist-ssr
 # Claude Code
 .claude/
 
+# Terraform
+infra/.terraform/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
