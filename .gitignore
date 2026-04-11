@@ -17,6 +17,10 @@ dist-ssr
 
 # Terraform
 infra/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
 
 # Editor directories and files
 .vscode/*

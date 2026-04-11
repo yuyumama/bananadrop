@@ -61,9 +61,12 @@ jobs:
           PLAN_OUTPUT: ${{ steps.plan.outputs.stdout }}
         with:
           script: |
-            const plan = (process.env.PLAN_OUTPUT || '').slice(0, 60000);
+            const fullPlan = process.env.PLAN_OUTPUT || '';
+            const truncated = fullPlan.length > 60000;
+            const plan = fullPlan.slice(0, 60000);
             const body = [
               '#### Terraform Plan',
+              truncated ? '⚠️ Plan output was truncated (exceeds 60,000 characters)' : '',
               '<details><summary>Show Plan</summary>',
               '',
               '```',
@@ -71,7 +74,7 @@ jobs:
               '```',
               '',
               '</details>',
-            ].join('\n');
+            ].filter(Boolean).join('\n');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
