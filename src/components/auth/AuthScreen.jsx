@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
@@ -72,16 +72,27 @@ export default function AuthScreen() {
   const [confirmEmail, setConfirmEmail] = useState('');
   const [slideDir, setSlideDir] = useState('none');
   const cardRef = useRef(null);
+  const transitionTimers = useRef([]);
 
-  const animateTransition = (newView, dir) => {
+  useEffect(() => {
+    return () => {
+      transitionTimers.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  const animateTransition = useCallback((newView, dir) => {
+    transitionTimers.current.forEach(clearTimeout);
+    transitionTimers.current = [];
     setSlideDir(dir);
     setError('');
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       setView(newView);
       setSlideDir(dir === 'left' ? 'enter-right' : 'enter-left');
-      setTimeout(() => setSlideDir('none'), 300);
+      const t2 = setTimeout(() => setSlideDir('none'), 300);
+      transitionTimers.current.push(t2);
     }, 200);
-  };
+    transitionTimers.current.push(t1);
+  }, []);
 
   const handleSignIn = async (email, password) => {
     setError('');

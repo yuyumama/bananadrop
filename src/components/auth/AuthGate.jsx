@@ -6,7 +6,12 @@ export default function AuthGate({ children }) {
 
   if (isLoading) {
     return (
-      <div style={styles.loading}>
+      <div
+        role="status"
+        aria-live="polite"
+        aria-label="読み込み中"
+        style={styles.loading}
+      >
         <div style={styles.loaderWrap}>
           <img
             src={`${import.meta.env.BASE_URL}banana_gold_01.png`}

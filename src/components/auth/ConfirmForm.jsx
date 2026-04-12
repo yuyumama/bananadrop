@@ -71,13 +71,13 @@ export default function ConfirmForm({ email, onSubmit, onBack, error }) {
       </div>
 
       {error && (
-        <div style={styles.error}>
+        <div id="confirm-code-error" role="alert" style={styles.error}>
           <span style={styles.errorIcon}>!</span>
           {error}
         </div>
       )}
 
-      <div style={styles.codeRow}>
+      <div role="group" aria-label="認証コード（6桁）" style={styles.codeRow}>
         {digits.map((digit, i) => (
           <input
             key={i}
@@ -88,6 +88,9 @@ export default function ConfirmForm({ email, onSubmit, onBack, error }) {
             value={digit}
             onChange={(e) => handleDigitChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
+            aria-label={`認証コード ${i + 1} 桁目`}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'confirm-code-error' : undefined}
             style={{
               ...styles.codeInput,
               borderColor: digit

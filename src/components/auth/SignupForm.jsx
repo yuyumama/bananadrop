@@ -44,14 +44,16 @@ export default function SignupForm({ onSubmit, onSwitchToLogin, error }) {
   return (
     <form onSubmit={handleSubmit} style={styles.form}>
       {displayError && (
-        <div style={styles.error}>
+        <div role="alert" style={styles.error}>
           <span style={styles.errorIcon}>!</span>
           {displayError}
         </div>
       )}
 
       <div style={styles.fieldGroup}>
-        <label style={styles.label}>メールアドレス</label>
+        <label htmlFor="signup-email" style={styles.label}>
+          メールアドレス
+        </label>
         <div
           style={{
             ...styles.inputWrap,
@@ -60,12 +62,14 @@ export default function SignupForm({ onSubmit, onSwitchToLogin, error }) {
         >
           <span style={styles.inputIcon}>✉</span>
           <input
+            id="signup-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setFocusedField('email')}
             onBlur={() => setFocusedField(null)}
             required
+            autoComplete="email"
             style={styles.input}
             placeholder="banana@example.com"
           />
@@ -73,7 +77,9 @@ export default function SignupForm({ onSubmit, onSwitchToLogin, error }) {
       </div>
 
       <div style={styles.fieldGroup}>
-        <label style={styles.label}>パスワード</label>
+        <label htmlFor="signup-password" style={styles.label}>
+          パスワード
+        </label>
         <div
           style={{
             ...styles.inputWrap,
@@ -82,13 +88,18 @@ export default function SignupForm({ onSubmit, onSwitchToLogin, error }) {
         >
           <span style={styles.inputIcon}>🔒</span>
           <input
+            id="signup-password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (localError) setLocalError('');
+            }}
             onFocus={() => setFocusedField('password')}
             onBlur={() => setFocusedField(null)}
             required
             minLength={8}
+            autoComplete="new-password"
             style={styles.input}
             placeholder="8文字以上"
           />
@@ -122,7 +133,9 @@ export default function SignupForm({ onSubmit, onSwitchToLogin, error }) {
       </div>
 
       <div style={styles.fieldGroup}>
-        <label style={styles.label}>パスワード（確認）</label>
+        <label htmlFor="signup-confirm-password" style={styles.label}>
+          パスワード（確認）
+        </label>
         <div
           style={{
             ...styles.inputWrap,
@@ -131,9 +144,13 @@ export default function SignupForm({ onSubmit, onSwitchToLogin, error }) {
         >
           <span style={styles.inputIcon}>🔒</span>
           <input
+            id="signup-confirm-password"
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (localError) setLocalError('');
+            }}
             onFocus={() => setFocusedField('confirm')}
             onBlur={() => setFocusedField(null)}
             required
