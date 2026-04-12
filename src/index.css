@@ -821,33 +821,8 @@ body {
   }
 }
 
-/* ── Responsive: small screens ── */
+/* ── Responsive: small screens (global classes only) ── */
 @media (max-width: 768px) {
-  .score-display {
-    top: 12px !important;
-    left: 12px !important;
-    padding: 10px 14px !important;
-  }
-
-  .score-display .score-value {
-    font-size: 1.1rem !important;
-  }
-
-  .shop-button {
-    top: 12px !important;
-    right: 12px !important;
-    padding: 8px 12px !important;
-  }
-
-  .shop-button .shop-coin-icon {
-    width: 28px !important;
-    height: 28px !important;
-  }
-
-  .shop-button .shop-coin-balance {
-    font-size: 1rem !important;
-  }
-
   .banana-tree-panel {
     top: 90px !important;
     left: 8px !important;
@@ -878,28 +853,6 @@ body {
     height: 18px !important;
   }
 
-  .upgrade-panel {
-    gap: 4px !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-  }
-
-  .upgrade-panel .upgrade-card-header-name {
-    font-size: 0.5rem !important;
-  }
-
-  .upgrade-panel .upgrade-card-body-label {
-    font-size: 0.52rem !important;
-  }
-
-  .upgrade-panel .upgrade-card-body-next {
-    font-size: 0.68rem !important;
-  }
-
-  .upgrade-panel .upgrade-card-cost-pill {
-    font-size: 0.56rem !important;
-  }
-
   .skill-choose-panel {
     width: 160px !important;
   }
@@ -915,7 +868,7 @@ body {
   }
 }
 
-/* ── Responsive: very small screens ── */
+/* ── Responsive: very small screens (global classes only) ── */
 @media (max-width: 480px) {
   .banana-tree-panel {
     top: 80px !important;
@@ -966,15 +919,6 @@ body {
 
   .unlocked-tiers-panel .tier-score {
     display: none !important;
-  }
-
-  .shop-button .shop-label,
-  .shop-button .shop-divider {
-    display: none !important;
-  }
-
-  .score-display .per-second-label {
-    font-size: 0.55rem !important;
   }
 
   .logout-button {

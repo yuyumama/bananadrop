@@ -18,6 +18,9 @@ dist-ssr
 # Claude Code
 .claude/
 
+# Playwright MCP
+.playwright-mcp/
+
 # Terraform
 infra/.terraform/
 *.tfstate

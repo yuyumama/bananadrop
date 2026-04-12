@@ -21,27 +21,15 @@ function UpgradeGroupCard({
 
   return (
     <div className={styles.wrapper}>
-      <div
+      <button
         className={styles.card}
-        role={nextItem && affordable ? 'button' : undefined}
-        tabIndex={nextItem && affordable ? 0 : undefined}
+        disabled={!nextItem || !affordable}
         aria-label={
           isMaxed
             ? `${group.label} - 最大レベル`
             : nextItem
               ? `${group.label} Lv.${level} → ${nextItem.label}、コスト: ${nextItem.cost.toLocaleString()}`
               : undefined
-        }
-        onKeyDown={
-          nextItem && affordable
-            ? (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onBuy(nextItem);
-                }
-              }
-            : undefined
         }
         style={{
           border: `1.5px solid ${
@@ -66,14 +54,10 @@ function UpgradeGroupCard({
               ? 'upgradeGlow 2.4s ease-in-out infinite'
               : 'none',
         }}
-        onClick={
-          nextItem && affordable
-            ? (e) => {
-                e.stopPropagation();
-                onBuy(nextItem);
-              }
-            : undefined
-        }
+        onClick={(e) => {
+          e.stopPropagation();
+          if (nextItem && affordable) onBuy(nextItem);
+        }}
         onMouseEnter={(e) => {
           if (!affordable || !nextItem) return;
           e.currentTarget.style.transform = 'translateY(-2px)';
@@ -205,7 +189,7 @@ function UpgradeGroupCard({
             />
           </div>
         )}
-      </div>
+      </button>
     </div>
   );
 }

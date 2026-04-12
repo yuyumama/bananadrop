@@ -32,7 +32,7 @@ function UnlockedBananaTiers({
     onekindBananaCount > 0;
 
   return (
-    <nav
+    <aside
       className="banana-ui-block unlocked-tiers-panel"
       aria-label="解放済みバナナ一覧"
       style={{
@@ -291,7 +291,7 @@ function UnlockedBananaTiers({
           </div>
         ))}
       </div>
-    </nav>
+    </aside>
   );
 }
 

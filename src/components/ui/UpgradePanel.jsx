@@ -4,7 +4,7 @@ import styles from './UpgradePanel.module.css';
 
 function UpgradePanel({ groups, purchased, score, onBuy, devMode }) {
   return (
-    <nav
+    <section
       className={`glass-panel upgrade-panel ${styles.root}`}
       aria-label="アップグレード"
     >
@@ -31,7 +31,7 @@ function UpgradePanel({ groups, purchased, score, onBuy, devMode }) {
           />
         );
       })}
-    </nav>
+    </section>
   );
 }
 

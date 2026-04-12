@@ -11,7 +11,7 @@ export default function ShopButton({ banaCoins, onOpen }) {
       <img
         className={`shop-coin-icon ${styles.coinIcon}`}
         src={`${import.meta.env.BASE_URL}coin.png`}
-        alt=""
+        alt="バナコイン"
       />
 
       <div className={styles.balanceColumn}>

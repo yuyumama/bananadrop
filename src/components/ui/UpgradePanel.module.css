@@ -1,0 +1,25 @@
+.root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding-top: 6px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 8px;
+  border-radius: 16px 16px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: none;
+}
+
+/* ── Responsive: small screens ── */
+@media (max-width: 768px) {
+  .root {
+    gap: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+}

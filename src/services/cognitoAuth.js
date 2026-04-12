@@ -15,6 +15,8 @@ const userPool = isCognitoConfigured
   : null;
 
 export function signUp(email, password) {
+  if (!userPool) return Promise.reject(new Error('Cognito is not configured'));
+
   return new Promise((resolve, reject) => {
     const attributes = [
       new CognitoUserAttribute({ Name: 'email', Value: email }),
@@ -28,6 +30,8 @@ export function signUp(email, password) {
 }
 
 export function confirmSignUp(email, code) {
+  if (!userPool) return Promise.reject(new Error('Cognito is not configured'));
+
   const cognitoUser = new CognitoUser({
     Username: email,
     Pool: userPool,
@@ -42,6 +46,8 @@ export function confirmSignUp(email, code) {
 }
 
 export function signIn(email, password) {
+  if (!userPool) return Promise.reject(new Error('Cognito is not configured'));
+
   const cognitoUser = new CognitoUser({
     Username: email,
     Pool: userPool,
@@ -61,6 +67,8 @@ export function signIn(email, password) {
 }
 
 export function signOut() {
+  if (!userPool) return;
+
   const cognitoUser = userPool.getCurrentUser();
   if (cognitoUser) {
     cognitoUser.signOut();
@@ -68,6 +76,8 @@ export function signOut() {
 }
 
 export function getCurrentSession() {
+  if (!userPool) return Promise.resolve(null);
+
   return new Promise((resolve, reject) => {
     const cognitoUser = userPool.getCurrentUser();
     if (!cognitoUser) return resolve(null);
@@ -81,5 +91,7 @@ export function getCurrentSession() {
 }
 
 export function getCurrentUser() {
+  if (!userPool) return null;
+
   return userPool.getCurrentUser();
 }
