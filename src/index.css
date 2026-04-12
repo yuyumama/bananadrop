@@ -97,7 +97,7 @@ body {
 }
 
 /* Auth screen animations */
-@keyframes bananaFall {
+@keyframes banana-fall {
   0% {
     transform: translateY(0) rotate(var(--r, 0deg));
     opacity: 0;
@@ -117,7 +117,7 @@ body {
   }
 }
 
-@keyframes bananaFloat {
+@keyframes banana-float {
   0%,
   100% {
     transform: translateY(0) rotate(-8deg);
@@ -128,7 +128,7 @@ body {
   }
 }
 
-@keyframes loaderPulse {
+@keyframes loader-pulse {
   0%,
   100% {
     transform: scaleX(1);
@@ -141,7 +141,7 @@ body {
   }
 }
 
-@keyframes authSlideInRight {
+@keyframes auth-slide-in-right {
   from {
     transform: translateX(20px);
     opacity: 0;
@@ -153,7 +153,7 @@ body {
   }
 }
 
-@keyframes authSlideInLeft {
+@keyframes auth-slide-in-left {
   from {
     transform: translateX(-20px);
     opacity: 0;
@@ -195,7 +195,7 @@ body {
   border: 1px solid var(--accent-gold-soft);
   padding: 8px 16px;
   border-radius: 8px;
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -945,7 +945,7 @@ body {
   color: var(--text-muted);
   font-size: 0.6rem;
   font-weight: 700;
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);

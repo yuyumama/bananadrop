@@ -28,7 +28,7 @@ function FallingBanana({ delay, left, duration, size, rotation, image }) {
         height: 'auto',
         opacity: 0.35,
         pointerEvents: 'none',
-        animation: `bananaFall ${duration}s linear ${delay}s infinite`,
+        animation: `banana-fall ${duration}s linear ${delay}s infinite`,
         transform: `rotate(${rotation}deg)`,
         filter: 'blur(1px)',
       }}
@@ -225,7 +225,7 @@ const styles = {
   heroImg: {
     width: '72px',
     height: 'auto',
-    animation: 'bananaFloat 3s ease-in-out infinite',
+    animation: 'banana-float 3s ease-in-out infinite',
   },
   titleWrap: {
     textAlign: 'center',
@@ -271,9 +271,9 @@ const styles = {
     opacity: 0,
   },
   slideInRight: {
-    animation: 'authSlideInRight 0.3s ease forwards',
+    animation: 'auth-slide-in-right 0.3s ease forwards',
   },
   slideInLeft: {
-    animation: 'authSlideInLeft 0.3s ease forwards',
+    animation: 'auth-slide-in-left 0.3s ease forwards',
   },
 };

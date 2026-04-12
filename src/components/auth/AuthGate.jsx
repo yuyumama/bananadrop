@@ -44,7 +44,7 @@ const styles = {
   loaderBanana: {
     width: '48px',
     height: 'auto',
-    animation: 'bananaFloat 1.5s ease-in-out infinite',
+    animation: 'banana-float 1.5s ease-in-out infinite',
     filter: 'drop-shadow(0 6px 12px rgba(212, 175, 55, 0.3))',
   },
   loaderDot: {
@@ -52,6 +52,6 @@ const styles = {
     height: '4px',
     borderRadius: '2px',
     background: 'rgba(212, 175, 55, 0.2)',
-    animation: 'loaderPulse 1.5s ease-in-out infinite',
+    animation: 'loader-pulse 1.5s ease-in-out infinite',
   },
 };

@@ -4,6 +4,7 @@ import styles from './ShopButton.module.css';
 export default function ShopButton({ banaCoins, onOpen }) {
   return (
     <button
+      type="button"
       className={`glass-panel shop-button ${styles.root}`}
       aria-label={`ショップを開く。バナコイン残高: ${banaCoins}`}
       onClick={onOpen}

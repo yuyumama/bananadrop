@@ -376,7 +376,6 @@ function App() {
 
   return (
     <main
-      role="application"
       aria-label="バナナドロップ ゲーム"
       style={{
         position: 'relative',
