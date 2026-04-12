@@ -23,7 +23,10 @@ resource "aws_iam_role" "github_actions_infra" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:${var.github_repo}:ref:refs/heads/main",
+              "repo:${var.github_repo}:pull_request",
+            ]
           }
         }
       }
@@ -112,6 +115,7 @@ resource "aws_iam_role_policy" "infra_resources" {
           "iam:DeleteRole",
           "iam:GetRole",
           "iam:UpdateRole",
+          "iam:UpdateAssumeRolePolicy",
           "iam:PassRole",
           "iam:TagRole",
           "iam:UntagRole",
@@ -125,6 +129,12 @@ resource "aws_iam_role_policy" "infra_resources" {
           "iam:DetachRolePolicy",
         ]
         Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_name}-*"
+      },
+      {
+        Sid      = "CognitoManagement"
+        Effect   = "Allow"
+        Action   = ["cognito-idp:*"]
+        Resource = "arn:aws:cognito-idp:${var.aws_region}:${data.aws_caller_identity.current.account_id}:userpool/*"
       },
     ]
   })
