@@ -22,3 +22,13 @@ output "github_actions_deploy_role_arn" {
   description = "IAM role ARN for deploy.yml"
   value       = aws_iam_role.github_actions_deploy.arn
 }
+
+output "cognito_user_pool_id" {
+  description = "Cognito User Pool ID"
+  value       = aws_cognito_user_pool.main.id
+}
+
+output "cognito_client_id" {
+  description = "Cognito App Client ID"
+  value       = aws_cognito_user_pool_client.spa.id
+}

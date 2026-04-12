@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useAuth } from './hooks/useAuth';
 import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
 import FeverBurst from './components/ui/FeverBurst';
@@ -32,6 +33,7 @@ const MAX_SPAWN_FLASHES = 3;
 const MAX_FEVER_BURSTS = 3;
 
 function App() {
+  const { signOut, user } = useAuth();
   const [score, setScore] = useState(0);
   const {
     bananaPerClick,
@@ -382,6 +384,30 @@ function App() {
       }}
       onClick={handleClick}
     >
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          signOut();
+        }}
+        style={{
+          position: 'fixed',
+          top: 10,
+          right: 10,
+          zIndex: 1000,
+          padding: '6px 14px',
+          borderRadius: '8px',
+          border: '1px solid var(--glass-border)',
+          background: 'var(--glass-bg)',
+          backdropFilter: 'blur(8px)',
+          color: 'var(--text-muted)',
+          fontSize: '12px',
+          fontWeight: 600,
+          cursor: 'pointer',
+        }}
+        title={user?.email}
+      >
+        Logout
+      </button>
       <ScoreDisplay
         score={score}
         perSecond={perSecond}

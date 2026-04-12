@@ -90,6 +90,81 @@ body {
   text-align: center;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Auth screen animations */
+@keyframes bananaFall {
+  0% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 0.35;
+  }
+
+  90% {
+    opacity: 0.35;
+  }
+
+  100% {
+    transform: translateY(110vh) rotate(calc(var(--r, 0deg) + 180deg));
+    opacity: 0;
+  }
+}
+
+@keyframes bananaFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(-4deg);
+  }
+}
+
+@keyframes loaderPulse {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: scaleX(1.8);
+    opacity: 0.6;
+  }
+}
+
+@keyframes authSlideInRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes authSlideInLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* Glassmorphism utility */
 .glass-panel {
   background: var(--glass-bg);
