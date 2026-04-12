@@ -1,5 +1,6 @@
 const SectionLabel = ({ children }) => (
   <div
+    className="section-label"
     style={{
       fontSize: '0.6rem',
       fontWeight: 800,
@@ -31,18 +32,19 @@ function UnlockedBananaTiers({
     onekindBananaCount > 0;
 
   return (
-    <div
-      className="banana-ui-block"
+    <aside
+      className="banana-ui-block unlocked-tiers-panel"
+      aria-label="解放済みバナナ一覧"
       style={{
         position: 'fixed',
-        top: 110,
+        top: 130,
         right: 24,
         zIndex: 10,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'flex-start',
         gap: 12,
-        maxHeight: 'calc(100vh - 110px - 120px)',
+        maxHeight: 'calc(100vh - 120px - 120px)',
       }}
     >
       {/* 特殊アイテムセクション（1体以上購入済みの場合のみ） */}
@@ -58,7 +60,7 @@ function UnlockedBananaTiers({
           <SectionLabel>Special</SectionLabel>
           {nuiBananaCount > 0 && (
             <div
-              className="glass-panel"
+              className="glass-panel tier-card"
               style={{
                 padding: '6px 14px',
                 fontSize: '0.75rem',
@@ -79,8 +81,9 @@ function UnlockedBananaTiers({
               }}
             >
               <img
+                className="tier-icon"
                 src={`${import.meta.env.BASE_URL}banana_nui.png`}
-                alt="ぬいバナナ"
+                alt=""
                 style={{ width: 24, height: 24, objectFit: 'contain' }}
               />
               <span>ぬいバナナ</span>
@@ -100,7 +103,7 @@ function UnlockedBananaTiers({
           )}
           {magicBananaCount > 0 && (
             <div
-              className="glass-panel"
+              className="glass-panel tier-card"
               style={{
                 padding: '6px 14px',
                 fontSize: '0.75rem',
@@ -121,8 +124,9 @@ function UnlockedBananaTiers({
               }}
             >
               <img
+                className="tier-icon"
                 src={`${import.meta.env.BASE_URL}banana_magic.png`}
-                alt="マジックバナナ"
+                alt=""
                 style={{ width: 24, height: 24, objectFit: 'contain' }}
               />
               <span>マジックバナナ</span>
@@ -142,7 +146,7 @@ function UnlockedBananaTiers({
           )}
           {blackholeBananaCount > 0 && (
             <div
-              className="glass-panel"
+              className="glass-panel tier-card"
               style={{
                 padding: '6px 14px',
                 fontSize: '0.75rem',
@@ -159,8 +163,9 @@ function UnlockedBananaTiers({
               }}
             >
               <img
+                className="tier-icon"
                 src={`${import.meta.env.BASE_URL}banana_blackhole.png`}
-                alt="ブラックホールバナナ"
+                alt=""
                 style={{ width: 24, height: 24, objectFit: 'contain' }}
               />
               <span>ブラックホール</span>
@@ -180,7 +185,7 @@ function UnlockedBananaTiers({
           )}
           {onekindBananaCount > 0 && (
             <div
-              className="glass-panel"
+              className="glass-panel tier-card"
               style={{
                 padding: '6px 14px',
                 fontSize: '0.75rem',
@@ -201,8 +206,9 @@ function UnlockedBananaTiers({
               }}
             >
               <img
+                className="tier-icon"
                 src={`${import.meta.env.BASE_URL}banana_onekind.png`}
-                alt="oneバナナ"
+                alt=""
                 style={{ width: 24, height: 24, objectFit: 'contain' }}
               />
               <span>oneバナナ</span>
@@ -238,7 +244,7 @@ function UnlockedBananaTiers({
         {unlockedTiers.map((tier) => (
           <div
             key={tier.tier}
-            className="glass-panel"
+            className="glass-panel tier-card"
             style={{
               padding: '6px 14px',
               fontSize: '0.75rem',
@@ -263,12 +269,14 @@ function UnlockedBananaTiers({
             }}
           >
             <img
+              className="tier-icon"
               src={`${import.meta.env.BASE_URL}${tier.icon}`}
-              alt={tier.name}
+              alt=""
               style={{ width: 24, height: 24, objectFit: 'contain' }}
             />
             <span>{tier.name}</span>
             <span
+              className="tier-score"
               style={{
                 fontSize: '0.65rem',
                 opacity: 0.6,
@@ -283,7 +291,7 @@ function UnlockedBananaTiers({
           </div>
         ))}
       </div>
-    </div>
+    </aside>
   );
 }
 

@@ -129,7 +129,9 @@ export default function BananaTree({
   }, [treeLevel]);
 
   return (
-    <div
+    <section
+      className="banana-tree-panel"
+      aria-label={`バナナツリー レベル${treeLevel} - ${currentStage.label}`}
       style={{
         position: 'fixed',
         top: 130,
@@ -144,7 +146,7 @@ export default function BananaTree({
     >
       {/* ── メインパネル ── */}
       <div
-        className="glass-panel"
+        className="glass-panel banana-tree-main"
         style={{
           padding: '14px 16px',
           display: 'flex',
@@ -173,9 +175,10 @@ export default function BananaTree({
           }}
         >
           <img
+            className="tree-image"
             key={stageIndex}
             src={imgSrc}
-            alt={currentStage.label}
+            alt={`${currentStage.label} ステージのバナナツリー`}
             style={{
               width: 140,
               height: 140,
@@ -189,6 +192,7 @@ export default function BananaTree({
           {/* Stage name + LV badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span
+              className="tree-stage-label"
               style={{
                 fontSize: '0.78rem',
                 fontWeight: 900,
@@ -199,6 +203,7 @@ export default function BananaTree({
               {currentStage.label}
             </span>
             <div
+              className="tree-lv-badge"
               style={{
                 fontSize: '0.58rem',
                 fontWeight: 900,
@@ -247,6 +252,11 @@ export default function BananaTree({
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div
+                role="progressbar"
+                aria-valuenow={Math.round(progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="バナコインまでの進捗"
                 style={{
                   flex: 1,
                   height: 7,
@@ -293,6 +303,8 @@ export default function BananaTree({
             }}
           >
             <button
+              className="water-button"
+              aria-label={`水やり +${waterBoostPercent}%、コスト: ${cost.toLocaleString()} バナナ`}
               onClick={() => canAfford && onWater()}
               disabled={!canAfford}
               style={{
@@ -493,7 +505,9 @@ export default function BananaTree({
       {/* ── スキル選択パネル（ツリーパネルの直下） ── */}
       {pendingChoice && (
         <div
-          className="glass-panel"
+          className="glass-panel skill-choose-panel"
+          role="dialog"
+          aria-label="スキル選択"
           style={{
             width: 192,
             display: 'flex',
@@ -627,6 +641,6 @@ export default function BananaTree({
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

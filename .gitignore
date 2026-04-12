@@ -11,9 +11,15 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
 
 # Claude Code
 .claude/
+
+# Playwright MCP
+.playwright-mcp/
 
 # Terraform
 infra/.terraform/

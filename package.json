@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "amazon-cognito-identity-js": "^6.3.16",
     "jimp": "^1.6.0",
     "lucide-react": "^0.575.0",
     "matter-js": "^0.20.0",

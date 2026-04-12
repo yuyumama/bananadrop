@@ -90,6 +90,81 @@ body {
   text-align: center;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Auth screen animations */
+@keyframes banana-fall {
+  0% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 0.35;
+  }
+
+  90% {
+    opacity: 0.35;
+  }
+
+  100% {
+    transform: translateY(110vh) rotate(calc(var(--r, 0deg) + 180deg));
+    opacity: 0;
+  }
+}
+
+@keyframes banana-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(-4deg);
+  }
+}
+
+@keyframes loader-pulse {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: scaleX(1.8);
+    opacity: 0.6;
+  }
+}
+
+@keyframes auth-slide-in-right {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes auth-slide-in-left {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 /* Glassmorphism utility */
 .glass-panel {
   background: var(--glass-bg);
@@ -120,7 +195,7 @@ body {
   border: 1px solid var(--accent-gold-soft);
   padding: 8px 16px;
   border-radius: 8px;
-  font-family: 'Outfit', sans-serif;
+  font-family: Outfit, sans-serif;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -744,6 +819,149 @@ body {
     transform: scale(1.25);
     opacity: 1;
   }
+}
+
+/* ── Responsive: small screens (global classes only) ── */
+@media (max-width: 768px) {
+  .banana-tree-panel {
+    top: 90px !important;
+    left: 8px !important;
+  }
+
+  .banana-tree-main {
+    width: 120px !important;
+    padding: 10px 10px !important;
+  }
+
+  .banana-tree-main .tree-image {
+    width: 90px !important;
+    height: 90px !important;
+  }
+
+  .unlocked-tiers-panel {
+    top: 90px !important;
+    right: 8px !important;
+  }
+
+  .unlocked-tiers-panel .tier-card {
+    padding: 4px 8px !important;
+    font-size: 0.65rem !important;
+  }
+
+  .unlocked-tiers-panel .tier-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .skill-choose-panel {
+    width: 160px !important;
+  }
+
+  .effect-status-label {
+    font-size: 0.6rem !important;
+    padding: 3px 10px !important;
+  }
+
+  .logout-button {
+    top: 8px !important;
+    right: 12px !important;
+  }
+}
+
+/* ── Responsive: very small screens (global classes only) ── */
+@media (max-width: 480px) {
+  .banana-tree-panel {
+    top: 80px !important;
+    left: 4px !important;
+  }
+
+  .banana-tree-main {
+    width: 100px !important;
+    padding: 8px 6px !important;
+  }
+
+  .banana-tree-main .tree-image {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .banana-tree-main .tree-stage-label {
+    font-size: 0.65rem !important;
+  }
+
+  .banana-tree-main .tree-lv-badge {
+    font-size: 0.5rem !important;
+  }
+
+  .banana-tree-main .water-button {
+    padding: 5px 10px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .unlocked-tiers-panel {
+    top: 80px !important;
+    right: 4px !important;
+  }
+
+  .unlocked-tiers-panel .tier-card {
+    padding: 3px 6px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .unlocked-tiers-panel .section-label {
+    font-size: 0.5rem !important;
+  }
+
+  .unlocked-tiers-panel .tier-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .unlocked-tiers-panel .tier-score {
+    display: none !important;
+  }
+
+  .logout-button {
+    top: 4px !important;
+    right: 8px !important;
+    font-size: 9px !important;
+    padding: 3px 8px !important;
+  }
+}
+
+/* ── Logout button ── */
+.logout-button {
+  position: fixed;
+  top: 12px;
+  right: 24px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: Outfit, sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.logout-button:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-main);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.logout-button:active {
+  transform: scale(0.96);
 }
 
 /* Custom Scrollbar for premium feel */

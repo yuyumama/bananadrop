@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useAuth } from './hooks/useAuth';
 import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
 import FeverBurst from './components/ui/FeverBurst';
@@ -32,6 +33,7 @@ const MAX_SPAWN_FLASHES = 3;
 const MAX_FEVER_BURSTS = 3;
 
 function App() {
+  const { signOut, user, authEnabled } = useAuth();
   const [score, setScore] = useState(0);
   const {
     bananaPerClick,
@@ -373,7 +375,8 @@ function App() {
   const effectiveGiantChance = isAllGiant ? 1 : giantChance;
 
   return (
-    <div
+    <main
+      aria-label="バナナドロップ ゲーム"
       style={{
         position: 'relative',
         width: '100%',
@@ -382,6 +385,34 @@ function App() {
       }}
       onClick={handleClick}
     >
+      {authEnabled && (
+        <button
+          className="logout-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            signOut();
+          }}
+          aria-label={`ログアウト${user?.email ? ` (${user.email})` : ''}`}
+          title={user?.email}
+        >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Logout</span>
+        </button>
+      )}
       <ScoreDisplay
         score={score}
         perSecond={perSecond}
@@ -444,6 +475,9 @@ function App() {
 
           {/* 中央フローティングラベル */}
           <div
+            className="effect-status-label"
+            role="status"
+            aria-label={`ぬいバナナフィーバー 残り${feverRemaining}秒`}
             style={{
               position: 'fixed',
               top: 10,
@@ -467,7 +501,9 @@ function App() {
               letterSpacing: '0.04em',
             }}
           >
-            <span style={{ fontSize: '0.85rem' }}>🔥</span>
+            <span style={{ fontSize: '0.85rem' }} aria-hidden="true">
+              🔥
+            </span>
             <span>ぬいバナナ</span>
             <span
               style={{
@@ -512,6 +548,9 @@ function App() {
             />
           </div>
           <div
+            className="effect-status-label"
+            role="status"
+            aria-label={`マジックバナナ 残り${allGiantRemaining}秒`}
             style={{
               position: 'fixed',
               top: isFever ? 36 : 10,
@@ -535,7 +574,9 @@ function App() {
               letterSpacing: '0.04em',
             }}
           >
-            <span style={{ fontSize: '0.85rem' }}>✨</span>
+            <span style={{ fontSize: '0.85rem' }} aria-hidden="true">
+              ✨
+            </span>
             <span>マジックバナナ</span>
             <span
               style={{
@@ -580,6 +621,9 @@ function App() {
             />
           </div>
           <div
+            className="effect-status-label"
+            role="status"
+            aria-label={`oneバナナ 残り${oneKindRemaining}秒`}
             style={{
               position: 'fixed',
               top: 10 + [isFever, isAllGiant].filter(Boolean).length * 26,
@@ -603,7 +647,9 @@ function App() {
               letterSpacing: '0.04em',
             }}
           >
-            <span style={{ fontSize: '0.85rem' }}>🍌</span>
+            <span style={{ fontSize: '0.85rem' }} aria-hidden="true">
+              🍌
+            </span>
             <span>oneバナナ</span>
             <span
               style={{
@@ -723,7 +769,7 @@ function App() {
         treeMutationRateBonus={treeMutationRateBonus}
         treeCriticalClickChance={treeCriticalClickChance}
       />
-    </div>
+    </main>
   );
 }
 
