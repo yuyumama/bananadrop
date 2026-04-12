@@ -5,14 +5,17 @@ import {
   signIn,
   signOut,
   getCurrentSession,
+  isCognitoConfigured,
 } from '../services/cognitoAuth';
 import { AuthContext } from './authContextValue';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(isCognitoConfigured);
 
   useEffect(() => {
+    if (!isCognitoConfigured) return;
+
     getCurrentSession()
       .then((session) => {
         if (session) {
@@ -53,8 +56,9 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
+        isAuthenticated: !isCognitoConfigured || !!user,
         isLoading,
+        authEnabled: isCognitoConfigured,
         signUp: handleSignUp,
         confirmSignUp: handleConfirmSignUp,
         signIn: handleSignIn,

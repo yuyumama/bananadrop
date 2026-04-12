@@ -24,6 +24,9 @@ export default function ShopModal({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="ショップ"
       style={{
         position: 'fixed',
         inset: 0,
@@ -74,6 +77,7 @@ export default function ShopModal({
             🛒 SHOP
           </div>
           <button
+            aria-label="ショップを閉じる"
             onClick={onClose}
             style={{
               width: 36,

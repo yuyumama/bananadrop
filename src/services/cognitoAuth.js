@@ -5,10 +5,14 @@ import {
   CognitoUserAttribute,
 } from 'amazon-cognito-identity-js';
 
-const userPool = new CognitoUserPool({
-  UserPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
-  ClientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
-});
+const POOL_ID = import.meta.env.VITE_COGNITO_USER_POOL_ID;
+const CLIENT_ID = import.meta.env.VITE_COGNITO_CLIENT_ID;
+
+export const isCognitoConfigured = !!(POOL_ID && CLIENT_ID);
+
+const userPool = isCognitoConfigured
+  ? new CognitoUserPool({ UserPoolId: POOL_ID, ClientId: CLIENT_ID })
+  : null;
 
 export function signUp(email, password) {
   return new Promise((resolve, reject) => {

@@ -1,3 +1,5 @@
+import styles from './UpgradeGroupCard.module.css';
+
 function UpgradeGroupCard({
   group,
   currentLabel,
@@ -18,17 +20,30 @@ function UpgradeGroupCard({
   const name = spaceIdx >= 0 ? group.label.slice(spaceIdx + 1) : '';
 
   return (
-    <div
-      style={{
-        flex: 1,
-        minWidth: 0,
-      }}
-    >
+    <div className={styles.wrapper}>
       <div
+        className={styles.card}
+        role={nextItem && affordable ? 'button' : undefined}
+        tabIndex={nextItem && affordable ? 0 : undefined}
+        aria-label={
+          isMaxed
+            ? `${group.label} - 最大レベル`
+            : nextItem
+              ? `${group.label} Lv.${level} → ${nextItem.label}、コスト: ${nextItem.cost.toLocaleString()}`
+              : undefined
+        }
+        onKeyDown={
+          nextItem && affordable
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onBuy(nextItem);
+                }
+              }
+            : undefined
+        }
         style={{
-          position: 'relative',
-          overflow: 'hidden',
-          borderRadius: 12,
           border: `1.5px solid ${
             isMaxed
               ? 'var(--status-maxed-border)'
@@ -46,8 +61,6 @@ function UpgradeGroupCard({
               ? '0 2px 12px rgba(212,175,55,0.22)'
               : '0 1px 4px rgba(0,0,0,0.06)',
           cursor: nextItem && affordable ? 'pointer' : 'default',
-          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-          userSelect: 'none',
           animation:
             affordable && !isMaxed
               ? 'upgradeGlow 2.4s ease-in-out infinite'
@@ -81,32 +94,12 @@ function UpgradeGroupCard({
           e.currentTarget.style.transform = 'translateY(-2px)';
         }}
       >
-        {/* Shimmer overlay when affordable */}
-        {affordable && !isMaxed && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '-50%',
-              left: '-50%',
-              width: '200%',
-              height: '200%',
-              background:
-                'linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)',
-              transform: 'rotate(45deg)',
-              animation: 'shimmer 3s infinite',
-              pointerEvents: 'none',
-              zIndex: 1,
-            }}
-          />
-        )}
+        {affordable && !isMaxed && <div className={styles.shimmer} />}
 
-        {/* Header: icon + name + level badge */}
+        {/* Header */}
         <div
+          className={styles.header}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '5px 7px 4px',
             borderBottom: `1px solid ${
               isMaxed
                 ? 'var(--status-maxed-bg)'
@@ -114,29 +107,22 @@ function UpgradeGroupCard({
                   ? 'rgba(212,175,55,0.18)'
                   : 'rgba(0,0,0,0.05)'
             }`,
-            position: 'relative',
-            zIndex: 2,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <span style={{ fontSize: '0.85rem', lineHeight: 1 }}>{icon}</span>
+          <div className={styles.headerLeft}>
+            <span className={styles.headerIcon}>{icon}</span>
             <span
+              className={`upgrade-card-header-name ${styles.headerName}`}
               style={{
-                fontSize: '0.58rem',
-                fontWeight: 700,
                 color: isMaxed ? 'var(--status-maxed)' : 'var(--text-muted)',
-                letterSpacing: '0.03em',
-                whiteSpace: 'nowrap',
               }}
             >
               {name}
             </span>
           </div>
-          {/* Level badge */}
           <div
+            className={styles.levelBadge}
             style={{
-              fontSize: '0.52rem',
-              fontWeight: 800,
               color: isMaxed
                 ? '#4caf50'
                 : affordable
@@ -147,10 +133,6 @@ function UpgradeGroupCard({
                 : affordable
                   ? 'rgba(212,175,55,0.14)'
                   : 'rgba(0,0,0,0.05)',
-              borderRadius: 5,
-              padding: '1px 5px',
-              letterSpacing: '0.02em',
-              whiteSpace: 'nowrap',
             }}
           >
             Lv.{level}
@@ -159,116 +141,35 @@ function UpgradeGroupCard({
 
         {/* Body */}
         {isMaxed ? (
-          /* ── MAXED ── */
-          <div
-            style={{
-              padding: '8px 6px 9px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 2,
-              position: 'relative',
-              zIndex: 2,
-            }}
-          >
-            <span style={{ fontSize: '1rem', lineHeight: 1 }}>✅</span>
-            <div
-              style={{
-                fontSize: '0.65rem',
-                fontWeight: 800,
-                color: 'var(--status-maxed)',
-                letterSpacing: '0.08em',
-              }}
-            >
-              MAXED
-            </div>
-            <div
-              style={{
-                fontSize: '0.6rem',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                maxWidth: '100%',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                textAlign: 'center',
-              }}
-            >
-              {currentLabel}
-            </div>
+          <div className={styles.bodyMaxed}>
+            <span className={styles.maxedIcon}>✅</span>
+            <div className={styles.maxedLabel}>MAXED</div>
+            <div className={styles.maxedDescription}>{currentLabel}</div>
           </div>
         ) : (
-          /* ── Normal ── */
-          <div
-            style={{
-              padding: '6px 8px 14px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 3,
-              alignItems: 'center',
-              position: 'relative',
-              zIndex: 2,
-            }}
-          >
-            {/* Current state */}
-            <div
-              style={{
-                fontSize: '0.59rem',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                maxWidth: '100%',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                lineHeight: 1.3,
-                textAlign: 'center',
-              }}
-            >
+          <div className={styles.bodyNormal}>
+            <div className={`upgrade-card-body-label ${styles.currentLabel}`}>
               {currentLabel}
             </div>
-
-            {/* Next upgrade name */}
-            <div
-              style={{
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                color: 'var(--text-main)',
-                maxWidth: '100%',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2,
-                textAlign: 'center',
-              }}
-            >
+            <div className={`upgrade-card-body-next ${styles.nextLabel}`}>
               {nextItem.label}
             </div>
-
-            {/* Cost pill */}
             <div
+              className={`upgrade-card-cost-pill ${styles.costPill}`}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
                 background: affordable
                   ? 'rgba(212,175,55,0.15)'
                   : 'rgba(0,0,0,0.05)',
                 border: `1px solid ${affordable ? 'rgba(212,175,55,0.3)' : 'transparent'}`,
-                borderRadius: 20,
-                padding: '2px 7px',
-                marginTop: 1,
               }}
             >
-              <span style={{ fontSize: '0.7em', lineHeight: 1 }}>🍌</span>
+              <span className={styles.costEmoji}>🍌</span>
               <span
+                className={styles.costValue}
                 style={{
-                  fontSize: '0.63rem',
-                  fontWeight: 700,
                   color: affordable
                     ? 'var(--accent-gold)'
                     : 'var(--text-muted)',
-                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
                 {nextItem.cost.toLocaleString()}
@@ -280,14 +181,12 @@ function UpgradeGroupCard({
         {/* Progress bar */}
         {!isMaxed && (
           <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: 6,
-              background: 'var(--progress-bg)',
-            }}
+            className={styles.progressTrack}
+            role="progressbar"
+            aria-valuenow={Math.round(progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`${name} アップグレード進捗`}
           >
             <div
               style={{

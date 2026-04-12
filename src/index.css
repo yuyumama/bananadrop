@@ -821,6 +821,205 @@ body {
   }
 }
 
+/* ── Responsive: small screens ── */
+@media (max-width: 768px) {
+  .score-display {
+    top: 12px !important;
+    left: 12px !important;
+    padding: 10px 14px !important;
+  }
+
+  .score-display .score-value {
+    font-size: 1.1rem !important;
+  }
+
+  .shop-button {
+    top: 12px !important;
+    right: 12px !important;
+    padding: 8px 12px !important;
+  }
+
+  .shop-button .shop-coin-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .shop-button .shop-coin-balance {
+    font-size: 1rem !important;
+  }
+
+  .banana-tree-panel {
+    top: 90px !important;
+    left: 8px !important;
+  }
+
+  .banana-tree-main {
+    width: 120px !important;
+    padding: 10px 10px !important;
+  }
+
+  .banana-tree-main .tree-image {
+    width: 90px !important;
+    height: 90px !important;
+  }
+
+  .unlocked-tiers-panel {
+    top: 90px !important;
+    right: 8px !important;
+  }
+
+  .unlocked-tiers-panel .tier-card {
+    padding: 4px 8px !important;
+    font-size: 0.65rem !important;
+  }
+
+  .unlocked-tiers-panel .tier-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .upgrade-panel {
+    gap: 4px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  .upgrade-panel .upgrade-card-header-name {
+    font-size: 0.5rem !important;
+  }
+
+  .upgrade-panel .upgrade-card-body-label {
+    font-size: 0.52rem !important;
+  }
+
+  .upgrade-panel .upgrade-card-body-next {
+    font-size: 0.68rem !important;
+  }
+
+  .upgrade-panel .upgrade-card-cost-pill {
+    font-size: 0.56rem !important;
+  }
+
+  .skill-choose-panel {
+    width: 160px !important;
+  }
+
+  .effect-status-label {
+    font-size: 0.6rem !important;
+    padding: 3px 10px !important;
+  }
+
+  .logout-button {
+    top: 8px !important;
+    right: 12px !important;
+  }
+}
+
+/* ── Responsive: very small screens ── */
+@media (max-width: 480px) {
+  .banana-tree-panel {
+    top: 80px !important;
+    left: 4px !important;
+  }
+
+  .banana-tree-main {
+    width: 100px !important;
+    padding: 8px 6px !important;
+  }
+
+  .banana-tree-main .tree-image {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .banana-tree-main .tree-stage-label {
+    font-size: 0.65rem !important;
+  }
+
+  .banana-tree-main .tree-lv-badge {
+    font-size: 0.5rem !important;
+  }
+
+  .banana-tree-main .water-button {
+    padding: 5px 10px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .unlocked-tiers-panel {
+    top: 80px !important;
+    right: 4px !important;
+  }
+
+  .unlocked-tiers-panel .tier-card {
+    padding: 3px 6px !important;
+    font-size: 0.6rem !important;
+  }
+
+  .unlocked-tiers-panel .section-label {
+    font-size: 0.5rem !important;
+  }
+
+  .unlocked-tiers-panel .tier-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .unlocked-tiers-panel .tier-score {
+    display: none !important;
+  }
+
+  .shop-button .shop-label,
+  .shop-button .shop-divider {
+    display: none !important;
+  }
+
+  .score-display .per-second-label {
+    font-size: 0.55rem !important;
+  }
+
+  .logout-button {
+    top: 4px !important;
+    right: 8px !important;
+    font-size: 9px !important;
+    padding: 3px 8px !important;
+  }
+}
+
+/* ── Logout button ── */
+.logout-button {
+  position: fixed;
+  top: 12px;
+  right: 24px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.logout-button:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-main);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.logout-button:active {
+  transform: scale(0.96);
+}
+
 /* Custom Scrollbar for premium feel */
 ::-webkit-scrollbar {
   width: 6px;
