@@ -2,17 +2,67 @@ import { useState, useEffect, useRef } from 'react';
 import { Droplets } from 'lucide-react';
 import { getMaxGrowth, getWaterCost } from '../../hooks/useUpgradeState';
 
+// Stage definitions with hex values for inline rgba calculations
 const TREE_STAGES = [
-  { label: '種子', color: 'var(--tree-green-1)' },
-  { label: '芽吹き', color: 'var(--tree-green-2)' },
-  { label: '若苗', color: 'var(--tree-green-3)' },
-  { label: '若葉', color: 'var(--tree-green-4)' },
-  { label: '成長期', color: 'var(--tree-green-5)' },
-  { label: '開花', color: 'var(--tree-green-6)' },
-  { label: '成熟', color: 'var(--accent-gold)' },
+  {
+    label: '種子',
+    cssColor: 'var(--tree-green-1)',
+    hex: '#8bc34a',
+    glow: 'rgba(139,195,74,0.4)',
+    glowSoft: 'rgba(139,195,74,0.18)',
+    particle: 'rgba(139,195,74,0.8)',
+  },
+  {
+    label: '芽吹き',
+    cssColor: 'var(--tree-green-2)',
+    hex: '#7cb342',
+    glow: 'rgba(124,179,66,0.4)',
+    glowSoft: 'rgba(124,179,66,0.18)',
+    particle: 'rgba(124,179,66,0.8)',
+  },
+  {
+    label: '若苗',
+    cssColor: 'var(--tree-green-3)',
+    hex: '#558b2f',
+    glow: 'rgba(85,139,47,0.42)',
+    glowSoft: 'rgba(85,139,47,0.18)',
+    particle: 'rgba(85,139,47,0.8)',
+  },
+  {
+    label: '若葉',
+    cssColor: 'var(--tree-green-4)',
+    hex: '#4caf50',
+    glow: 'rgba(76,175,80,0.42)',
+    glowSoft: 'rgba(76,175,80,0.18)',
+    particle: 'rgba(76,175,80,0.8)',
+  },
+  {
+    label: '成長期',
+    cssColor: 'var(--tree-green-5)',
+    hex: '#388e3c',
+    glow: 'rgba(56,142,60,0.42)',
+    glowSoft: 'rgba(56,142,60,0.18)',
+    particle: 'rgba(56,142,60,0.8)',
+  },
+  {
+    label: '開花',
+    cssColor: 'var(--tree-green-6)',
+    hex: '#a5d240',
+    glow: 'rgba(165,210,64,0.5)',
+    glowSoft: 'rgba(165,210,64,0.22)',
+    particle: 'rgba(165,210,64,0.85)',
+  },
+  {
+    label: '成熟',
+    cssColor: 'var(--accent-gold)',
+    hex: '#d4af37',
+    glow: 'rgba(212,175,55,0.5)',
+    glowSoft: 'rgba(212,175,55,0.22)',
+    particle: 'rgba(212,175,55,0.9)',
+  },
 ];
 
-// スキル種別ごとのカラーテーマ
+// Skill type themes
 const SKILL_TYPE_THEMES = {
   growthBonus: {
     bg: 'rgba(76,175,80,0.13)',
@@ -20,8 +70,6 @@ const SKILL_TYPE_THEMES = {
     text: '#2e7d32',
     glow: 'rgba(76,175,80,0.35)',
     dot: '#4caf50',
-    cardBg:
-      'linear-gradient(135deg, rgba(76,175,80,0.12) 0%, rgba(165,214,120,0.08) 100%)',
   },
   waterCostDiscount: {
     bg: 'rgba(0,188,212,0.12)',
@@ -29,8 +77,6 @@ const SKILL_TYPE_THEMES = {
     text: '#006064',
     glow: 'rgba(0,188,212,0.35)',
     dot: '#00bcd4',
-    cardBg:
-      'linear-gradient(135deg, rgba(0,188,212,0.12) 0%, rgba(100,220,240,0.08) 100%)',
   },
   waterBoost: {
     bg: 'rgba(30,136,229,0.12)',
@@ -38,8 +84,6 @@ const SKILL_TYPE_THEMES = {
     text: '#1565c0',
     glow: 'rgba(30,136,229,0.35)',
     dot: '#1e88e5',
-    cardBg:
-      'linear-gradient(135deg, rgba(30,136,229,0.12) 0%, rgba(100,181,246,0.08) 100%)',
   },
   coinsPerLevelUp: {
     bg: 'rgba(212,175,55,0.13)',
@@ -47,8 +91,6 @@ const SKILL_TYPE_THEMES = {
     text: '#b8860b',
     glow: 'rgba(212,175,55,0.4)',
     dot: '#d4af37',
-    cardBg:
-      'linear-gradient(135deg, rgba(212,175,55,0.13) 0%, rgba(255,230,100,0.08) 100%)',
   },
   mutationRateBonus: {
     bg: 'rgba(156,39,176,0.11)',
@@ -56,8 +98,6 @@ const SKILL_TYPE_THEMES = {
     text: '#6a1b9a',
     glow: 'rgba(156,39,176,0.35)',
     dot: '#9c27b0',
-    cardBg:
-      'linear-gradient(135deg, rgba(156,39,176,0.11) 0%, rgba(206,147,216,0.08) 100%)',
   },
   criticalClickChance: {
     bg: 'rgba(255,87,34,0.11)',
@@ -65,8 +105,6 @@ const SKILL_TYPE_THEMES = {
     text: '#bf360c',
     glow: 'rgba(255,87,34,0.38)',
     dot: '#ff5722',
-    cardBg:
-      'linear-gradient(135deg, rgba(255,87,34,0.11) 0%, rgba(255,171,145,0.08) 100%)',
   },
 };
 
@@ -76,13 +114,22 @@ const FALLBACK_THEME = {
   text: '#555',
   glow: 'rgba(100,100,100,0.25)',
   dot: '#aaa',
-  cardBg: 'rgba(100,100,100,0.06)',
 };
 
 function getSkillTheme(skill) {
   const key = Object.keys(SKILL_TYPE_THEMES).find((k) => skill[k] != null);
   return key ? SKILL_TYPE_THEMES[key] : FALLBACK_THEME;
 }
+
+// Static particle configs (positions and drift vectors) to avoid rerenders
+const PARTICLE_CONFIGS = [
+  { left: '30%', top: '62%', delay: 0.0, tx: '-6px', duration: 3.0 },
+  { left: '70%', top: '52%', delay: 0.9, tx: '7px', duration: 3.5 },
+  { left: '45%', top: '36%', delay: 1.7, tx: '-3px', duration: 2.8 },
+  { left: '63%', top: '44%', delay: 0.5, tx: '5px', duration: 3.2 },
+  { left: '20%', top: '47%', delay: 2.3, tx: '-8px', duration: 2.6 },
+  { left: '80%', top: '67%', delay: 1.2, tx: '6px', duration: 3.8 },
+];
 
 export default function BananaTree({
   score,
@@ -112,9 +159,54 @@ export default function BananaTree({
   const maxGrowth = getMaxGrowth(treeLevel);
   const progress = Math.min(100, Math.max(0, (treeGrowth / maxGrowth) * 100));
 
-  const imgSrc = `${import.meta.env.BASE_URL}tree_stage${String(stageIndex).padStart(2, '0')}.png`;
+  const getImgSrc = (idx) =>
+    `${import.meta.env.BASE_URL}tree_stage${String(idx).padStart(2, '0')}.png`;
   const coinSrc = `${import.meta.env.BASE_URL}coin.png`;
 
+  // ── Stage transition crossfade state ──
+  const displayedStageRef = useRef(stageIndex);
+  const transitionTimersRef = useRef([]);
+  const [treeTransition, setTreeTransition] = useState({
+    currentStageIndex: stageIndex,
+    prevStageIndex: null,
+    isTransitioning: false,
+    showBurst: false,
+  });
+
+  useEffect(() => {
+    if (stageIndex === displayedStageRef.current) return;
+
+    const prevStage = displayedStageRef.current;
+    displayedStageRef.current = stageIndex;
+
+    transitionTimersRef.current.forEach(clearTimeout);
+
+    setTreeTransition({
+      currentStageIndex: stageIndex,
+      prevStageIndex: prevStage,
+      isTransitioning: true,
+      showBurst: true,
+    });
+
+    transitionTimersRef.current = [
+      setTimeout(() => {
+        setTreeTransition((prev) => ({ ...prev, showBurst: false }));
+      }, 580),
+      setTimeout(() => {
+        setTreeTransition((prev) => ({
+          ...prev,
+          prevStageIndex: null,
+          isTransitioning: false,
+        }));
+      }, 750),
+    ];
+  }, [stageIndex]);
+
+  useEffect(() => {
+    return () => transitionTimersRef.current.forEach(clearTimeout);
+  }, []);
+
+  // Level-up flash
   useEffect(() => {
     if (treeLevel > prevLevelRef.current) {
       const showTimer = setTimeout(() => setShowLevelUp(true), 0);
@@ -127,6 +219,17 @@ export default function BananaTree({
     }
     prevLevelRef.current = treeLevel;
   }, [treeLevel]);
+
+  const particleCount = Math.min(stageIndex + 1, 6);
+  const currentImgSrc = getImgSrc(treeTransition.currentStageIndex);
+  const prevImgSrc =
+    treeTransition.prevStageIndex !== null
+      ? getImgSrc(treeTransition.prevStageIndex)
+      : null;
+  const prevStage =
+    treeTransition.prevStageIndex !== null
+      ? TREE_STAGES[treeTransition.prevStageIndex]
+      : null;
 
   return (
     <section
@@ -158,66 +261,186 @@ export default function BananaTree({
           maxHeight: 'calc(100vh - 130px - 120px)',
           boxSizing: 'border-box',
           borderRadius: '24px',
-          border: isGold
-            ? '1px solid var(--accent-gold-soft)'
-            : '1px solid var(--glass-border)',
+          border: `1px solid ${currentStage.glow}`,
+          transition: 'border-color 1.2s ease',
           animation: showLevelUp ? 'levelUpFlash 0.8s ease-out' : undefined,
           pointerEvents: 'auto',
         }}
       >
-        {/* Top: tree image + level badge */}
+        {/* ── Tree Showcase: circular living frame ── */}
         <div
+          className="tree-showcase"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 4,
+            position: 'relative',
+            width: 136,
+            height: 136,
+            flexShrink: 0,
           }}
         >
-          <img
-            className="tree-image"
-            key={stageIndex}
-            src={imgSrc}
-            alt={`${currentStage.label} ステージのバナナツリー`}
+          {/* Outer glow ring */}
+          <div
+            aria-hidden="true"
             style={{
-              width: 140,
-              height: 140,
-              objectFit: 'contain',
-              display: 'block',
-              filter: isGold
-                ? 'drop-shadow(0 0 8px rgba(212,175,55,0.6))'
-                : 'drop-shadow(0 2px 8px rgba(0,0,0,0.12))',
+              position: 'absolute',
+              inset: -4,
+              borderRadius: '50%',
+              border: `1px solid ${currentStage.glow}`,
+              boxShadow: `0 0 16px ${currentStage.glow}`,
+              transition: 'all 1.2s ease',
+              pointerEvents: 'none',
+              zIndex: 2,
             }}
           />
-          {/* Stage name + LV badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span
-              className="tree-stage-label"
-              style={{
-                fontSize: '0.78rem',
-                fontWeight: 900,
-                color: currentStage.color,
-                letterSpacing: '0.03em',
-              }}
-            >
-              {currentStage.label}
-            </span>
+
+          {/* Circular viewport */}
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              background: `radial-gradient(circle at 50% 78%, ${currentStage.glowSoft} 0%, rgba(252,250,245,0.35) 65%)`,
+              border: `1.5px solid ${currentStage.glow}`,
+              boxShadow: isGold
+                ? `0 4px 24px rgba(212,175,55,0.3), inset 0 0 20px rgba(212,175,55,0.1)`
+                : `0 4px 18px ${currentStage.glow}, inset 0 0 14px ${currentStage.glowSoft}`,
+              transition:
+                'background 1.2s ease, border-color 1.2s ease, box-shadow 1.2s ease',
+            }}
+          >
+            {/* Ground reflection ellipse */}
             <div
-              className="tree-lv-badge"
+              aria-hidden="true"
               style={{
-                fontSize: '0.58rem',
-                fontWeight: 900,
-                color: currentStage.color,
-                background: isGold
-                  ? 'rgba(212,175,55,0.14)'
-                  : 'var(--status-maxed-bg)',
-                padding: '1px 8px',
-                borderRadius: 10,
-                letterSpacing: '0.05em',
+                position: 'absolute',
+                bottom: 5,
+                left: '16%',
+                right: '16%',
+                height: 18,
+                background: `radial-gradient(ellipse at center, ${currentStage.glowSoft} 0%, transparent 70%)`,
+                transition: 'background 1.2s ease',
+                filter: 'blur(5px)',
+                pointerEvents: 'none',
+                zIndex: 1,
               }}
-            >
-              LV.{treeLevel}
-            </div>
+            />
+
+            {/* Previous tree image (stage-out animation) */}
+            {prevImgSrc && prevStage && (
+              <img
+                src={prevImgSrc}
+                alt=""
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 5,
+                  width: 'calc(100% - 10px)',
+                  height: 'calc(100% - 10px)',
+                  objectFit: 'contain',
+                  filter: `drop-shadow(0 2px 6px ${prevStage.glow})`,
+                  animation:
+                    'treeStageOut 0.55s cubic-bezier(0.4, 0, 1, 1) forwards',
+                  pointerEvents: 'none',
+                  zIndex: 2,
+                }}
+              />
+            )}
+
+            {/* Current tree image */}
+            <img
+              className="tree-image"
+              src={currentImgSrc}
+              alt={`${currentStage.label} ステージのバナナツリー`}
+              style={{
+                position: 'absolute',
+                inset: 5,
+                width: 'calc(100% - 10px)',
+                height: 'calc(100% - 10px)',
+                objectFit: 'contain',
+                animation: treeTransition.isTransitioning
+                  ? 'treeStageIn 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) forwards'
+                  : 'treeSway 5.5s ease-in-out infinite',
+                filter: isGold
+                  ? 'drop-shadow(0 2px 10px rgba(212,175,55,0.6))'
+                  : `drop-shadow(0 2px 8px ${currentStage.glow})`,
+                transition: 'filter 1.2s ease',
+                pointerEvents: 'none',
+                zIndex: 3,
+              }}
+            />
+
+            {/* Floating particles (count increases with stage) */}
+            {PARTICLE_CONFIGS.slice(0, particleCount).map((p, i) => (
+              <div
+                key={i}
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  left: p.left,
+                  top: p.top,
+                  width: 2 + (i % 3 === 0 ? 2 : i % 2),
+                  height: 2 + (i % 3 === 0 ? 2 : i % 2),
+                  borderRadius: '50%',
+                  background: currentStage.particle,
+                  opacity: 0,
+                  '--tx': p.tx,
+                  animation: `treeParticleFloat ${p.duration}s ease-in-out ${p.delay}s infinite`,
+                  transition: 'background 1.2s ease',
+                  pointerEvents: 'none',
+                  zIndex: 4,
+                }}
+              />
+            ))}
+
+            {/* Stage-change burst overlay */}
+            {treeTransition.showBurst && (
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '50%',
+                  background: `radial-gradient(circle at center, ${currentStage.glowSoft} 0%, transparent 70%)`,
+                  animation: 'treeStageBurst 0.55s ease-out forwards',
+                  pointerEvents: 'none',
+                  zIndex: 5,
+                }}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Stage name + LV badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span
+            className="tree-stage-label"
+            style={{
+              fontSize: '0.78rem',
+              fontWeight: 900,
+              color: currentStage.cssColor,
+              letterSpacing: '0.03em',
+              transition: 'color 1s ease',
+            }}
+          >
+            {currentStage.label}
+          </span>
+          <div
+            className="tree-lv-badge"
+            style={{
+              fontSize: '0.58rem',
+              fontWeight: 900,
+              color: currentStage.cssColor,
+              background: isGold
+                ? 'rgba(212,175,55,0.14)'
+                : 'var(--status-maxed-bg)',
+              padding: '1px 8px',
+              borderRadius: 10,
+              letterSpacing: '0.05em',
+              transition: 'color 1s ease',
+            }}
+          >
+            LV.{treeLevel}
           </div>
         </div>
 
@@ -242,10 +465,25 @@ export default function BananaTree({
                 fontSize: '0.6rem',
                 fontWeight: 700,
                 color: 'var(--text-muted)',
+                gap: 4,
+                minWidth: 0,
               }}
             >
-              <span>次のバナコインまで</span>
-              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+              <span
+                className="tree-progress-label"
+                style={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+                次のバナコインまで
+              </span>
+              <span
+                style={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}
+              >
                 {Math.round(progress)}%
               </span>
             </div>
@@ -271,9 +509,10 @@ export default function BananaTree({
                     width: `${progress}%`,
                     background: isGold
                       ? 'linear-gradient(90deg, var(--accent-gold), #ffe066)'
-                      : `linear-gradient(90deg, ${currentStage.color}, #a5d678)`,
+                      : `linear-gradient(90deg, ${currentStage.hex}, #a5d678)`,
                     borderRadius: 4,
-                    transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition:
+                      'width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 1.2s ease',
                   }}
                 />
               </div>
@@ -352,7 +591,8 @@ export default function BananaTree({
                 size={14}
                 fill={canAfford ? 'rgba(255,255,255,0.25)' : 'none'}
               />
-              水やり +{waterBoostPercent}%
+              <span className="water-button-label">水やり </span>+
+              {waterBoostPercent}%
             </button>
             <span
               style={{
@@ -385,7 +625,7 @@ export default function BananaTree({
               overflowY: 'auto',
             }}
           >
-            {/* ── ステージ進捗ドット ── */}
+            {/* Stage progress dots */}
             <div
               style={{
                 display: 'flex',
@@ -439,7 +679,7 @@ export default function BananaTree({
               )}
             </div>
 
-            {/* ── 選択済みスキル（カラーピルバッジ） ── */}
+            {/* Chosen skill badges */}
             {chosenSkills.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {chosenSkills.map((skill) => {
@@ -482,9 +722,7 @@ export default function BananaTree({
               </div>
             )}
 
-            {/* スキル選択中の場合はパネル外にフローティング表示 */}
-
-            {/* ── スキル未解放ヒント ── */}
+            {/* Skill unlock hint */}
             {!pendingChoice && chosenSkills.length === 0 && (
               <div
                 style={{
@@ -502,7 +740,7 @@ export default function BananaTree({
         </div>
       </div>
 
-      {/* ── スキル選択パネル（ツリーパネルの直下） ── */}
+      {/* ── Skill choose panel ── */}
       {pendingChoice && (
         <div
           className="glass-panel skill-choose-panel"
@@ -522,7 +760,7 @@ export default function BananaTree({
             pointerEvents: 'auto',
           }}
         >
-          {/* ヘッダー部分 */}
+          {/* Header */}
           <div
             style={{
               display: 'flex',
@@ -563,7 +801,7 @@ export default function BananaTree({
             />
           </div>
 
-          {/* リスト部分 */}
+          {/* Skill list */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {pendingChoice.map((skill, idx) => {
               const theme = getSkillTheme(skill);
