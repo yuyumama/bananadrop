@@ -78,7 +78,7 @@
 /* ── Responsive: small screens ── */
 @media (max-width: 768px) {
   .root {
-    top: 12px;
+    top: 36px;
     right: 12px;
     padding: 8px 12px;
   }
@@ -94,6 +94,10 @@
 }
 
 @media (max-width: 480px) {
+  .root {
+    top: 28px;
+  }
+
   .shopIcon,
   .divider {
     display: none;

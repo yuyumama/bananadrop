@@ -808,6 +808,96 @@ body {
   }
 }
 
+/* ── Tree showcase animations ── */
+
+/* Stage-out: old image scales down + blurs + rotates slightly */
+@keyframes treeStageOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px);
+  }
+  35% {
+    opacity: 0.6;
+    transform: scale(1.06) rotate(2deg);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-5deg);
+    filter: blur(10px);
+  }
+}
+
+/* Stage-in: new image blooms from small with springy overshoot */
+@keyframes treeStageIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.45) rotate(5deg);
+    filter: blur(12px);
+  }
+  55% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0px);
+  }
+}
+
+/* Idle sway: gentle breathing + lateral drift */
+@keyframes treeSway {
+  0%,
+  100% {
+    transform: translateX(0px) scale(1);
+  }
+  20% {
+    transform: translateX(-1.5px) scale(1.004);
+  }
+  50% {
+    transform: translateX(0px) scale(1.01) translateY(-1.5px);
+  }
+  80% {
+    transform: translateX(1.5px) scale(1.004);
+  }
+}
+
+/* Floating particles that drift upward and fade out */
+@keyframes treeParticleFloat {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  18% {
+    opacity: 0.85;
+    transform: translate(0, -4px) scale(1);
+  }
+  70% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 6px), -26px) scale(0.15);
+  }
+}
+
+/* Stage-change burst: radial bloom that expands and fades */
+@keyframes treeStageBurst {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.2);
+  }
+  45% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
 @keyframes skillPulse {
   0%,
   100% {
@@ -833,9 +923,9 @@ body {
     padding: 10px 10px !important;
   }
 
-  .banana-tree-main .tree-image {
-    width: 90px !important;
-    height: 90px !important;
+  .banana-tree-main .tree-showcase {
+    width: 100px !important;
+    height: 100px !important;
   }
 
   .unlocked-tiers-panel {
@@ -851,6 +941,15 @@ body {
   .unlocked-tiers-panel .tier-icon {
     width: 18px !important;
     height: 18px !important;
+  }
+
+  .banana-tree-main .water-button {
+    padding: 6px 8px !important;
+    font-size: 0.62rem !important;
+  }
+
+  .banana-tree-main .water-button-label {
+    display: none !important;
   }
 
   .skill-choose-panel {
@@ -871,7 +970,7 @@ body {
 /* ── Responsive: very small screens (global classes only) ── */
 @media (max-width: 480px) {
   .banana-tree-panel {
-    top: 80px !important;
+    top: 92px !important;
     left: 4px !important;
   }
 
@@ -880,9 +979,13 @@ body {
     padding: 8px 6px !important;
   }
 
-  .banana-tree-main .tree-image {
-    width: 70px !important;
-    height: 70px !important;
+  .banana-tree-main .tree-showcase {
+    width: 84px !important;
+    height: 84px !important;
+  }
+
+  .banana-tree-main .tree-progress-label {
+    display: none !important;
   }
 
   .banana-tree-main .tree-stage-label {
@@ -894,8 +997,9 @@ body {
   }
 
   .banana-tree-main .water-button {
-    padding: 5px 10px !important;
-    font-size: 0.6rem !important;
+    padding: 5px 6px !important;
+    font-size: 0.52rem !important;
+    gap: 3px !important;
   }
 
   .unlocked-tiers-panel {
