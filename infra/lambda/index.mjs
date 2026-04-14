@@ -146,7 +146,10 @@ async function handlePutProfile(sub, rawBody) {
 // ユーザーが入力したユーザー名を検証・整形する（日本語対応、最大20文字）
 function sanitizeUserName(raw) {
   if (typeof raw !== 'string') return null;
-  const cleaned = raw.replace(/[\x00-\x1F\x7F]/g, '').trim();
+  const cleaned = raw
+    .replace(/[\x00-\x1F\x7F]/g, '')
+    .replace(/<[^>]*>/g, '')
+    .trim();
   if (cleaned.length === 0 || cleaned.length > 20) return null;
   return cleaned;
 }

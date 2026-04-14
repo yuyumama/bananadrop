@@ -4,7 +4,8 @@ resource "aws_apigatewayv2_api" "main" {
   name          = "${var.project_name}-api"
   protocol_type = "HTTP"
 
-  # CloudFront 経由のアクセスが前提だが、ローカル開発時の直接アクセスにも対応するため CORS を許可
+  # CloudFront 経由のアクセスが前提（same-origin のため通常 CORS 不要だが、
+  # API Gateway 直接アクセス時のフォールバックとして設定）
   cors_configuration {
     allow_origins = ["https://${aws_cloudfront_distribution.main.domain_name}"]
     allow_methods = ["GET", "POST", "PUT", "OPTIONS"]

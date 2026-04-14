@@ -51,6 +51,8 @@ export function useSaveSync({ user, getGameState, restoreGame, onSaveLoaded }) {
   const doSave = useCallback(async () => {
     if (!isCognitoConfigured || !user) return;
     try {
+      // postSave 内部でも getAccessToken() を呼ぶが、ここでは beforeunload 用に
+      // tokenRef へ最新トークンをキャッシュする目的で別途取得している
       const token = await getAccessToken();
       tokenRef.current = token;
       await postSave(getGameStateRef.current());
@@ -67,29 +69,25 @@ export function useSaveSync({ user, getGameState, restoreGame, onSaveLoaded }) {
   }, [user, doSave]);
 
   // ページ離脱時に保存
-  // fetch keepalive を使うことでブラウザがページを閉じた後もリクエストを完遂する。
-  // getAccessToken() は非同期のため呼び出せないので、直前の定期セーブで更新した
-  // キャッシュトークンを使用する。
+  // sendBeacon は Authorization ヘッダーを付けられないため fetch + keepalive を使用。
+  // keepalive によりブラウザがページを閉じた後もリクエストを完遂する。
+  // getAccessToken() は非同期のため beforeunload 内では呼べないので、
+  // 直前の定期セーブで更新したキャッシュトークンを使用する。
   useEffect(() => {
     if (!isCognitoConfigured || !user) return;
     const handleBeforeUnload = () => {
       const token = tokenRef.current;
       if (!token) return;
       const body = JSON.stringify({ gameState: getGameStateRef.current() });
-      navigator.sendBeacon
-        ? navigator.sendBeacon(
-            '/api/save',
-            new Blob([body], { type: 'application/json' }),
-          )
-        : fetch('/api/save', {
-            method: 'POST',
-            keepalive: true,
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            body,
-          });
+      fetch('/api/save', {
+        method: 'POST',
+        keepalive: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body,
+      });
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
