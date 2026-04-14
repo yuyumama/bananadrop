@@ -32,3 +32,13 @@ output "cognito_client_id" {
   description = "Cognito App Client ID"
   value       = aws_cognito_user_pool_client.spa.id
 }
+
+output "api_gateway_endpoint" {
+  description = "API Gateway HTTP API endpoint"
+  value       = aws_apigatewayv2_api.main.api_endpoint
+}
+
+output "dynamodb_table_name" {
+  description = "DynamoDB table name"
+  value       = aws_dynamodb_table.main.name
+}
