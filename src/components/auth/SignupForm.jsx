@@ -223,7 +223,7 @@ const styles = {
     padding: '12px 0',
     border: 'none',
     background: 'transparent',
-    fontSize: '15px',
+    fontSize: '16px',
     color: '#4a4a4a',
     outline: 'none',
     fontFamily: "'Outfit', sans-serif",
