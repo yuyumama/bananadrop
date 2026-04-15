@@ -15,6 +15,7 @@ import ShopButton from './components/ui/ShopButton';
 import ShopModal from './components/ui/ShopModal';
 import UnlockedBananaTiers from './components/ui/UnlockedBananaTiers';
 import UpgradePanel from './components/ui/UpgradePanel';
+import LoadingScreen from './components/ui/LoadingScreen';
 
 import { TIER_COLORS } from './data/constants/tierColors';
 import { UPGRADE_GROUPS } from './data/constants/upgradeGroups';
@@ -149,7 +150,7 @@ function App() {
     [restoreState],
   );
 
-  useSaveSync({
+  const { isLoadingSave } = useSaveSync({
     user,
     getGameState,
     restoreGame,
@@ -439,6 +440,10 @@ function App() {
   // エフェクト適用後の値
   const effectiveRate = autoSpawnRate * effectiveAutoMultiplier;
   const effectiveGiantChance = isAllGiant ? 1 : giantChance;
+
+  if (isLoadingSave) {
+    return <LoadingScreen />;
+  }
 
   return (
     <main

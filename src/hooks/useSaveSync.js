@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+  useState,
+} from 'react';
 import { loadSave, postSave } from '../services/saveApi';
 import { isCognitoConfigured, getAccessToken } from '../services/cognitoAuth';
 
@@ -16,6 +22,9 @@ const AUTO_SAVE_INTERVAL_MS = 60_000;
  */
 export function useSaveSync({ user, getGameState, restoreGame, onSaveLoaded }) {
   const hasLoadedRef = useRef(false);
+  const [isLoadingSave, setIsLoadingSave] = useState(
+    () => isCognitoConfigured && !!user,
+  );
   // コールバック類は毎レンダーで再生成される可能性があるので ref 経由で最新を保持
   const getGameStateRef = useRef(getGameState);
   const onSaveLoadedRef = useRef(onSaveLoaded);
@@ -48,7 +57,8 @@ export function useSaveSync({ user, getGameState, restoreGame, onSaveLoaded }) {
         }
         onSaveLoadedRef.current?.(data);
       })
-      .catch((err) => console.error('Save load failed:', err));
+      .catch((err) => console.error('Save load failed:', err))
+      .finally(() => setIsLoadingSave(false));
   }, [user, restoreGame]);
 
   // ログアウト時にロード済みフラグをリセット
@@ -100,4 +110,6 @@ export function useSaveSync({ user, getGameState, restoreGame, onSaveLoaded }) {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [user]);
+
+  return { isLoadingSave };
 }
