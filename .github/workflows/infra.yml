@@ -44,13 +44,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Untaint tainted resources
-        # tainted リソースは destroy→recreate が試みられ、read 権限不足で失敗することがある。
-        # untaint することで通常の apply フローに戻す。
-        # taint されていない場合は exit 1 になるため continue-on-error で無視する。
-        continue-on-error: true
-        run: terraform untaint aws_cloudwatch_log_group.lambda
-
       - name: Terraform Format Check
         run: terraform fmt -check
 
@@ -59,7 +52,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -refresh=false -out=tfplan
+        run: terraform plan -no-color -out=tfplan
 
       - name: Comment Plan on PR
         if: github.event_name == 'pull_request'
