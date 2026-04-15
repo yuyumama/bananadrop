@@ -142,6 +142,33 @@ resource "aws_iam_role_policy" "infra_resources" {
         Action   = ["cognito-idp:*"]
         Resource = "arn:aws:cognito-idp:${var.aws_region}:${data.aws_caller_identity.current.account_id}:userpool/*"
       },
+      {
+        Sid      = "LambdaManagement"
+        Effect   = "Allow"
+        Action   = ["lambda:*"]
+        Resource = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${var.project_name}-*"
+      },
+      {
+        Sid    = "ApiGatewayManagement"
+        Effect = "Allow"
+        Action = ["apigateway:*"]
+        Resource = [
+          "arn:aws:apigateway:${var.aws_region}::/apis",
+          "arn:aws:apigateway:${var.aws_region}::/apis/*",
+        ]
+      },
+      {
+        Sid      = "DynamoDBManagement"
+        Effect   = "Allow"
+        Action   = ["dynamodb:*"]
+        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.project_name}*"
+      },
+      {
+        Sid      = "CloudWatchLogsManagement"
+        Effect   = "Allow"
+        Action   = ["logs:*"]
+        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.project_name}-*"
+      },
     ]
   })
 }

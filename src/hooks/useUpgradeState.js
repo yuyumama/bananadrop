@@ -210,6 +210,29 @@ export default function useUpgradeState() {
     setUnlockedTiers([BANANA_TIERS[0]]);
   }, []);
 
+  const restoreState = useCallback((gs) => {
+    setPurchased(new Set(gs.purchased ?? []));
+    setBananaPerClick(gs.bananaPerClick ?? 1);
+    setAutoSpawnRate(gs.autoSpawnRate ?? 0);
+    setGiantChance(gs.giantChance ?? 0);
+    const restoredTiers = gs.unlockedTierIds
+      ? BANANA_TIERS.filter((t) => gs.unlockedTierIds.includes(t.tier))
+      : [BANANA_TIERS[0]];
+    setUnlockedTiers(
+      restoredTiers.length > 0 ? restoredTiers : [BANANA_TIERS[0]],
+    );
+    setShopPurchases(gs.shopPurchases ?? {});
+    setTreeData({
+      level: gs.treeLevel ?? 0,
+      growth: gs.treeGrowth ?? 0,
+      banaCoins: gs.banaCoins ?? 0,
+      waterCount: gs.waterCount ?? 0,
+      chosenSkills: gs.chosenSkills ?? [],
+      chosenStages: gs.chosenStages ?? 0,
+      pendingChoice: null,
+    });
+  }, []);
+
   return {
     bananaPerClick,
     autoSpawnRate,
@@ -222,6 +245,7 @@ export default function useUpgradeState() {
     banaCoins: treeData.banaCoins,
     treeGrowth: treeData.growth,
     waterCount: treeData.waterCount,
+    treeChosenStages: treeData.chosenStages,
     waterTree,
     addBanaCoin,
     treeChosenSkills: treeData.chosenSkills,
@@ -233,5 +257,6 @@ export default function useUpgradeState() {
     cheatBanaCoins,
     adjustCoins,
     resetUpgrades,
+    restoreState,
   };
 }

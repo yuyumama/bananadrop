@@ -23,6 +23,7 @@ dist-ssr
 
 # Terraform
 infra/.terraform/
+infra/.build/
 *.tfstate
 *.tfstate.*
 *.tfvars

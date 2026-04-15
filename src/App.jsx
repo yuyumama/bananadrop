@@ -1,5 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
+import { useSaveSync } from './hooks/useSaveSync';
+import { autoUserName } from './services/saveApi';
+import ProfileModal from './components/auth/ProfileModal';
 import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
 import FeverBurst from './components/ui/FeverBurst';
@@ -43,6 +46,7 @@ function App() {
     purchased,
     buyUpgrade,
     treeLevel,
+    treeChosenStages,
     banaCoins,
     treeGrowth,
     waterCount,
@@ -55,6 +59,7 @@ function App() {
     buyShopItem,
     adjustCoins,
     resetUpgrades,
+    restoreState,
   } = useUpgradeState();
 
   const {
@@ -96,6 +101,63 @@ function App() {
     0,
   );
 
+  // score の最新値を非同期コールバックから参照するための ref
+  const scoreRef = useRef(score);
+  scoreRef.current = score;
+
+  const getGameState = useCallback(
+    () => ({
+      score: scoreRef.current,
+      purchased: Array.from(purchased),
+      bananaPerClick,
+      autoSpawnRate,
+      giantChance,
+      unlockedTierIds: unlockedTiers.map((t) => t.tier),
+      treeLevel,
+      treeGrowth,
+      banaCoins,
+      waterCount,
+      chosenSkills: treeChosenSkills,
+      chosenStages: treeChosenStages,
+      shopPurchases,
+    }),
+    [
+      purchased,
+      bananaPerClick,
+      autoSpawnRate,
+      giantChance,
+      unlockedTiers,
+      treeLevel,
+      treeGrowth,
+      banaCoins,
+      waterCount,
+      treeChosenSkills,
+      treeChosenStages,
+      shopPurchases,
+    ],
+  );
+
+  const restoreGame = useCallback(
+    (gs) => {
+      restoreState(gs);
+      setScore(gs.score ?? 0);
+    },
+    [restoreState],
+  );
+
+  useSaveSync({
+    user,
+    getGameState,
+    restoreGame,
+    onSaveLoaded: (data) => {
+      if (data.userName) {
+        setUserName(data.userName);
+      } else if (user?.sub) {
+        setUserName(autoUserName(user.sub));
+      }
+    },
+  });
+
   const bananaWorldRef = useRef(null);
 
   const [floatingTexts, setFloatingTexts] = useState([]);
@@ -107,6 +169,9 @@ function App() {
   const [perSecond, setPerSecond] = useState(0);
   const [devMode, setDevMode] = useState(false);
   const [isShopOpen, setIsShopOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userName, setUserName] = useState(null);
+  const [floatingCoins, setFloatingCoins] = useState([]);
 
   // 開発者モード: Ctrl+Shift+D で切り替え
   useEffect(() => {
@@ -144,8 +209,6 @@ function App() {
     }
     prevTreeLevelRef.current = treeLevel;
   }, [treeLevel]);
-
-  const [floatingCoins, setFloatingCoins] = useState([]);
 
   const handleCoinCollected = useCallback(
     (x) => {
@@ -386,32 +449,80 @@ function App() {
       onClick={handleClick}
     >
       {authEnabled && (
-        <button
-          className="logout-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            signOut();
+        <div
+          style={{
+            position: 'fixed',
+            top: 12,
+            right: 12,
+            zIndex: 50,
+            display: 'flex',
+            gap: 6,
           }}
-          aria-label={`ログアウト${user?.email ? ` (${user.email})` : ''}`}
-          title={user?.email}
+          onClick={(e) => e.stopPropagation()}
         >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+          <button
+            className="logout-button"
+            onClick={() => setIsProfileOpen(true)}
+            aria-label="プロフィール設定"
+            title={userName ?? ''}
+            style={{ gap: 5 }}
           >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          <span>Logout</span>
-        </button>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+            <span
+              style={{
+                maxWidth: 80,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {userName ?? '…'}
+            </span>
+          </button>
+          <button
+            className="logout-button"
+            onClick={signOut}
+            aria-label={`ログアウト${user?.email ? ` (${user.email})` : ''}`}
+            title={user?.email}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span>Logout</span>
+          </button>
+        </div>
+      )}
+      {isProfileOpen && (
+        <ProfileModal
+          userName={userName}
+          onClose={() => setIsProfileOpen(false)}
+          onSaved={(newName) => setUserName(newName)}
+        />
       )}
       <ScoreDisplay
         score={score}

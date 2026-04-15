@@ -95,3 +95,17 @@ export function getCurrentUser() {
 
   return userPool.getCurrentUser();
 }
+
+export function getAccessToken() {
+  if (!userPool) return Promise.resolve(null);
+
+  return new Promise((resolve) => {
+    const cognitoUser = userPool.getCurrentUser();
+    if (!cognitoUser) return resolve(null);
+
+    cognitoUser.getSession((err, session) => {
+      if (err || !session?.isValid()) return resolve(null);
+      resolve(session.getAccessToken().getJwtToken());
+    });
+  });
+}
