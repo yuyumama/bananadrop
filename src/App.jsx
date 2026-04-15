@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useSaveSync } from './hooks/useSaveSync';
-import { autoUserName } from './services/saveApi';
+import { autoUserName, postSave } from './services/saveApi';
 import ProfileModal from './components/auth/ProfileModal';
 import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
@@ -18,6 +18,7 @@ import UpgradePanel from './components/ui/UpgradePanel';
 import LoadingScreen from './components/ui/LoadingScreen';
 
 import { TIER_COLORS } from './data/constants/tierColors';
+import { BANANA_TIERS } from './data/constants/bananaTiers';
 import { UPGRADE_GROUPS } from './data/constants/upgradeGroups';
 import { PANEL_HEIGHT } from './data/constants/layout';
 import useUpgradeState from './hooks/useUpgradeState';
@@ -377,6 +378,31 @@ function App() {
   const handleAdjustScore = useCallback((delta) => {
     setScore((s) => Math.max(0, s + delta));
   }, []);
+
+  const handleResetAll = useCallback(async () => {
+    resetUpgrades();
+    setScore(0);
+    const initialState = {
+      score: 0,
+      purchased: [],
+      bananaPerClick: 1,
+      autoSpawnRate: 0,
+      giantChance: 0,
+      unlockedTierIds: [BANANA_TIERS[0].tier],
+      treeLevel: 0,
+      treeGrowth: 0,
+      banaCoins: 0,
+      waterCount: 0,
+      chosenSkills: [],
+      chosenStages: 0,
+      shopPurchases: {},
+    };
+    try {
+      await postSave(initialState);
+    } catch (err) {
+      console.error('Reset save failed:', err);
+    }
+  }, [resetUpgrades]);
 
   const handleWaterTree = useCallback(() => {
     const cost = waterTree(
@@ -879,7 +905,7 @@ function App() {
         onCoinCollected={handleCoinCollected}
         shopPurchases={shopPurchases}
         devMode={devMode}
-        onResetUpgrades={resetUpgrades}
+        onResetUpgrades={handleResetAll}
         onAdjustScore={handleAdjustScore}
         onAdjustCoins={adjustCoins}
         isOneKind={isOneKind}
