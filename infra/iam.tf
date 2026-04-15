@@ -106,6 +106,10 @@ resource "aws_iam_role_policy" "infra_resources" {
           "cloudfront:UpdateOriginAccessControl",
           "cloudfront:ListOriginAccessControls",
           "cloudfront:CreateInvalidation",
+          "cloudfront:ListCachePolicies",
+          "cloudfront:GetCachePolicy",
+          "cloudfront:ListOriginRequestPolicies",
+          "cloudfront:GetOriginRequestPolicy",
         ]
         Resource = "*"
       },
