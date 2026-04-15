@@ -103,6 +103,7 @@ function App() {
 
   // score の最新値を非同期コールバックから参照するための ref
   const scoreRef = useRef(score);
+  const prevTreeLevelRef = useRef(null);
   scoreRef.current = score;
 
   const getGameState = useCallback(
@@ -139,6 +140,9 @@ function App() {
 
   const restoreGame = useCallback(
     (gs) => {
+      // セーブ復元時のtreeLevelの変化をレベルアップと誤検知しないよう
+      // 復元前にrefを更新しておく
+      prevTreeLevelRef.current = gs.treeLevel ?? 0;
       restoreState(gs);
       setScore(gs.score ?? 0);
     },
@@ -186,7 +190,6 @@ function App() {
   }, []);
 
   // ツリーレベルアップ時にバナコインをスポーン（coinsPerLevelUp 個）
-  const prevTreeLevelRef = useRef(null);
   useEffect(() => {
     if (prevTreeLevelRef.current === null) {
       prevTreeLevelRef.current = treeLevel;
