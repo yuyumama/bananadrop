@@ -4,6 +4,16 @@ import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import ConfirmForm from './ConfirmForm';
 
+function resetViewportZoom() {
+  const viewport = document.querySelector('meta[name=viewport]');
+  if (!viewport) return;
+  const original = viewport.getAttribute('content');
+  viewport.setAttribute('content', original + ', maximum-scale=1');
+  requestAnimationFrame(() => {
+    viewport.setAttribute('content', original);
+  });
+}
+
 const BANANA_IMAGES = [
   'banana_ripe_01.png',
   'banana_ripe_02.png',
@@ -98,6 +108,7 @@ export default function AuthScreen() {
     setError('');
     try {
       await signIn(email, password);
+      resetViewportZoom();
     } catch (err) {
       setError(err.message || 'ログインに失敗しました');
     }
