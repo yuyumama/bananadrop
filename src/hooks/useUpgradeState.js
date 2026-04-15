@@ -208,6 +208,16 @@ export default function useUpgradeState() {
     setAutoSpawnRate(0);
     setGiantChance(0);
     setUnlockedTiers([BANANA_TIERS[0]]);
+    setShopPurchases({});
+    setTreeData({
+      level: 0,
+      growth: 0,
+      banaCoins: 0,
+      waterCount: 0,
+      chosenSkills: [],
+      chosenStages: 0,
+      pendingChoice: null,
+    });
   }, []);
 
   const restoreState = useCallback((gs) => {
