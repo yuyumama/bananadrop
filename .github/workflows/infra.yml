@@ -47,8 +47,7 @@ jobs:
       - name: Terraform Untaint tainted resources
         # tainted リソースは destroy→recreate が試みられ、read 権限不足で失敗することがある。
         # untaint することで通常の apply フローに戻す。|| true で存在しない場合もスキップ。
-        run: |
-          terraform state untaint aws_cloudwatch_log_group.lambda || true
+        run: terraform untaint aws_cloudwatch_log_group.lambda || true
 
       - name: Terraform Format Check
         run: terraform fmt -check
