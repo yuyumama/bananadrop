@@ -52,10 +52,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        # -refresh=false: ブートストラップ問題の回避策
-        # IAMロールにCognito権限を追加するplanの際、まだCognito権限がないため
-        # refreshでDescribeUserPoolが失敗する。既存stateファイルを使用してplanする。
-        run: terraform plan -no-color -refresh=false -out=tfplan
+        run: terraform plan -no-color -out=tfplan
 
       - name: Comment Plan on PR
         if: github.event_name == 'pull_request'
