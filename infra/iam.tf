@@ -164,10 +164,11 @@ resource "aws_iam_role_policy" "infra_resources" {
         Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.project_name}*"
       },
       {
-        Sid      = "CloudWatchLogsManagement"
-        Effect   = "Allow"
-        Action   = ["logs:*"]
-        Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.project_name}-*"
+        Sid    = "CloudWatchLogsManagement"
+        Effect = "Allow"
+        Action = ["logs:*"]
+        # logs:DescribeLogGroups はリソースレベルの制限をサポートしないため Resource = "*"
+        Resource = "*"
       },
     ]
   })
