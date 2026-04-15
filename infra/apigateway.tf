@@ -3,15 +3,8 @@
 resource "aws_apigatewayv2_api" "main" {
   name          = "${var.project_name}-api"
   protocol_type = "HTTP"
-
-  # CloudFront 経由のアクセスが前提（same-origin のため通常 CORS 不要だが、
-  # API Gateway 直接アクセス時のフォールバックとして設定）
-  cors_configuration {
-    allow_origins = ["https://${aws_cloudfront_distribution.main.domain_name}"]
-    allow_methods = ["GET", "POST", "PUT", "OPTIONS"]
-    allow_headers = ["Authorization", "Content-Type"]
-    max_age       = 86400
-  }
+  # CORS は CloudFront 経由の same-origin アクセスが前提のため設定しない。
+  # API Gateway への直接アクセスは想定していない。
 }
 
 # --- JWT Authorizer (Cognito) ---
