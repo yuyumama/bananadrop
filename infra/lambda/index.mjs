@@ -69,7 +69,12 @@ function autoUserName(sub) {
 
 // POST /api/save — save player game state
 async function handlePostSave(sub, rawBody) {
-  const body = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+  let body;
+  try {
+    body = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+  } catch {
+    return response(400, { error: 'Invalid JSON in request body' });
+  }
 
   if (!body || !body.gameState) {
     return response(400, { error: 'Missing gameState in request body' });
@@ -112,7 +117,12 @@ async function handlePostSave(sub, rawBody) {
 
 // PUT /api/profile — ユーザー名を変更する
 async function handlePutProfile(sub, rawBody) {
-  const body = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+  let body;
+  try {
+    body = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+  } catch {
+    return response(400, { error: 'Invalid JSON in request body' });
+  }
   const cleaned = sanitizeUserName(body?.userName);
 
   if (!cleaned) {

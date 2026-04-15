@@ -28,6 +28,14 @@ export function useSaveSync({ user, getGameState, restoreGame, onSaveLoaded }) {
     onSaveLoadedRef.current = onSaveLoaded;
   });
 
+  // ログイン時にトークンを即時キャッシュ（beforeunload が最初の定期セーブ前に来ても保存できるよう）
+  useEffect(() => {
+    if (!isCognitoConfigured || !user) return;
+    getAccessToken().then((token) => {
+      if (token) tokenRef.current = token;
+    });
+  }, [user]);
+
   // ログイン時に自動ロード（1セッションに1回のみ）
   useEffect(() => {
     if (!isCognitoConfigured || !user || hasLoadedRef.current) return;

@@ -6,6 +6,7 @@ export const autoUserName = (sub) =>
 
 async function authFetch(path, options = {}) {
   const token = await getAccessToken();
+  if (!token) throw new Error('Not authenticated');
   return fetch(path, {
     ...options,
     headers: {
