@@ -1,4 +1,5 @@
 # IAM resources for GitHub Actions CI/CD and Lambda execution roles
+# (bootstrap fix applied: cognito-idp permissions now in place)
 data "aws_caller_identity" "current" {}
 
 locals {
