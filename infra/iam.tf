@@ -1,4 +1,5 @@
 # IAM resources for GitHub Actions CI/CD and Lambda execution roles
+
 data "aws_caller_identity" "current" {}
 
 locals {
