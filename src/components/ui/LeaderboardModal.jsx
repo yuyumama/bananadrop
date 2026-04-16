@@ -49,7 +49,10 @@ export default function LeaderboardModal({ currentUserName, onClose }) {
               {entries.map((entry) => {
                 const isMe = entry.userName === currentUserName;
                 return (
-                  <li key={entry.rank} style={styles.entry(entry.rank, isMe)}>
+                  <li
+                    key={entry.userName}
+                    style={styles.entry(entry.rank, isMe)}
+                  >
                     <span style={styles.rank(entry.rank)}>
                       {entry.rank === 1
                         ? '🥇'
