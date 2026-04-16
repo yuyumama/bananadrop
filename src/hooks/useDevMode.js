@@ -6,7 +6,8 @@ export default function useDevMode() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      // CapsLock オン時は e.key が 'd' になるため e.code も併用する
+      if (e.ctrlKey && e.shiftKey && (e.code === 'KeyD' || e.key === 'D')) {
         e.preventDefault();
         setDevMode((prev) => !prev);
       }

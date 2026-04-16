@@ -114,10 +114,15 @@ function App() {
 
   const bananaWorldRef = useRef(null);
 
+  const spawnPhysicsCoin = useCallback(
+    (x) => bananaWorldRef.current?.spawnCoin(x),
+    [],
+  );
+
   const { primeTreeLevel } = useTreeLevelUpCoins({
     treeLevel,
     coinsPerLevelUp,
-    spawnPhysicsCoin: (x) => bananaWorldRef.current?.spawnCoin(x),
+    spawnPhysicsCoin,
     spawnCoinFlashes,
   });
 
