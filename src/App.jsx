@@ -490,7 +490,10 @@ function App() {
             right: 12,
             zIndex: 50,
             display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
             gap: 6,
+            maxWidth: 'calc(100vw - 24px)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
