@@ -960,11 +960,6 @@ body {
     font-size: 0.6rem !important;
     padding: 3px 10px !important;
   }
-
-  .logout-button {
-    top: 8px !important;
-    right: 12px !important;
-  }
 }
 
 /* ── Responsive: very small screens (global classes only) ── */
@@ -1026,8 +1021,6 @@ body {
   }
 
   .logout-button {
-    top: 4px !important;
-    right: 8px !important;
     font-size: 9px !important;
     padding: 3px 8px !important;
   }
@@ -1035,10 +1028,6 @@ body {
 
 /* ── Logout button ── */
 .logout-button {
-  position: fixed;
-  top: 12px;
-  right: 24px;
-  z-index: 1001;
   display: flex;
   align-items: center;
   gap: 5px;
