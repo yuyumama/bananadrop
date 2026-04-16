@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { useSaveSync } from './hooks/useSaveSync';
 import { autoUserName, postSave } from './services/saveApi';
 import ProfileModal from './components/auth/ProfileModal';
+import LeaderboardModal from './components/ui/LeaderboardModal';
 import BananaWorld from './components/BananaWorld';
 import ClickRipple from './components/ui/ClickRipple';
 import FeverBurst from './components/ui/FeverBurst';
@@ -176,6 +177,7 @@ function App() {
   const [devMode, setDevMode] = useState(false);
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [userName, setUserName] = useState(null);
   const [floatingCoins, setFloatingCoins] = useState([]);
 
@@ -499,6 +501,28 @@ function App() {
         >
           <button
             className="logout-button"
+            onClick={() => setIsLeaderboardOpen(true)}
+            aria-label="リーダーボード"
+            title="リーダーボード"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+            <span>Ranking</span>
+          </button>
+          <button
+            className="logout-button"
             onClick={() => setIsProfileOpen(true)}
             aria-label="プロフィール設定"
             title={userName ?? ''}
@@ -559,6 +583,12 @@ function App() {
           userName={userName}
           onClose={() => setIsProfileOpen(false)}
           onSaved={(newName) => setUserName(newName)}
+        />
+      )}
+      {isLeaderboardOpen && (
+        <LeaderboardModal
+          currentUserName={userName}
+          onClose={() => setIsLeaderboardOpen(false)}
         />
       )}
       <ScoreDisplay

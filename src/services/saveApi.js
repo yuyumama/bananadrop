@@ -43,3 +43,9 @@ export async function putProfile(userName) {
   }
   return res.json();
 }
+
+export async function getLeaderboard() {
+  const res = await authFetch('/api/leaderboard');
+  if (!res.ok) throw new Error(`getLeaderboard failed: ${res.status}`);
+  return res.json();
+}
