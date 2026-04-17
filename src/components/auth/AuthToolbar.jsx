@@ -90,9 +90,9 @@ function AuthToolbar({
         >
           <button
             className="logout-button"
+            type="button"
             onClick={() => setIsSettingsOpen((prev) => !prev)}
             aria-label="設定"
-            aria-haspopup="menu"
             aria-expanded={isSettingsOpen}
             title={user?.email ?? '設定'}
           >
@@ -113,17 +113,12 @@ function AuthToolbar({
             <span>Settings</span>
           </button>
           {isSettingsOpen && (
-            <div
-              role="menu"
-              aria-label="設定メニュー"
-              className="glass-panel"
-              style={menuStyles.menu}
-            >
+            <div className="glass-panel" style={menuStyles.menu}>
               <button
                 type="button"
-                role="menuitem"
                 className="settings-menu-item"
                 onClick={handleOpenProfile}
+                aria-label="プロフィール設定を開く"
               >
                 <svg
                   width="14"
@@ -148,9 +143,9 @@ function AuthToolbar({
               </button>
               <button
                 type="button"
-                role="menuitem"
                 className="settings-menu-item"
                 onClick={handleSignOut}
+                aria-label={`ログアウト${user?.email ? ` (${user.email})` : ''}`}
               >
                 <svg
                   width="14"
