@@ -1057,6 +1057,38 @@ body {
   transform: scale(0.96);
 }
 
+/* ── Settings menu ── */
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-main);
+  font-family: Outfit, sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.settings-menu-item:hover {
+  background: rgba(212, 175, 55, 0.12);
+}
+
+.settings-menu-item:active {
+  transform: scale(0.98);
+}
+
+.settings-menu-item:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.6);
+  outline-offset: 2px;
+}
+
 /* Custom Scrollbar for premium feel */
 ::-webkit-scrollbar {
   width: 6px;
