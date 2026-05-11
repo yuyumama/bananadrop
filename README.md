@@ -2,8 +2,8 @@
 
 バナナを落として、スコアを稼ぐブラウザゲームです。
 
-**▶ [今すぐ遊ぶ](https://yuyumama.github.io/bananadrop/)**
-**▶ [AWS環境\*メンテ中](https://d28dbgr2bbmfim.cloudfront.net/)**
+**▶ [今すぐ遊ぶ](https://d28dbgr2bbmfim.cloudfront.net/)**
+**▶ [開発用・旧版（GitHub Pages）](https://yuyumama.github.io/bananadrop/)**
 
 ---
 
