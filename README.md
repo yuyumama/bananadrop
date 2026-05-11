@@ -2,8 +2,8 @@
 
 バナナを落として、スコアを稼ぐブラウザゲームです。
 
-**▶ [今すぐ遊ぶ](https://yuyumama.github.io/bananadrop/)**
-**▶ [AWS環境\*メンテ中](https://d28dbgr2bbmfim.cloudfront.net/)**
+**▶ [今すぐ遊ぶ](https://d28dbgr2bbmfim.cloudfront.net/)**
+**▶ [開発用・旧版（GitHub Pages）](https://yuyumama.github.io/bananadrop/)**
 
 ---
 
@@ -29,11 +29,20 @@
 
 バナコインを使ってショップで特殊なバナナを購入できます。
 
+### ランキング
+
+リーダーボードで他のプレイヤーとスコアを競えます。ログインすると自分のスコアが記録されます。
+
+### セーブ・ログイン
+
+ログインすると進捗が自動的にクラウドに保存され、別の端末からも続きをプレイできます。
+
 ## 技術スタック
 
 - **[Vite](https://vitejs.dev/)** — ビルドツール
 - **[React 19](https://react.dev/)** — UIフレームワーク
 - **[Matter.js](https://brm.io/matter-js/)** — 2D物理エンジン（バナナの落下シミュレーション）
+- **[Amazon Cognito](https://aws.amazon.com/cognito/)** — 認証基盤（ログイン・セーブデータ管理）
 
 ---
 
