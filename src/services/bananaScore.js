@@ -11,6 +11,7 @@ export const collectBananaOutcome = ({
   for (const b of bananas) {
     if (b.position.x < -200 || b.position.x > screenWidth + 200) {
       lostBodies.push(b);
+      continue;
     }
 
     if (b.position.y > screenHeight + 200) {
