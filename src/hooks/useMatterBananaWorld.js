@@ -49,6 +49,52 @@ export default function useMatterBananaWorld({
   const tableRef = useRef(null);
   const rimLeftRef = useRef(null);
   const rimRightRef = useRef(null);
+  const bananaBodiesRef = useRef(new Set());
+  const specialBodiesRef = useRef(new Set());
+  const coinBodiesRef = useRef(new Set());
+  const blackholeBodiesRef = useRef(new Set());
+
+  const trackDynamicBody = useCallback((body) => {
+    switch (body.label) {
+      case 'banana':
+        bananaBodiesRef.current.add(body);
+        break;
+      case 'special_banana':
+        specialBodiesRef.current.add(body);
+        if (body.shopItemId === 'banana_blackhole') {
+          blackholeBodiesRef.current.add(body);
+        }
+        break;
+      case 'coin':
+        coinBodiesRef.current.add(body);
+        break;
+    }
+  }, []);
+
+  const untrackDynamicBody = useCallback((body) => {
+    bananaBodiesRef.current.delete(body);
+    specialBodiesRef.current.delete(body);
+    coinBodiesRef.current.delete(body);
+    blackholeBodiesRef.current.delete(body);
+  }, []);
+
+  const addDynamicBody = useCallback(
+    (body) => {
+      if (!engineRef.current) return;
+      trackDynamicBody(body);
+      Matter.Composite.add(engineRef.current.world, body);
+    },
+    [trackDynamicBody],
+  );
+
+  const removeDynamicBody = useCallback(
+    (body) => {
+      if (!engineRef.current) return;
+      untrackDynamicBody(body);
+      Matter.Composite.remove(engineRef.current.world, body);
+    },
+    [untrackDynamicBody],
+  );
 
   const addRims = useCallback((world, cx, cy, tw) => {
     const opts = {
@@ -116,21 +162,24 @@ export default function useMatterBananaWorld({
         viewportWidth: window.innerWidth,
         baseUrl: import.meta.env.BASE_URL,
       });
-      Matter.Composite.add(engineRef.current.world, banana);
+      addDynamicBody(banana);
     },
-    [giantChanceRef, unlockedTiersRef],
+    [addDynamicBody, giantChanceRef, unlockedTiersRef],
   );
 
-  const spawnCoin = useCallback((x) => {
-    if (!engineRef.current) return;
-    const coin = createCoinBody({
-      x,
-      y: -100,
-      viewportWidth: window.innerWidth,
-      baseUrl: import.meta.env.BASE_URL,
-    });
-    Matter.Composite.add(engineRef.current.world, coin);
-  }, []);
+  const spawnCoin = useCallback(
+    (x) => {
+      if (!engineRef.current) return;
+      const coin = createCoinBody({
+        x,
+        y: -100,
+        viewportWidth: window.innerWidth,
+        baseUrl: import.meta.env.BASE_URL,
+      });
+      addDynamicBody(coin);
+    },
+    [addDynamicBody],
+  );
 
   const spawnSpecialBanana = useCallback(
     (x, item) => {
@@ -143,9 +192,9 @@ export default function useMatterBananaWorld({
         viewportWidth: window.innerWidth,
         baseUrl: import.meta.env.BASE_URL,
       });
-      Matter.Composite.add(engineRef.current.world, body);
+      addDynamicBody(body);
     },
-    [giantChanceRef],
+    [addDynamicBody, giantChanceRef],
   );
 
   // tableWidth変更時にテーブルを再生成
@@ -179,6 +228,10 @@ export default function useMatterBananaWorld({
 
     const engine = Engine.create();
     engineRef.current = engine;
+    const bananaBodies = bananaBodiesRef.current;
+    const specialBodies = specialBodiesRef.current;
+    const coinBodies = coinBodiesRef.current;
+    const blackholeBodies = blackholeBodiesRef.current;
 
     const render = Render.create({
       element: sceneRef.current,
@@ -343,15 +396,9 @@ export default function useMatterBananaWorld({
       syncBar(clampedX, y);
 
       // ブラックホール引力：半径350px以内のバナナを引き寄せる
-      const allBodies = Composite.allBodies(engine.world);
-      const blackholes = allBodies.filter(
-        (b) =>
-          b.label === 'special_banana' && b.shopItemId === 'banana_blackhole',
-      );
-      if (blackholes.length > 0) {
-        const bananas = allBodies.filter((b) => b.label === 'banana');
-        blackholes.forEach((bh) => {
-          bananas.forEach((banana) => {
+      if (blackholeBodiesRef.current.size > 0) {
+        blackholeBodiesRef.current.forEach((bh) => {
+          bananaBodiesRef.current.forEach((banana) => {
             if (banana.isStatic) return;
             const dx = bh.position.x - banana.position.x;
             const dy = bh.position.y - banana.position.y;
@@ -371,61 +418,39 @@ export default function useMatterBananaWorld({
 
     // 下落下 → スコア/効果発動、左右アウト → ロス
     Matter.Events.on(engine, 'afterUpdate', () => {
-      const bodies = Composite.allBodies(engine.world);
       const w = window.innerWidth;
       const h = window.innerHeight;
 
-      // 1ループで3種を分類（filter×3 → forEach×1 に削減）
-      const bananas = [];
-      const specials = [];
-      const coins = [];
-      for (let i = 0; i < bodies.length; i++) {
-        const b = bodies[i];
-        switch (b.label) {
-          case 'banana':
-            bananas.push(b);
-            break;
-          case 'special_banana':
-            specials.push(b);
-            break;
-          case 'coin':
-            coins.push(b);
-            break;
-        }
-      }
-
       // 通常バナナ
       const { scoreItems, scoredBodies, lostBodies } = collectBananaOutcome({
-        bananas,
+        bananas: bananaBodiesRef.current,
         screenWidth: w,
         screenHeight: h,
       });
-      scoredBodies.forEach((b) => Matter.Composite.remove(engine.world, b));
-      lostBodies.forEach((b) => Composite.remove(engine.world, b));
+      const removedBananas = new Set([...scoredBodies, ...lostBodies]);
+      removedBananas.forEach(removeDynamicBody);
       if (scoreItems.length > 0) onScoreRef.current?.(scoreItems);
 
       // 特殊バナナ：画面下に落ちたら効果発動、横に出たら消去
-      for (let i = 0; i < specials.length; i++) {
-        const b = specials[i];
+      for (const b of Array.from(specialBodiesRef.current)) {
         if (b.position.y > h + 200) {
-          Composite.remove(engine.world, b);
+          removeDynamicBody(b);
           onEffectRef.current?.(b.shopItemId, {
             x: b.position.x,
             y: h - 20,
           });
         } else if (b.position.x < -200 || b.position.x > w + 200) {
-          Composite.remove(engine.world, b);
+          removeDynamicBody(b);
         }
       }
 
       // バナコイン：画面下に落ちたら収集、横に出たら消去
-      for (let i = 0; i < coins.length; i++) {
-        const coin = coins[i];
+      for (const coin of Array.from(coinBodiesRef.current)) {
         if (coin.position.y > h + 100) {
-          Composite.remove(engine.world, coin);
+          removeDynamicBody(coin);
           onCoinRef.current?.(coin.position.x);
         } else if (coin.position.x < -200 || coin.position.x > w + 200) {
-          Composite.remove(engine.world, coin);
+          removeDynamicBody(coin);
         }
       }
     });
@@ -462,6 +487,10 @@ export default function useMatterBananaWorld({
       Runner.stop(runner);
       window.removeEventListener('resize', handleResize);
       Composite.clear(engine.world);
+      bananaBodies.clear();
+      specialBodies.clear();
+      coinBodies.clear();
+      blackholeBodies.clear();
       Engine.clear(engine);
       render.canvas.remove();
       render.canvas = null;
@@ -475,6 +504,7 @@ export default function useMatterBananaWorld({
     onScoreRef,
     panelHeightRef,
     removeRims,
+    removeDynamicBody,
     sceneRef,
     syncRims,
     tableWidthRef,
